@@ -5,7 +5,12 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rw.AdeSystem.Core", "Rw.AdeSystem.Core\Rw.AdeSystem.Core.csproj", "{760E6DD4-449E-4E83-A2EB-D35203FBF093}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rw.AdeSystem.Gui", "Rw.AdeSystem.Gui\Rw.AdeSystem.Gui.csproj", "{4C9DAA2F-02DB-4420-BF03-51AC47C5A90D}"
+EndProject
 Global
+	GlobalSection(CodealikeProperties) = postSolution
+		SolutionGuid = afa5ad51-272c-44a4-be7f-1160d621b827
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,6 +20,10 @@ Global
 		{760E6DD4-449E-4E83-A2EB-D35203FBF093}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{760E6DD4-449E-4E83-A2EB-D35203FBF093}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{760E6DD4-449E-4E83-A2EB-D35203FBF093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C9DAA2F-02DB-4420-BF03-51AC47C5A90D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9DAA2F-02DB-4420-BF03-51AC47C5A90D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9DAA2F-02DB-4420-BF03-51AC47C5A90D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9DAA2F-02DB-4420-BF03-51AC47C5A90D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
