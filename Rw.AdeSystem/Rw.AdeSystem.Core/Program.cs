@@ -9,7 +9,7 @@ namespace Rw.AdeSystem.Core
         {
             //Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\swipl\bin");
             if (PlEngine.IsInitialized) return;
-            String[] param = { "-q" };  // suppressing informational and banner messages
+            String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
             PlEngine.Initialize(param);
             PlQuery.PlCall("assert(father(martin, inka))");
             PlQuery.PlCall("assert(father(uwe, gloria))");
