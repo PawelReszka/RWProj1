@@ -1,0 +1,34 @@
+﻿<Window x:Class="Rw.AdeSystem.Gui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <StackPanel  Orientation="Horizontal">
+                <TextBlock>Fluenty:</TextBlock>
+                <TextBox Name="FluentsTextBox" Width="161" Height="auto" LostKeyboardFocus="FluentsTextBox_LostKeyboardFocus"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Wykonawcy:</TextBlock>
+                <TextBox Name="ExecutorsTextBox" Width="136" Height="auto" LostKeyboardFocus="ExecutorsTextBox_LostKeyboardFocus"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Akcje:</TextBlock>
+                <TextBox Name="ActionsTextBox" Width="171" Height="auto" LostKeyboardFocus="ActionsTextBox_LostKeyboardFocus"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock>Kwerenda: </TextBlock>
+                <TextBox Name="QueryTextBox" Width="205" TextChanged="QueryTextBox_TextChanged"></TextBox>
+            </StackPanel>
+            <StackPanel>
+                <ListBox Name="SuggestionListBox"  SelectionChanged="ListBox_SelectionChanged"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>
