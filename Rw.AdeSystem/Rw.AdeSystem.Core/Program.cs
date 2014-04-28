@@ -7,6 +7,9 @@ namespace Rw.AdeSystem.Core
     {
         static void Main(string[] args)
         {
+            // ------------
+            // przyklad z instrukcji do wrappera SwiPlCs :
+
             //Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\swipl\bin");
             if (PlEngine.IsInitialized) return;
             String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
