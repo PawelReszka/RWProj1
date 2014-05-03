@@ -1,0 +1,79 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+
+\title{Dokumentacja użytkownika implementacji projektu nr 1. RW}
+
+\author{Tomasz Półgrabia}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{Wstęp}
+	Wstęp
+
+\section{Wykorzystane technologie}
+	Implementacja projektu nr 1. z RW będzie wykonana przy użyciu następujących technologii:
+    \begin{itemize}
+    	\item C\# (framework środowiska developerskiego .NET v4.5),
+        \item prolog (implementacja SWI-prolog).
+    \end{itemize}
+    
+    C\# zostanie wykorzystany w celu stworzenia wizualizacji zdarzeń zachodzących w czasie wykonania
+    programu, natomiast prolog do implementacji logiki języka. Następnie zostanie wykorzystany
+    interfejs C\# - prolog w celu zapewnienia komunikacji pomiędzy wyżej wymienionymi modułami.
+    
+    Do komunikacji pomiędzy modułami zostanie wykorzystana biblioteka SWIPlCs.
+    
+    \subsection{C\#}
+    	TODO
+    
+    \subsection{Prolog}
+    Prolog zostanie wykorzystany w projekcie \textit{TODO} w celu
+    zaimplementowania logiki języka z domyślnymi akcjami. Prolog to
+    jeden z popularniejszych języków programowania logicznego. Powstał on
+    w celu automatycznej analizy języków naturalnych, jednakże jest on
+    językiem ogólnego zastosowania i dobrze sprawdza się w programach 
+    związanych ze sztuczną inteligencją. Program w Prologu składa się z faktów
+    i reguł wnioskowania, aby go uruchomić należy wprowadzić odpowiednie 
+    zapytanie. Prolog opiera się na rachunku predykatowym pierwszego rzędu,
+    jednakże ogranicza się on do \textit{klauzul Horna}. Istnieją jednak
+    wbudowane predykaty wyższego stopnia.
+
+    \subsubsection{SWI-prolog}
+        SWI-prolog to jedna z wielu otwarto-źródłowych implementacji prologa,
+        ogólnie używana w celach edukacyjnych i sieci semantycznych. Ma bogaty
+        zbiór cech i bibliotek wspierjących takie funkcjonalności jak:
+        \begin{itemize}
+            \item wielowątkowość,
+            \item testowanie jednostkowe (ang. unit testing),
+            \item GUI,
+            \item interfejsy do Java, ODBC
+            \item literate programming (pol. programowanie piśmienne),
+            \item serwery web,
+            \item SGML,
+            \item RDF,
+            \item RDFS,
+            \item narzędzia developerskie (np. GUI debugger i GUI profiler),
+            \item obszerną dokumentację.
+
+        \end{itemize}
+
+        Dzięki rozbudowanemu zbiorowi bibliotek, programowanie w prologu
+        będzie łatwiejsze i wykluczy problemy w interfejsie c\# i prolog.
+
+\section{Zakończenie}
+	Zakończenie
+
+
+\end{document}
