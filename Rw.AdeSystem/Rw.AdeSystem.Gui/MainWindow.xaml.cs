@@ -35,6 +35,18 @@ namespace Rw.AdeSystem.Gui
             suggestionListBox.Visibility = System.Windows.Visibility.Hidden;
             answerLabel.Visibility = System.Windows.Visibility.Hidden;
             historyListView.Visibility = System.Windows.Visibility.Hidden;
+
+            _fluents.Add("hasGunHador");
+            _fluents.Add("hasGunMiętus");
+            _fluents.Add("alive");
+            _fluents.Add("walking");
+
+            _actions.Add("SHOOT");
+            _actions.Add("CHOWN");
+            _actions.Add("ENTICE");
+
+            _executors.Add("Hador");
+            _executors.Add("Miętus");
         }
 
         private void loadModelButton_Click(object sender, RoutedEventArgs e)
@@ -79,9 +91,10 @@ namespace Rw.AdeSystem.Gui
             buildModelLabel.Content = "Model is ready. You can now start querying.";
             queryLabel.Visibility = System.Windows.Visibility.Visible;
             queryTextBox.Visibility = System.Windows.Visibility.Visible;
-            suggestionListBox.Visibility = System.Windows.Visibility.Hidden;
+            suggestionListBox.Visibility = System.Windows.Visibility.Visible;
             answerLabel.Visibility = System.Windows.Visibility.Visible;
             historyListView.Visibility = System.Windows.Visibility.Visible;
+            UpdateQueryTextBox();
         }
 
         private void queryTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -99,9 +112,6 @@ namespace Rw.AdeSystem.Gui
 
         private void UpdateQueryTextBox()
         {
-            // TODO: @robert dokoncz / ulepsz to funkcje widzisz o co chodzi
-            // Robert: spoko, jutro 
-
             suggestionListBox.Items.Clear();
             var openings = new List<string>(new[] { "always", "possibly", "typically" });
             var logicBinOp = new List<string>(new[] { "or,and" });
