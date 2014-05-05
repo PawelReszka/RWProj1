@@ -36,8 +36,29 @@
     Do komunikacji pomiędzy modułami zostanie wykorzystana biblioteka SWIPlCs.
     
     \subsection{C\#}
-    	TODO
-    
+    C\# to wielo paradygmatowy język programowania (głównie obiektowy)
+    zaprojektowany przez zespół pod kierunkiem \textit{Andersa Hejlsberga}
+    dla firmy \textit{Microsoft}. Program napisany w tym język kompilowane są
+    do języka \textit{Common Intermediate Language} (\textit{CIL}),
+    specjalnego kodu pośredniego wykonywanego w środowisku takim jak 
+    \textit{.NET Framework}, open source \textit{Mono} czy \textit{DotGNU}.
+    Wykonanie takiego kodu bez środowiska nie jest możliwe.
+
+    Podstawowe cechy \textit{C\#} to:
+    \begin{itemize}
+        \item \textit{obiektowość} z hierarchią o jednym elemencie nadrzędnym,
+        \item odśmiecanie pamięci (ang. garbage collector),
+        \item właściwości, indeksery,
+        \item delegaty, zdarzenia,
+        \item typy ogólne,
+        \item bogata biblioteka klas \textit{BCL}, umożliwiająca rozwijanie
+            aplikacji konsolowych, okienkowych (\textit{Forms} czy \textit{WPF})
+        \item ADO.NET,
+    \end{itemize}
+
+    C\# został wykorzystany głównie do stworzenia przyjaznego interfejsu
+    dla użytkownika systemu.
+
     \subsection{Prolog}
     Prolog zostanie wykorzystany w projekcie \textit{TODO} w celu
     zaimplementowania logiki języka z domyślnymi akcjami. Prolog to
@@ -72,8 +93,49 @@
         Dzięki rozbudowanemu zbiorowi bibliotek, programowanie w prologu
         będzie łatwiejsze i wykluczy problemy w interfejsie c\# i prolog.
 
+\section{Interfejs użytkownika}
+    \subsection{Interfejs graficzny}
+
+        Interfejs graficzny systemu \textit{AD} jest prosty w obsłudze.
+        Składa się z jednego okna dialogowego z możliwością załadowania
+        modelu z pliku ,,LOAD MODEL FILE'' i zbudowania modeulu
+        ,,BUILD MODEL''. Poniżej obu przycisków znajduje się pole tekstowe
+        służące do wyrażenia zapytania (ang. query) w języku wejścia 
+        systemu \textit{AD}.
+
+        W załączniku są dołączone obrazy z działania aplikacji.
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{images/acomp_1.jpg}
+            \caption{przykład auto - uzupełniania kwerendy nr 1}
+            \label{fig:acomp1}
+        \end{figure}
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{images/acomp_2.jpg}
+            \caption{przykład auto - uzupełniania kwerendy nr 2}
+            \label{fig:acomp2}
+        \end{figure}
+
+        \begin{figure}[p]
+            \centering
+            \includegraphics[width=\textwidth]{images/acomp_3.jpg}
+            \caption{przykład ładowania modelu z pliku}
+            \label{fig:acomp3}
+        \end{figure}
+
+    \subsection{Język wejścia / kwerend}
+    Język wejścia systemu \textit{AD} jest opisany w pełni w dokumencie 
+    języka systemu \textit{AD}. Dane w takim języku są tłumaczone na kod
+    wejścia prologu poprzez parser danych wejściowych.
+
+    Przykładowo:
+        TODO.
+
 \section{Zakończenie}
-	Zakończenie
+    Zakończenie
 
 
 \end{document}
