@@ -19,9 +19,6 @@
 
 \end{abstract}
 
-\section{Wstęp}
-	Wstęp
-
 \section{Wykorzystane technologie}
 	Implementacja projektu nr 1. z RW będzie wykonana przy użyciu następujących technologii:
     \begin{itemize}
@@ -126,16 +123,38 @@
             \label{fig:acomp3}
         \end{figure}
 
+    \subsection{Język modelu systemu}
+        Język modelu dostarczanego do systemu przez klienta jest zgodny
+        z językiem AD opisanego w specyfikacji języka \textit{AD} dostarczonej
+        na laboratoria nr 1.
+
+        Przykładowo:
+
+        \begin{itemize}
+            \item initially a - początkowo a jest prawdziwe,
+            \item \textit{always $\gamma$ after $A_1, ... , A_n$ by 
+                $E_1, ..., E_n$ from $\pi$} - po serii akcji wykonanych przez
+                wykonawcą ze stanu $\pi$ zawsze prawdziwe jest $\gamma$.
+        \end{itemize}
+
     \subsection{Język wejścia / kwerend}
-    Język wejścia systemu \textit{AD} jest opisany w pełni w dokumencie 
-    języka systemu \textit{AD}. Dane w takim języku są tłumaczone na kod
-    wejścia prologu poprzez parser danych wejściowych.
+        Język wejścia systemu \textit{AD} jest opisany w pełni w dokumencie 
+        języka systemu \textit{AD}. Dane w takim języku są tłumaczone na kod
+        wejścia prologu poprzez parser danych wejściowych.
+
 
     Przykładowo:
-        TODO.
+      
+    \begin{itemize}
+        \item \textit{ possibly executable $A_1, A_2, ..., A_n$ by $E_1, E_2, ... E_n$ from $\pi$ }
+            zwróci użytkownikowi informacje o tym, czy ciąg akcji 
+            $A_1, A_2, A_3, ..., A_N$ wykonanych przez ciąg wykonawców
+            $E_1, E_2, ..., E_N$ jest możliwa do wykonania.
+        \item \textit{ always executable  $A_1, A_2, ..., A_n$ by $E_1, E_2, ... E_n$ from $\pi$  }
+            zwróci użytkownikowi informacje o tym, czy ciąg akcji
+            $A_1, A_2, A_3, ..., A_N$ wykonanych przez ciąg wykonawców
+            $E_1, E_2, ..., E_N$ jest zawsze możliwa do wykonania.
 
-\section{Zakończenie}
-    Zakończenie
-
+    \end{itemize}
 
 \end{document}
