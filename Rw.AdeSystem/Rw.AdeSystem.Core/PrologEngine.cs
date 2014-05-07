@@ -37,7 +37,9 @@ namespace Rw.AdeSystem.Core
         public void AssertFact(string prologFact)
         {
             PlQuery.PlCall("assert(" + prologFact + ")");
+            
         }
+
 
         //etc rozne potrzebne call'e
     }

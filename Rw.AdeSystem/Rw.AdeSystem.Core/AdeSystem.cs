@@ -17,6 +17,10 @@ namespace Rw.AdeSystem.Core
         private readonly PrologEngine _prologEngine = PrologEngine.Instance;
         private readonly Signature _signature = new Signature();
 
+        private readonly List<string> _actions = new List<string>();
+        private readonly List<string> _executors = new List<string>();
+        private List<string> _fluents = new List<string>();
+
         public AdeSystem(params string[][] prologEngineInitParams)
         {
             _prologEngine.Initialize(prologEngineInitParams);
@@ -93,9 +97,18 @@ namespace Rw.AdeSystem.Core
 
         public void ConstructSystemDomain()
         {
+            //foreach (var phrase in _domainPhrases)
+            //{
+            //    phrase.ExecutePrologQuery()(_prologEngine);
+            //}
+            _prologEngine.AssertFact("and(A,B):-(is_true(A),is_true(B))");
+            _prologEngine.AssertFact("or(A,B):-(is_true(A); is_true(B))");
+            _prologEngine.AssertFact("neg(A):-not(is_true(A))");
+
             foreach (var phrase in _domainPhrases)
             {
-                phrase.ExecutePrologQuery()(_prologEngine);
+                _fluents.AddRange(phrase._fluents);
+                _fluents = _fluents.Distinct().ToList();
             }
         }
 
