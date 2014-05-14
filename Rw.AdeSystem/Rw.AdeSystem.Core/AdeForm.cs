@@ -6,6 +6,9 @@ using System;
 
 namespace Rw.AdeSystem.Core
 {
+    /// <summary>
+    /// Klasa reprezentuje wyrazenie logiczne
+    /// </summary>
     public class AdeForm
     {
         public AdeForm(string formString)

@@ -26,11 +26,13 @@ namespace Rw.AdeSystem.Core
             {
                 p.AddRange(strArr);
             }
+            if (PlEngine.IsInitialized) return;
             PlEngine.Initialize(p.ToArray());
         }
 
         public void Initialize(params string[] initParams)
         {
+            if (PlEngine.IsInitialized) return;
             PlEngine.Initialize(initParams);
         }
 

@@ -2,132 +2,99 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
+using Rw.AdeSystem.Core.Expressions;
 
 #endregion
 
 namespace Rw.AdeSystem.Core
 {
-    public class AdeSystem
+    public static class AdeSystem
     {
         #region Fields & ctors
 
-        private readonly List<AdeExpression> _domainPhrases = new List<AdeExpression>();
-        private readonly PrologEngine _prologEngine = PrologEngine.Instance;
-        private readonly Signature _signature = new Signature();
+        public static readonly List<Expression> DomainPhrases = new List<Expression>(); 
+        public static readonly PrologEngine PrologEngine = PrologEngine.Instance;
+        public static readonly AdeSignature Signature = new AdeSignature();
 
-        private readonly List<string> _actions = new List<string>();
-        private readonly List<string> _executors = new List<string>();
-        private List<string> _fluents = new List<string>();
+        public static readonly List<string> Actions = new List<string>();
+        public static readonly List<string> Executors = new List<string>();
+        public static readonly List<string> Fluents = new List<string>();
 
-        public AdeSystem(params string[][] prologEngineInitParams)
+        public static void Initialize(params string[][] prologEngineInitParams)
         {
-            _prologEngine.Initialize(prologEngineInitParams);
+            PrologEngine.Initialize(prologEngineInitParams);
         }
 
-        public AdeSystem(params string[] prologEngineInitParams)
+        public static void Initialize(params string[] prologEngineInitParams)
         {
-            _prologEngine.Initialize(prologEngineInitParams);
-        }
-
-        #endregion
-
-        #region Language signature
-
-        public void LoadSignatureFromFile(string filename)
-        {
-            LoadSignature(LoadFromFile(filename));
-        }
-
-        public void LoadSignature(string signature)
-        {
-            // TODO: trzeba ustalic strukture plikow/tekstu ktore wczytujemy do sygnatury/domeny/akcji (na razie przyjmuje 3 linijki, wyrazenia oddzielone przecinkami
-            var lines = signature.Split(new[] {Environment.NewLine}, StringSplitOptions.None);
-            if (lines.Length != 3)
-            {
-                throw new ArgumentException();
-            }
-            lines[0].Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Fluents.Add(s));
-            lines[1].Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Actions.Add(s));
-            lines[2].Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Executors.Add(s));
-        }
-
-        public void LoadSignature(string fluents, string actions, string executors)
-        {
-            fluents.Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Fluents.Add(s));
-            actions.Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Actions.Add(s));
-            executors.Split(',', ' ').Where(s => s.Length > 0).ToList().ForEach(s => _signature.Executors.Add(s));
-        }
-
-        private class Signature
-        {
-            public Signature()
-            {
-                Fluents = new HashSet<string>();
-                Actions = new HashSet<string>();
-                Executors = new HashSet<string>();
-            }
-
-            public HashSet<string> Fluents { get; private set; }
-            public HashSet<string> Actions { get; private set; }
-            public HashSet<string> Executors { get; private set; }
+            PrologEngine.Initialize(prologEngineInitParams);
         }
 
         #endregion
 
         #region System domain
 
-        public void LoadDomainFromFile(string filename)
+        public static void LoadDomainFromFile(string filename)
         {
-            LoadDomain(LoadFromFile(filename));
+            LoadDomain(Helpers.LoadFromFile(filename));
         }
 
-        public void LoadDomain(string domainInAdeString)
+        public static void LoadDomain(string domainInAdeString)
         {
+            //TODO: Dodac wyrażenia regularne dla pozostałych wyrażeń języka - Justyna
+            //Na razie wystarczy, żeby rozróżniać wyrażenia i załadować akcje/wykonawcow do odpowiednich list - Actions, Executors
+            //Fluenty na razie można zostawić - parser wyrażen logicznych zrobi Konrad i Paweł
+            //Na razie nie trzeba robic nic Prologowego
             foreach (var line in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
             {
-                _domainPhrases.Add(new AdeExpression(line, AdeExpressionKind.DomainPhrase));
+                if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)]*"))
+                {
+                    DomainPhrases.Add(new AlwaysExpression(line));
+                }
+                else if (Regex.IsMatch(line, @"initially [a-z,&,!,\s]*"))
+                {
+                    DomainPhrases.Add(new InitiallyExpression(line));
+                }
+                else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+
+                    //W komentarzu jest jakies nasze podejscie do czytania akcji etc z wyrazenia
+
+                    //var format = ReverseStringFormat("{0} causes {1}", line);
+                    //Actions.Add(format[0]);
+                }
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z]+ causes [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+
+                    //W komentarzu jest jakies nasze podejscie do czytania akcji etc z wyrazenia
+
+                    //var format = ReverseStringFormat("{0} by {1} causes {2}", line);
+                    //Actions.Add(format[0]);
+                    //Executors.Add(format[1]);
+                }
+                else
+                {
+                    throw new ArgumentException("Nieznane wyrażenie języka ADE.");
+                }
             }
-            if (_domainPhrases.Count == 0)
+            if (DomainPhrases.Count == 0)
             {
                 throw new ArgumentException();
             }
         }
 
-        public void ConstructSystemDomain()
+        /// <summary>
+        /// Metoda konstruujaca podstawowe fakty i reguly Prologa
+        /// </summary>
+        public static void ConstructSystemDomain()
         {
-            //foreach (var phrase in _domainPhrases)
-            //{
-            //    phrase.ExecutePrologQuery()(_prologEngine);
-            //}
-            _prologEngine.AssertFact("and(A,B):-(is_true(A),is_true(B))");
-            _prologEngine.AssertFact("or(A,B):-(is_true(A); is_true(B))");
-            _prologEngine.AssertFact("neg(A):-not(is_true(A))");
-
-            foreach (var phrase in _domainPhrases)
-            {
-                _fluents.AddRange(phrase._fluents);
-                _fluents = _fluents.Distinct().ToList();
-            }
-        }
-
-        #endregion
-
-        #region Queries and querying
-
-        #endregion
-
-        #region Helpers
-
-        private string LoadFromFile(string filename)
-        {
-            string ret;
-            using (var sr = new StreamReader(filename))
-            {
-                ret = sr.ReadToEnd();
-            }
-            return ret;
+            //Na razie sa tu jakies przykladowe, proste reguly
+            PrologEngine.AssertFact("and(A,B):-(is_true(A),is_true(B))");
+            PrologEngine.AssertFact("or(A,B):-(is_true(A); is_true(B))");
+            PrologEngine.AssertFact("neg(A):-not(is_true(A))");
         }
 
         #endregion
