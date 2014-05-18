@@ -1,0 +1,40 @@
+To co mi się nie zgadza i mam problemy z definicjami Resów:
+
+podstawowe:
+- dla każdej akcji, czy przynajmniej jednej???
+- nawiasy (akcja i 1) -> 2 czy akcja i (1 -> 2)???
+
+shoot hador w stanie 0
+skoro nie jest pre warunek spełniony to każdy stan następny może być
+[0-7]
+
+shoot mietus w stanie 3
+u na [state0, state1, state4, state5, state6, state7]
+a u nich [4,5]
+
+Res0 w stanie x dla każdej akcji powinno być to spełnione???
+jaka jest def Res0 czy dla każdej akcji suma skutków akcji musi być spełniona w stanie końcowym???
+
+jeśli spełnione są dla każdej akcji kwalifikującej się (ACTION, EXECUTOR) warunki
+to ich suma skutków musi być zawarta w stanie?????????????? - MIETUS
+
+shoot mietus w state1 u mnie
+
+?- res0(shoot,mietus,state1,X).
+X = [state0, state1, state2, state3, state4, state5, state6, state7] .
+
+?- res0_min(shoot,mietus,state1,X).
+X = [state1] .
+
+?- res0_plus(shoot,mietus,state1,X).
+X = [state0, state1, state2, state3, state4, state5, state6, state7] 
+
+w dokumencie 0,1,4,5
+
+u mnie jest jeśli istnieje jakakolwiek akcja causes i dla niej spełnione jest 1 -> 2 (czyli not(1) v 2)
+
+a jak w dokumencie?????
+
+16 strona koniec shoot hadora w stanie 4
+
+w dokumencie wszystkie stany z loaded????? (przy strzale ;>)
