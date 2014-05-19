@@ -96,7 +96,7 @@ test(shoot_hador_7) :-
 test(shoot_hador_4) :-
     res0(shoot, hador, state4, [state2,state3,state6,state7]),
     res0_min(shoot, hador, state4, [state6]),
-    res0_plus(shoot, hador, state4, [[state2,state3,state6,state7]),
+    res0_plus(shoot, hador, state4, [state2,state3,state6,state7]),
     resN(shoot, hador, state4, [state6]),
     resAb(shoot, hador, state4, []).
 
