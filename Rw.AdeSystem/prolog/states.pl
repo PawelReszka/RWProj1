@@ -191,14 +191,17 @@ copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES).
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   !.
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES).
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   !.
 
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
     resN(ACTION, EXECUTOR, STATE, STATESN),
-    subtract(STATES0, STATESN, STATES).
+    subtract(STATES0, STATESN, STATES),
+    !.
