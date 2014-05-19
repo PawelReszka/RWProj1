@@ -38,9 +38,9 @@ test(shoot_hador_0) :-
     resAb(shoot, hador, state0, []).
 
 test(shoot_hador_1) :-
-    res0(shoot, hador, state1, [state1, state3, state5, state7]),
+    res0(shoot, hador, state1, [state0, state1, state2, state3, state4,state5, state6, state7]),
     res0_min(shoot, hador, state1, [state1]),
-    res0_plus(shoot, hador, state1, [state1, state3, state5, state7]),
+    res0_plus(shoot, hador, state1, [state0, state1, state2, state3, state4, state5, state6, state7]),
     resN(shoot, hador, state1, [state1]),
     resAb(shoot, hador, state1, []).
 
@@ -94,10 +94,10 @@ test(shoot_hador_7) :-
     resAb(shoot, hador, state7, []).
 
 test(shoot_hador_4) :-
-    res0(shoot, hador, state4, [state2,state3,state6,state7]),
-    res0_min(shoot, hador, state4, [state6]),
-    res0_plus(shoot, hador, state4, [state2,state3,state6,state7]),
-    resN(shoot, hador, state4, [state6]),
+    res0(shoot, hador, state4, [state0,state1,state4,state5]),
+    res0_min(shoot, hador, state4, [state4]),
+    res0_plus(shoot, hador, state4, [state0,state1,state4,state5]),
+    resN(shoot, hador, state4, [state4]),
     resAb(shoot, hador, state4, []).
 
 
