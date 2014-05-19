@@ -150,7 +150,7 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], [HEAD|STATES]) :-
     !.
 
 res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
-    possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE),
+    not(possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE)),
     res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
