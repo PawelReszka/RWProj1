@@ -205,3 +205,19 @@ resAb(ACTION,EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATESN),
     subtract(STATES0, STATESN, STATES),
     !.
+
+% possibly_executable(ACTIONS, EXECUTORS, FLUENTS).
+% always_executable(ACTIONS, EXECUTORS, FLUENTS).
+
+% possibly_accessible(STATE_TO, STATE_FROM).
+% always_accessible(STATE_TO, STATE_FROM).
+% typically_accessible(STATE_TO, STATE_FROM).
+
+% possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
+% always_involved(EXECUTOR, ACTIONS, EXECUTORS).
+% typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
+
+% possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+% always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+% typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+
