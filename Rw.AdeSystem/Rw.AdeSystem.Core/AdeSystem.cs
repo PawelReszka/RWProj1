@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Rw.AdeSystem.Core.Expressions;
 
@@ -42,7 +43,7 @@ namespace Rw.AdeSystem.Core
 
         public static void LoadDomain(string domainInAdeString)
         {
-            //TODO: Dodac wyrażenia regularne dla pozostałych wyrażeń języka - Justyna
+            //TODO: Dodac wyrażenia regularne dla pozostałych wyrażeń języka 
             //Na razie wystarczy, żeby rozróżniać wyrażenia i załadować akcje/wykonawcow do odpowiednich list - Actions, Executors
             //Fluenty na razie można zostawić - parser wyrażen logicznych zrobi Konrad i Paweł
             //Na razie nie trzeba robic nic Prologowego
@@ -92,10 +93,16 @@ namespace Rw.AdeSystem.Core
         public static void ConstructSystemDomain()
         {
             //Na razie sa tu jakies przykladowe, proste reguly
-            PrologEngine.AssertFact("and(A,B):-(is_true(A),is_true(B))");
-            PrologEngine.AssertFact("or(A,B):-(is_true(A); is_true(B))");
-            PrologEngine.AssertFact("neg(A):-not(is_true(A))");
+            foreach (var f in Fluents.Distinct())
+            {
+                PrologEngine.AssertFact("fluent("+f+")");
+            }
+            foreach (var f in Fluents.Distinct())
+            {
+                PrologEngine.AssertFact("sneg(" + f +",not_"+ f +")");
+            }
         }
+
 
         #endregion
     }
