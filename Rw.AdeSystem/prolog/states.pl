@@ -93,13 +93,17 @@ force_cause_change(LIST,[TOP1|X],[TOP1|Y]) :-
     force_cause_change(LIST,X,Y).
 
 possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
-    findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R),
+    findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R1),
+    findall([X,Y], causes(ACTION, epsilon, X, Y), R2),
+    append(R1,R2,R),
     state(STATE1, STATE1_LIST),
     state(STATE2, STATE2_LIST),
     possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
 
 possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
-    findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R),
+    findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R1),
+    findall([X,Y], causes(ACTION, epsilon, X, Y), R2),
+    append(R1,R2,R),
     length(R,R_LENGTH),
     R_LENGTH > 0,
     state(STATE1, STATE1_LIST),
@@ -205,6 +209,19 @@ resAb(ACTION,EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATESN),
     subtract(STATES0, STATESN, STATES),
     !.
+
+action_causes([], _,_, []).
+action_causes([HEAD|STATES_FROM], ACTION, EXECUTOR, STATES_TO) :- 
+    action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO2),
+    res0_min(ACTION, EXECUTOR, HEAD,STATES),
+    subtract(STATES,STATES_TO2,STATES2),
+    append(STATES2,STATES_TO2,STATES_TO).
+
+actions_causes(STATES,[],[],STATES).
+
+actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :- 
+    action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO1),
+    actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 % possibly_executable(ACTIONS, EXECUTORS, FLUENTS).
 % always_executable(ACTIONS, EXECUTORS, FLUENTS).
