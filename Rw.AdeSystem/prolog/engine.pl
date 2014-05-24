@@ -3,6 +3,19 @@ neg(X,Y) :- sneg(X,Y).
 
 neg(X,X) :- !,fail.
 
+release_fluent([], _,[]).
+
+release_fluent([HEAD|STATES], FLUENT, OUTPUT) :- 
+    release_fluent(STATES, FLUENT, OUTPUT2),
+    neg(FLUENT, NEG_FLUENT),
+    state(HEAD,STATE_LIST),
+    force_cause_change([FLUENT], STATE_LIST, STATE1_LIST),
+    force_cause_change([NEG_FLUENT], STATE_LIST, STATE2_LIST),
+    state(STATE1, STATE1_LIST),
+    state(STATE2, STATE2_LIST),
+    subtract([STATE1,STATE2], OUTPUT2, OUTPUT3),
+    append(OUTPUT2, OUTPUT3,OUTPUT).
+
 formula_valid(FORMULA, FLUENTS) :- 
     formula(FORMULA, STMT_LIST),
     formula_valid_continue(STMT_LIST, FLUENTS).
