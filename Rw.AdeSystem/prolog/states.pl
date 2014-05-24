@@ -223,6 +223,21 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO1),
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
+executable(STATE, ACTION, EXECUTOR) :-
+    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R1),
+    findall([X,Y], causes(ACTION, epsilon, X,Y),R2),
+    findall([X,Y], typically_causes(ACTION, EXECUTOR, X,Y),R3),
+    findall([X,Y], typically_causes(ACTION, epsilon, X,Y),R4),
+    append(R1,R2,A1),
+    append(A1,R3,A2),
+    append(A2,R4,R),
+    state(STATE, STATE_LIST),
+    executable_continue(R, STATE_LIST).
+
+executable_continue([HEAD|LIST],STATE_LIST) :- 
+    nth0(1, HEAD, PRELIST),
+    (subset(PRELIST,STATE_LIST) ; executable_continue(LIST, STATE_LIST)).
+
 % possibly_executable(ACTIONS, EXECUTORS, FLUENTS).
 % always_executable(ACTIONS, EXECUTORS, FLUENTS).
 
