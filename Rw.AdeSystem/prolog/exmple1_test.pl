@@ -1,4 +1,4 @@
-:- [states].
+:- [states],[exmple1].
 
 :- begin_tests(resy).
 
