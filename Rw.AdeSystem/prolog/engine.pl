@@ -16,6 +16,13 @@ release_fluent([HEAD|STATES], FLUENT, OUTPUT) :-
     subtract([STATE1,STATE2], OUTPUT2, OUTPUT3),
     append(OUTPUT2, OUTPUT3,OUTPUT).
 
+release_fluents(STATES, [], STATES).
+
+release_fluents(STATES, [HEAD|FLUENTS], OUTPUT) :-
+    release_fluents(STATES, FLUENTS, OUTPUT1),
+    release_fluent(OUTPUT1, HEAD, OUTPUT).
+
+
 formula_valid(FORMULA, FLUENTS) :- 
     formula(FORMULA, STMT_LIST),
     formula_valid_continue(STMT_LIST, FLUENTS).
