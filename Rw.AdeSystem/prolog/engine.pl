@@ -1,3 +1,7 @@
+initial_states(STATES) :- 
+    initially(X),
+    all_possible_states(X,STATES).
+
 list_of_states(R) :- findall(X, state(X,_),R).
 
 possible_state(LIST_OF_FLUENTS, STATE) :-

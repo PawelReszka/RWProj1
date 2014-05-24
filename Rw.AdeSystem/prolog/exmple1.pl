@@ -31,7 +31,7 @@ inertial(X) :- neg(X,Y),
 
 noninertial(X) :- not(inertial(X)).
 
-initially([hador_ma_bron, not_has_gun_mietus, alive]).
+initially([has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
 state(state0, [has_gun_hador, not_has_gun_mietus, not_loaded, alive]).
 state(state1, [not_has_gun_hador, has_gun_mietus, not_loaded, alive]).
