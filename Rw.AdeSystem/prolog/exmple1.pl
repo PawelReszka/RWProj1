@@ -15,11 +15,6 @@ sneg(has_gun_hador, not_has_gun_hador).
 sneg(loaded, not_loaded).
 sneg(alive, not_alive).
 
-neg(X,Y) :- sneg(Y,X).
-neg(X,Y) :- sneg(X,Y).
-
-neg(X,X) :- !,fail.
-
 sinertial(has_gun_mietus).
 sinertial(has_gun_hador).
 sinertial(loaded).
@@ -37,6 +32,8 @@ stmt(s1, [not_has_gun_hador, has_gun_mietus]).
 stmt(s2, [not_has_gun_mietus,has_gun_hador]).
 
 formula(f, [s1,s2]).
+
+always(f).
 
 state(state0, [has_gun_hador, not_has_gun_mietus, not_loaded, alive]).
 state(state1, [not_has_gun_hador, has_gun_mietus, not_loaded, alive]).

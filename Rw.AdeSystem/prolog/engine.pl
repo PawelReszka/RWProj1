@@ -1,3 +1,8 @@
+neg(X,Y) :- sneg(Y,X).
+neg(X,Y) :- sneg(X,Y).
+
+neg(X,X) :- !,fail.
+
 formula_valid(FORMULA, FLUENTS) :- 
     formula(FORMULA, STMT_LIST),
     formula_valid_continue(STMT_LIST, FLUENTS).
@@ -13,7 +18,30 @@ formula_valid_continue([HEAD|STMT], FLUENTS) :-
     not(subset(HEAD_LIST,FLUENTS)),
     formula_valid_continue(STMT, FLUENTS).
 
+state_valid(X) :-
+    findall([X,Y], formula(X,Y), R),
+    state_valid_continue(R, X).
 
+state_valid_continue([HEAD|_], STATE) :-
+    nth0(0, HEAD, FORMULA),
+    state_valid_with_formula(STATE, FORMULA).
+
+state_valid_continue([], _).
+
+state_valid_with_formula(STATE, FORMULA) :-
+    state(STATE, FLUENTS),
+    formula_valid(FORMULA, FLUENTS).
+
+fluents_valid(X) :-
+    findall([Z,Y], formula(Z,Y), R),
+    fluents_valid_continue(R, X).
+
+fluents_valid_continue([HEAD|FORMULAS], FLUENTS) :-
+    nth0(0, HEAD, FORMULA),
+    formula_valid(FORMULA, FLUENTS),
+    fluents_valid_continue(FORMULAS, FLUENTS).
+
+fluents_valid_continue([], _).
 
 initial_states(STATES) :- 
     initially(X),
