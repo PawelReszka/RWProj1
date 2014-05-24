@@ -71,8 +71,17 @@
     <Compile Include="AdeSystem.cs" />
     <Compile Include="AdeForm.cs" />
     <Compile Include="Expressions\AlwaysExpression.cs" />
+    <Compile Include="Expressions\ByExpression.cs" />
+    <Compile Include="Expressions\CausesExpression.cs" />
+    <Compile Include="Expressions\CausesIfExpression.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\InitiallyExpression.cs" />
+    <Compile Include="Expressions\NoninertialExpression.cs" />
+    <Compile Include="Expressions\PreservesExpression.cs" />
+    <Compile Include="Expressions\ReleasesExpression.cs" />
+    <Compile Include="Expressions\ReleasesIfExpression.cs" />
+    <Compile Include="Expressions\TypicallyCausesExpression.cs" />
+    <Compile Include="Expressions\TypicallyCausesIfExpression.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PrologEngine.cs" />
