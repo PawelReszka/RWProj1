@@ -223,23 +223,31 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO1),
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
-executable(STATE, ACTION, EXECUTOR) :-
-    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R1),
-    findall([X,Y], causes(ACTION, epsilon, X,Y),R2),
-    findall([X,Y], typically_causes(ACTION, EXECUTOR, X,Y),R3),
-    findall([X,Y], typically_causes(ACTION, epsilon, X,Y),R4),
-    append(R1,R2,A1),
-    append(A1,R3,A2),
-    append(A2,R4,R),
-    state(STATE, STATE_LIST),
-    executable_continue(R, STATE_LIST).
+pexecutable(STATE, ACTION, EXECUTOR) :-
+    res0_min(ACTION, EXECUTOR, STATE, X),
+    length(X,Y),
+    Y > 0.
 
-executable_continue([HEAD|LIST],STATE_LIST) :- 
-    nth0(1, HEAD, PRELIST),
-    (subset(PRELIST,STATE_LIST) ; executable_continue(LIST, STATE_LIST)).
+possible_executable(ACTION, EXECUTOR, FLUENTS) :-
+    all_possible_states(FLUENTS, STATES),
+    possible_executable_continue(ACTION, EXECUTOR, STATES).
 
-% possibly_executable(ACTIONS, EXECUTORS, FLUENTS).
-% always_executable(ACTIONS, EXECUTORS, FLUENTS).
+possible_executable_continue(ACTION, EXECUTOR, [HEAD|_]) :-   
+    pexecutable(HEAD, ACTION, EXECUTOR).
+
+possible_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
+    not(pexecutable(HEAD, ACTION, EXECUTOR)),
+    possible_executable_continue(ACTION, EXECUTOR, STATES).
+
+always_executable(ACTION, EXECUTOR, FLUENTS) :- 
+    all_possible_states(FLUENTS, STATES),
+    always_executable_continue(ACTION, EXECUTOR, STATES).
+
+always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
+    pexecutable(HEAD, ACTION, EXECUTOR),
+    always_executable_continue(ACTION, EXECUTOR, STATES).
+
+always_executable_continue(_, _, []).
 
 % possibly_accessible(STATE_TO, STATE_FROM).
 % always_accessible(STATE_TO, STATE_FROM).
