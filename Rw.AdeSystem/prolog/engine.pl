@@ -1,3 +1,20 @@
+formula_valid(FORMULA, FLUENTS) :- 
+    formula(FORMULA, STMT_LIST),
+    formula_valid_continue(STMT_LIST, FLUENTS).
+
+formula_valid_continue([],_) :- !,fail.
+
+formula_valid_continue([HEAD|_], FLUENTS) :-
+    stmt(HEAD, HEAD_LIST),
+    subset(HEAD_LIST,FLUENTS).
+
+formula_valid_continue([HEAD|STMT], FLUENTS) :-
+    stmt(HEAD, HEAD_LIST),
+    not(subset(HEAD_LIST,FLUENTS)),
+    formula_valid_continue(STMT, FLUENTS).
+
+
+
 initial_states(STATES) :- 
     initially(X),
     all_possible_states(X,STATES).
