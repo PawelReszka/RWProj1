@@ -92,41 +92,35 @@ force_cause_change(LIST,[TOP1|X],[TOP1|Y]) :-
     not(member(TOP2,LIST)),
     force_cause_change(LIST,X,Y).
 
-possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2,OUTPUT) :-
+possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R),
     state(STATE1, STATE1_LIST),
     state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST,OUTPUT).
+    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
 
-possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2,OUTPUT) :-
+possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R),
     length(R,R_LENGTH),
     R_LENGTH > 0,
     state(STATE1, STATE1_LIST),
     state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST,OUTPUT).
+    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
 
-possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2,OUTPUT) :-
+possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R),
     length(R,R_LENGTH),
     R_LENGTH == 0,
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R2),
     state(STATE1, STATE1_LIST),
     state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R2, STATE1_LIST, STATE2_LIST,OUTPUT).
+    possible_causes_fto_states2(R2, STATE1_LIST, STATE2_LIST).
 
-possible_causes_fto_states2([], _, _, []).
-possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2, [HEAD|OUTPUT]) :-
+possible_causes_fto_states2([], _, _).
+possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2) :-
     nth0(0, HEAD, HEAD1),
     nth0(1, HEAD, HEAD2),
     (not(subset(HEAD2, LIST2)); subset(HEAD1, LIST1)),
-    possible_causes_fto_states2(TAIL, LIST1, LIST2, OUTPUT).
-
-possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2, OUTPUT) :-
-    nth0(0, HEAD, HEAD1),
-    nth0(1, HEAD, HEAD2),
-    subset(HEAD2, LIST2) ,  not(subset(HEAD1, LIST1)),
-    possible_causes_fto_states2(TAIL, LIST1, LIST2, OUTPUT).
+    possible_causes_fto_states2(TAIL, LIST1, LIST2).
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
     list_of_states(ALL),
@@ -135,16 +129,14 @@ res0(ACTION, EXECUTOR, STATE, STATES) :-
 res0_continue(_,_,_,[],[]).
 
 res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], [HEAD|STATES]) :-
-    possible_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE, OUTPUT),
-    length(OUTPUT, OUTPUT_LENGTH),
-    OUTPUT_LENGTH > 0,
-    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    possible_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE),
+    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
+    !.
 
 res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
-    possible_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE, OUTPUT),
-    length(OUTPUT, OUTPUT_LENGTH),
-    OUTPUT_LENGTH == 0,
-    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    not(possible_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE)),
+    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
+    !.
 
 res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     res0(ACTION, EXECUTOR, STATE, ALL),
@@ -153,16 +145,14 @@ res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
 res0_plus_continue(_,_,_,[],[]).
 
 res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], [HEAD|STATES]) :-
-    possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE, OUTPUT),
-    length(OUTPUT, OUTPUT_LENGTH),
-    OUTPUT_LENGTH > 0,
-    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE),
+    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
+    !.
 
 res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
-    possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE, OUTPUT),
-    length(OUTPUT, OUTPUT_LENGTH),
-    OUTPUT_LENGTH == 0,
-    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    not(possible_typically_causes_fto_states(ACTION, EXECUTOR, HEAD, STATE)),
+    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
+    !.
 
 
 new(STATE1, STATE2,OUTPUT) :-
@@ -201,14 +191,33 @@ copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES).
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   !.
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES).
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   !.
 
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
     resN(ACTION, EXECUTOR, STATE, STATESN),
-    subtract(STATES0, STATESN, STATES).
+    subtract(STATES0, STATESN, STATES),
+    !.
+
+% possibly_executable(ACTIONS, EXECUTORS, FLUENTS).
+% always_executable(ACTIONS, EXECUTORS, FLUENTS).
+
+% possibly_accessible(STATE_TO, STATE_FROM).
+% always_accessible(STATE_TO, STATE_FROM).
+% typically_accessible(STATE_TO, STATE_FROM).
+
+% possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
+% always_involved(EXECUTOR, ACTIONS, EXECUTORS).
+% typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
+
+% possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+% always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+% typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+
