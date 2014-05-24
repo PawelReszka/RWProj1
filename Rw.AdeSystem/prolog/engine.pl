@@ -19,7 +19,7 @@ formula_valid_continue([HEAD|STMT], FLUENTS) :-
     formula_valid_continue(STMT, FLUENTS).
 
 state_valid(X) :-
-    findall([X,Y], formula(X,Y), R),
+    findall([X], always(X), R),
     state_valid_continue(R, X).
 
 state_valid_continue([HEAD|_], STATE) :-
@@ -33,7 +33,7 @@ state_valid_with_formula(STATE, FORMULA) :-
     formula_valid(FORMULA, FLUENTS).
 
 fluents_valid(X) :-
-    findall([Z,Y], formula(Z,Y), R),
+    findall([Y], always(Y), R),
     fluents_valid_continue(R, X).
 
 fluents_valid_continue([HEAD|FORMULAS], FLUENTS) :-
