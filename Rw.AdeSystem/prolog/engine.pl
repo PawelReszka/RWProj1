@@ -216,11 +216,31 @@ resN(ACTION, EXECUTOR, STATE, STATES) :-
    copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
    !.
 
+
+states_valid([],[]).
+
+states_valid([HEAD|X],[HEAD|Y]) :- 
+    state_valid(HEAD),
+    states_valid(X,Y).
+
+states_valid([HEAD|X],Y) :- 
+    not(state_valid(HEAD)),
+    states_valid(X,Y).
+
+ resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
+    resN(ACTION, EXECUTOR, STATE, STATES2),
+    states_valid(STATES2, STATES).
+
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
     resN(ACTION, EXECUTOR, STATE, STATESN),
     subtract(STATES0, STATESN, STATES),
     !.
+
+ resAb_trunc(ACTION, EXECUTOR, STATE, STATES) :-
+    resAb(ACTION, EXECUTOR, STATE, STATES2),
+    states_valid(STATES2, STATES).
+
 
 action_causes([], _,_, []).
 action_causes([HEAD|STATES_FROM], ACTION, EXECUTOR, STATES_TO) :- 

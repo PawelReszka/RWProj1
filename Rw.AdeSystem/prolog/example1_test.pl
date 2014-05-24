@@ -1,4 +1,4 @@
-:- [states],[exmple1].
+:- [engine],[example1].
 
 :- begin_tests(resy).
 
