@@ -322,7 +322,48 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 
 always_executable_continue(_, _, []).
 
-% possibly_accessible(STATE_TO, STATE_FROM).
+possibly_accessible(STATE_TO, STATE_FROM) :-
+    possibly_accessible_continue([STATE_FROM],[], STATE_TO).
+
+possibly_accessible_continue([],_, _) :- !,fail.
+
+possibly_accessible_continue([HEAD|_], _, GOAL) :-
+    HEAD == GOAL.
+
+possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    HEAD \= GOAL,
+    findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
+    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
+    states_possible_with_causes(HEAD, R1, STATES1),
+    states_possible_with_typically_causes(HEAD, R2, STATES2),
+    append(STATES1,STATES2, STATES),
+    subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
+    subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
+    append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
+    possibly_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
+
+states_possible_with_causes(_, [],[]).
+
+states_possible_with_causes(STATE_FROM, [HEAD|CAUSES], STATES_TO) :-
+    states_possible_with_causes(STATE_FROM, CAUSES, STATES_TO2),
+    nth0(0, HEAD, ACTION),
+    nth0(1, HEAD, EXECUTOR),
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM,STATES_TO3),
+    subtract(STATES_TO3, STATES_TO2, STATES_TO_ADD),
+    append(STATES_TO2, STATES_TO_ADD, STATES_TO).
+
+states_possible_with_typically_causes(_, [],[]).
+
+states_possible_with_typically_causes(STATE_FROM, [HEAD|CAUSES], STATES_TO) :-
+    states_possible_with_causes(STATE_FROM, CAUSES, STATES_TO2),
+    nth0(0, HEAD, ACTION),
+    nth0(1, HEAD, EXECUTOR),
+    resN_trunc(ACTION, EXECUTOR, STATE_FROM,STATES_TO3),
+    subtract(STATES_TO3, STATES_TO2, STATES_TO_ADD),
+    append(STATES_TO2, STATES_TO_ADD, STATES_TO).
+
+
+
 % always_accessible(STATE_TO, STATE_FROM).
 % typically_accessible(STATE_TO, STATE_FROM).
 
