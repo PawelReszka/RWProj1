@@ -248,16 +248,23 @@ convert_negatives([HEAD|FLUENTS], [CONVERTED|NFLUENTS]) :-
     convert_negatives(FLUENTS, NFLUENTS).
 
 
-preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO) :-
+preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO, OUTPUT) :-
     preserve(ACTION, EXECUTOR, PRESERVED),
     fluent_values(STATE_FROM, PRESERVED, VALUES),
-    possible_states(VALUES, STATES_TO).
+    all_possible_states(VALUES, POSSIBLE_STATES),
+    subtract(STATES_TO,POSSIBLE_STATES, STATES_TO_NOT_ALLOWED),
+    subtract(STATES_TO, STATES_TO_NOT_ALLOWED, OUTPUT).
 
+preserve_fluents(ACTION, EXECUTOR, _, STATES_TO, STATES_TO) :-
+    not(preserve(ACTION, EXECUTOR, _)).
+
+% przypadek nie ma preserve dla danej akcji
 
 
 resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATES2),
-    states_valid(STATES2, STATES).
+    states_valid(STATES2, STATES3),
+    preserve_fluents(ACTION, EXECUTOR, STATE, STATES3,STATES).
 
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
@@ -267,7 +274,13 @@ resAb(ACTION,EXECUTOR, STATE, STATES) :-
 
 resAb_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resAb(ACTION, EXECUTOR, STATE, STATES2),
-    states_valid(STATES2, STATES).
+    states_valid(STATES2, STATES3),
+    preserve_fluents(ACTION, EXECUTOR, STATE,STATES3,STATES).
+
+res0_trunc(ACTION, EXECUTOR, STATE, STATES) :-
+    resN_trunc(ACTION, EXECUTOR, STATE, STATES1),
+    resAb_trunc(ACTION, EXECUTOR, STATE, STATES2),
+    append(STATES1, STATES2, STATES).
 
 
 action_causes([], _,_, []).
