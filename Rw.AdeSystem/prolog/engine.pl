@@ -1,3 +1,5 @@
+:-  dynamic(releases/4).
+
 neg(X,Y) :- sneg(Y,X).
 neg(X,Y) :- sneg(X,Y).
 
