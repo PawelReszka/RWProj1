@@ -9,6 +9,28 @@ inertial(X) :- neg(X,Y),
 
 noninertial(X) :- not(inertial(X)).
 
+released_fluents(ACTION, EXECUTOR, STATE_FROM, OUTPUT) :-
+    findall([X,Y], releases(ACTION, EXECUTOR,X,Y),R),
+    released_fluents_continue(STATE_FROM, R, OUTPUT).
+
+released_fluents_continue(_,[],[]).
+
+released_fluents_continue(STATE, [HEAD|FLUENTS], OUTPUT) :-
+    released_fluents_continue(STATE, FLUENTS, OUTPUT2),
+    nth0(0, HEAD, FLUENT),
+    nth0(1, HEAD, FORMULA),
+    state_valid_with_formula(STATE, FORMULA),
+    append(FLUENT, OUTPUT2,OUTPUT),
+    !.
+
+released_fluents_continue(STATE, [HEAD|FLUENTS], OUTPUT) :-
+    released_fluents_continue(STATE, FLUENTS, OUTPUT2),
+    nth0(1, HEAD, FORMULA),
+    not(state_valid_with_formula(STATE, FORMULA)),
+    OUTPUT = OUTPUT2,
+    !.
+
+
 
 release_fluent([], _,[]).
 
@@ -18,16 +40,28 @@ release_fluent([HEAD|STATES], FLUENT, OUTPUT) :-
     state(HEAD,STATE_LIST),
     force_cause_change([FLUENT], STATE_LIST, STATE1_LIST),
     force_cause_change([NEG_FLUENT], STATE_LIST, STATE2_LIST),
-    state(STATE1, STATE1_LIST),
-    state(STATE2, STATE2_LIST),
-    subtract([STATE1,STATE2], OUTPUT2, OUTPUT3),
-    append(OUTPUT2, OUTPUT3,OUTPUT).
+    join_possible_states(OUTPUT2, [STATE1_LIST, STATE2_LIST], OUTPUT),
+    !. 
+
+join_possible_states(LIST, [], LIST) :- !.
+
+join_possible_states(LIST, [HEAD|REST], [STATE|OUTPUT]) :- 
+    state(STATE, HEAD),not(member(STATE,LIST)),
+    join_possible_states(LIST, REST, OUTPUT),
+    !.
+
+join_possible_states(LIST, [HEAD|REST], OUTPUT) :- 
+    (not(state(_, HEAD));member(_,LIST)),
+    join_possible_states(LIST, REST, OUTPUT),
+    !.
+
 
 release_fluents(STATES, [], STATES).
 
 release_fluents(STATES, [HEAD|FLUENTS], OUTPUT) :-
     release_fluents(STATES, FLUENTS, OUTPUT1),
-    release_fluent(OUTPUT1, HEAD, OUTPUT).
+    release_fluent(OUTPUT1, HEAD, OUTPUT),
+    !.
 
 
 formula_valid(FORMULA, FLUENTS) :- 
@@ -147,7 +181,12 @@ possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2) :-
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
     list_of_states(ALL),
-    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
+    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+    release_fluents(STATES2, FLUENTS, STATES3),
+    sort(STATES3,STATES),
+    !.
+
 
 res0_continue(_,_,_,[],[]).
 
@@ -163,7 +202,12 @@ res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
 
 res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     res0(ACTION, EXECUTOR, STATE, ALL),
-    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES).
+    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
+    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+    release_fluents(STATES2, FLUENTS, STATES3),
+    sort(STATES3,STATES),
+    !.
+
 
 res0_plus_continue(_,_,_,[],[]).
 
@@ -214,13 +258,19 @@ copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
+   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+   release_fluents(STATES2, FLUENTS, STATES3),
+   sort(STATES3,STATES),
    !.
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
    minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES),
+   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
+   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+   release_fluents(STATES2, FLUENTS, STATES3),
+   sort(STATES3,STATES),
    !.
 
 
@@ -272,7 +322,8 @@ resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
     resN(ACTION, EXECUTOR, STATE, STATESN),
-    subtract(STATES0, STATESN, STATES),
+    subtract(STATES0, STATESN, STATES3),
+    sort(STATES3,STATES),
     !.
 
 resAb_trunc(ACTION, EXECUTOR, STATE, STATES) :-
