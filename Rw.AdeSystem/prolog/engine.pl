@@ -388,9 +388,9 @@ states_possible_with_typically_causes(STATE_FROM, [HEAD|CAUSES], STATES_TO) :-
     append(STATES_TO2, STATES_TO_ADD, STATES_TO).
 
 
-
-% always_accessible(STATE_TO, STATE_FROM).
-% typically_accessible(STATE_TO, STATE_FROM).
+% possibly_accessible(FLUENTS_TO, FLUENTS_FROM).
+% always_accessible(FLUENTS_TO, FLUENTS_FROM).
+% typically_accessible(FLUENTS_TO, FLUENTS_FROM).
 
 % possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
 % always_involved(EXECUTOR, ACTIONS, EXECUTORS).
