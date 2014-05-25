@@ -388,8 +388,29 @@ states_possible_with_typically_causes(STATE_FROM, [HEAD|CAUSES], STATES_TO) :-
     append(STATES_TO2, STATES_TO_ADD, STATES_TO).
 
 
-% possibly_accessible(FLUENTS_TO, FLUENTS_FROM).
-% always_accessible(FLUENTS_TO, FLUENTS_FROM).
+possibly_accessible(FLUENTS_TO, FLUENTS_FROM) :-
+    possible_states(FLUENTS_FROM, STATES),
+    possible_states_continue(STATES, FLUENTS_TO).
+
+possibly_accessible_continue([], _) :- !,fail.
+
+possibly_accessible_continue([HEAD|_], FLUENTS_TO) :-
+    accessible(FLUENTS_TO, HEAD).
+
+possibly_accessible_continue([HEAD|STATES], FLUENTS_TO) :-
+    not(accessible(FLUENTS_TO, HEAD)),
+    possibly_accessible_continue(STATES, FLUENTS_TO).
+
+always_accessible(FLUENTS_TO, FLUENTS_FROM) :-
+    possible_states(FLUENTS_FROM, STATES),
+    always_accessible_continue(STATES, FLUENTS_TO).
+
+always_accessible_continue([], _).
+
+always_accessible_continue([HEAD|STATES], FLUENTS_TO) :-
+    accessible(FLUENTS_TO, HEAD),
+    always_accessible_continue(STATES, FLUENTS_TO).
+
 % typically_accessible(FLUENTS_TO, FLUENTS_FROM).
 
 % possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
