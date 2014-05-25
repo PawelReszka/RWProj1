@@ -227,6 +227,27 @@ states_valid([HEAD|X],Y) :-
     not(state_valid(HEAD)),
     states_valid(X,Y).
 
+fluent_values(STATE, FLUENTS, VALUES) :-
+    state(STATE, STATE_FLUENTS),
+    subtract(FLUENTS, STATE_FLUENTS,  NEGATIVE),
+    subtract(FLUENTS, NEGATIVE, POSITIVE),
+    convert_negatives(NEGATIVE, NPOSITIVES),
+    append(POSITIVE, NPOSITIVES, VALUES).
+
+convert_negatives([], []).
+
+convert_negatives([HEAD|FLUENTS], [CONVERTED|NFLUENTS]) :-
+    neg(HEAD, CONVERTED),
+    convert_negatives(FLUENTS, NFLUENTS).
+
+
+preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO) :-
+    preserve(ACTION, EXECUTOR, PRESERVED),
+    fluent_values(STATE_FROM, PRESERVED, VALUES),
+    possible_states(VALUES, STATES_TO).
+
+
+
 resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATES2),
     states_valid(STATES2, STATES).
