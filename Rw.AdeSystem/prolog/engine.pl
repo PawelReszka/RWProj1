@@ -322,16 +322,18 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 
 always_executable_continue(_, _, []).
 
-possibly_accessible(STATE_TO, STATE_FROM) :-
-    possibly_accessible_continue([STATE_FROM],[], STATE_TO).
+accessible(STATE_TO, STATE_FROM) :-
+    accessible_continue([STATE_FROM],[], STATE_TO).
 
-possibly_accessible_continue([],_, _) :- !,fail.
+accessible_continue([],_, _) :- !,fail.
 
-possibly_accessible_continue([HEAD|_], _, GOAL) :-
-    HEAD == GOAL.
+accessible_continue([HEAD|_], _, GOAL) :-
+    state(HEAD, FLUENTS),
+    subset(GOAL, FLUENTS).
 
-possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    HEAD \= GOAL,
+accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
     states_possible_with_causes(HEAD, R1, STATES1),
@@ -340,7 +342,30 @@ possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-    possibly_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
+    accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
+
+typically_accessible(STATE_TO, STATE_FROM) :-
+    typically_accessible_continue([STATE_FROM],[], STATE_TO).
+
+typically_accessible_continue([],_, _) :- !,fail.
+
+typically_accessible_continue([HEAD|_], _, GOAL) :-
+    state(HEAD, FLUENTS),
+    subset(GOAL, FLUENTS).
+
+typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    not(subset(GOAL, FLUENTS)),
+    findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
+    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
+    states_possible_with_causes(HEAD, R1, STATES1),
+    states_possible_with_typically_causes(HEAD, R2, STATES2),
+    append(STATES1,STATES2, STATES),
+    subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
+    subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
+    append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
+    typically_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
+
 
 states_possible_with_causes(_, [],[]).
 
