@@ -227,7 +227,7 @@ states_valid([HEAD|X],Y) :-
     not(state_valid(HEAD)),
     states_valid(X,Y).
 
- resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
+resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATES2),
     states_valid(STATES2, STATES).
 
@@ -237,7 +237,7 @@ resAb(ACTION,EXECUTOR, STATE, STATES) :-
     subtract(STATES0, STATESN, STATES),
     !.
 
- resAb_trunc(ACTION, EXECUTOR, STATE, STATES) :-
+resAb_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resAb(ACTION, EXECUTOR, STATE, STATES2),
     states_valid(STATES2, STATES).
 
