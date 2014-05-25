@@ -20,12 +20,6 @@ sinertial(has_gun_hador).
 sinertial(loaded).
 sinertial(chown).
 
-inertial(X) :- sinertial(X).
-inertial(X) :- neg(X,Y),
-               sinertial(Y).
-
-noninertial(X) :- not(inertial(X)).
-
 initially([has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).

@@ -3,6 +3,13 @@ neg(X,Y) :- sneg(X,Y).
 
 neg(X,X) :- !,fail.
 
+inertial(X) :- sinertial(X).
+inertial(X) :- neg(X,Y),
+               sinertial(Y).
+
+noninertial(X) :- not(inertial(X)).
+
+
 release_fluent([], _,[]).
 
 release_fluent([HEAD|STATES], FLUENT, OUTPUT) :- 
