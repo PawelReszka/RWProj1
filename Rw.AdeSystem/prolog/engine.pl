@@ -228,10 +228,12 @@ states_valid([],[]).
 
 states_valid([HEAD|X],[HEAD|Y]) :- 
     state_valid(HEAD),
+    !,
     states_valid(X,Y).
 
 states_valid([HEAD|X],Y) :- 
     not(state_valid(HEAD)),
+    !,
     states_valid(X,Y).
 
 fluent_values(STATE, FLUENTS, VALUES) :-
@@ -253,7 +255,8 @@ preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO, OUTPUT) :-
     fluent_values(STATE_FROM, PRESERVED, VALUES),
     all_possible_states(VALUES, POSSIBLE_STATES),
     subtract(STATES_TO,POSSIBLE_STATES, STATES_TO_NOT_ALLOWED),
-    subtract(STATES_TO, STATES_TO_NOT_ALLOWED, OUTPUT).
+    subtract(STATES_TO, STATES_TO_NOT_ALLOWED, OUTPUT),
+    !.
 
 preserve_fluents(ACTION, EXECUTOR, _, STATES_TO, STATES_TO) :-
     not(preserve(ACTION, EXECUTOR, _)).
