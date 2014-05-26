@@ -458,9 +458,14 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     )
     ,!.
 
+all_continue_ways_check([], _,_,_).
+all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
+     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
+     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
+     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
+     accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
+     all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
 
-% all_continue_ways_check([HEAD|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
-%    .
 
 
 typically_accessible(STATE_TO, STATE_FROM) :-
