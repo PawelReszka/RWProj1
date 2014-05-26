@@ -363,7 +363,7 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 pexecutable(STATE, ACTION, EXECUTOR) :-
-    res0_min(ACTION, EXECUTOR, STATE, X),
+    res0_trunc(ACTION, EXECUTOR, STATE, X),
     length(X,Y),
     Y > 0.
 
