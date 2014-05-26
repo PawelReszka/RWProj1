@@ -437,9 +437,10 @@ galways_accessible_continue([HEAD|_], _, GOAL) :-
     subset(GOAL, FLUENTS).
 
 
-get_res_list_for_causes(_,[],_).
+get_res_list_for_causes(_,[],[]).
 
 get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
+    get_res_list_for_causes(STATE, CAUSES, LIST_OF_RES2),
     nth0(0, HEAD, ACTION),
     nth0(1, HEAD, EXECUTOR),
     res0_min(ACTION, EXECUTOR, STATE, X),
@@ -447,15 +448,15 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     (
         (
             X_LENGTH > 0,
-            append(LIST_OF_RES, X, LIST_OF_RES2),
-            get_res_list_for_cause(STATE, CAUSES, LIST_OF_RES2)
+            append(LIST_OF_RES2, [X], LIST_OF_RES)
         )
     ;
         (
             X_LENGTH == 0,
-              get_res_list_for_cause(STATE, CAUSES, LIST_OF_RES)
+            LIST_OF_RES = LIST_OF_RES2
         )
-    ).
+    )
+    ,!.
 
 
 % all_continue_ways_check([HEAD|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
