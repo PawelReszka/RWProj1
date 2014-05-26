@@ -390,7 +390,7 @@ always_executable_continue(_, _, []).
 
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
-    accessible_continue(STATES_FROM,[], GOAL).
+    always_accessible_continue(STATES_FROM,[], GOAL).
 
 always_accessible_continue([],_, _) :- !,fail.
 
@@ -403,8 +403,8 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    get_res_list_for_possible_causes(HEAD, R1, STATES1),
-    get_res_list_for_possible_causes(HEAD, R2, STATES2),
+    get_res_list_for_causes(HEAD, R1, STATES1),
+    get_res_list_for_causes(HEAD, R2, STATES2),
     append(STATES1,STATES2, STATES),
     prod(STATES, POSSIBLE_FUNCTION_VALUES),
     % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
