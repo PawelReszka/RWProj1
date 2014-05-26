@@ -422,10 +422,6 @@ accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
     % i sprawdzić czy dla każdego z nich idzie dojść ;)
     all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
-%    subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
-%    subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
-%    append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-%    accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
 
 galways_accessible(GOAL_TO, STATE_FROM) :-
     accessible_continue([STATE_FROM],[], GOAL_TO).
