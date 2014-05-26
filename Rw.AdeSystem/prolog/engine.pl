@@ -388,29 +388,17 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 
 always_executable_continue(_, _, []).
 
-accessible(GOAL, STATE_FROM) :-
-    accessible_continue([STATE_FROM],[], GOAL).
+always_accessible(GOAL, FLUENTS) :-
+    possible_states(FLUENTS, STATES_FROM),
+    accessible_continue(STATES_FROM,[], GOAL).
 
-accessible_continue([],_, _) :- !,fail.
+always_accessible_continue([],_, _) :- !,fail.
 
-accessible_continue([HEAD|_], _, GOAL) :-
+always_accessible_continue([HEAD|_], _, GOAL) :-
     state(HEAD, FLUENTS),
     subset(GOAL, FLUENTS).
 
-accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
-    findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
-    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    states_possible_with_causes(HEAD, R1, STATES1),
-    states_possible_with_typically_causes(HEAD, R2, STATES2),
-    append(STATES1,STATES2, STATES),
-    subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
-    subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
-    append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-    accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
-
-accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
     not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
@@ -422,16 +410,6 @@ accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
     % i sprawdzić czy dla każdego z nich idzie dojść ;)
     all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
-
-galways_accessible(GOAL_TO, STATE_FROM) :-
-    accessible_continue([STATE_FROM],[], GOAL_TO).
-
-galways_accessible_continue([],_, _) :- !,fail.
-
-galways_accessible_continue([HEAD|_], _, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
-
 
 get_res_list_for_causes(_,[],[]).
 
@@ -459,21 +437,21 @@ all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOA
      subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
      subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
      append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-     accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
+     always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
      all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
 
 
+possibly_accessible(GOAL, FLUENTS) :-
+    possible_states(FLUENTS, STATES_FROM),
+    possibly_accessible_continue(STATES_FROM,[], GOAL).
 
-typically_accessible(STATE_TO, STATE_FROM) :-
-    typically_accessible_continue([STATE_FROM],[], STATE_TO).
+possibly_accessible_continue([],_, _) :- !,fail.
 
-typically_accessible_continue([],_, _) :- !,fail.
-
-typically_accessible_continue([HEAD|_], _, GOAL) :-
+possibly_accessible_continue([HEAD|_], _, GOAL) :-
     state(HEAD, FLUENTS),
     subset(GOAL, FLUENTS).
 
-typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
     not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
@@ -484,7 +462,7 @@ typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-    typically_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
+    possibly_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL).
 
 
 states_possible_with_causes(_, [],[]).
@@ -507,29 +485,6 @@ states_possible_with_typically_causes(STATE_FROM, [HEAD|CAUSES], STATES_TO) :-
     subtract(STATES_TO3, STATES_TO2, STATES_TO_ADD),
     append(STATES_TO2, STATES_TO_ADD, STATES_TO).
 
-
-possibly_accessible(FLUENTS_TO, FLUENTS_FROM) :-
-    possible_states(FLUENTS_FROM, STATES),
-    possible_states_continue(STATES, FLUENTS_TO).
-
-possibly_accessible_continue([], _) :- !,fail.
-
-possibly_accessible_continue([HEAD|_], FLUENTS_TO) :-
-    accessible(FLUENTS_TO, HEAD).
-
-possibly_accessible_continue([HEAD|STATES], FLUENTS_TO) :-
-    not(accessible(FLUENTS_TO, HEAD)),
-    possibly_accessible_continue(STATES, FLUENTS_TO).
-
-always_accessible(FLUENTS_TO, FLUENTS_FROM) :-
-    possible_states(FLUENTS_FROM, STATES),
-    always_accessible_continue(STATES, FLUENTS_TO).
-
-always_accessible_continue([], _).
-
-always_accessible_continue([HEAD|STATES], FLUENTS_TO) :-
-    accessible(FLUENTS_TO, HEAD),
-    always_accessible_continue(STATES, FLUENTS_TO).
 
 % typically_accessible(FLUENTS_TO, FLUENTS_FROM).
 
