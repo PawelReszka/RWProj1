@@ -83,6 +83,7 @@
     <Compile Include="Expressions\TypicallyCausesExpression.cs" />
     <Compile Include="Expressions\TypicallyCausesIfExpression.cs" />
     <Compile Include="Helpers.cs" />
+    <Compile Include="LogicFormulaParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="PrologEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
