@@ -479,6 +479,13 @@ always_accessible_continue([HEAD|STATES], FLUENTS_TO) :-
 
 % typically_accessible(FLUENTS_TO, FLUENTS_FROM).
 
+cart_prod(L1, L2, RES) :- bagof([X,Y],
+    (member(X,L1),member(Y,L2)),RES).
+
+prod([],[[]]).
+prod([L|Ls],Out) :-
+            bagof([X|R],(prod(Ls,O), member(X,L), member(R,O)),Out).
+
 % possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
 % always_involved(EXECUTOR, ACTIONS, EXECUTORS).
 % typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
