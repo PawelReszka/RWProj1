@@ -413,7 +413,8 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
 
 all_continue_ways_check([], _,_,_).
-all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
+all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
+     list_to_set(STATES2,STATES),
      subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
      subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
      append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
@@ -443,7 +444,8 @@ typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
 
 typically_all_continue_ways_check([], _,_,_).
 typically_all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
-     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
+     list_to_set(STATES,STATES2),
+     subtract(STATES2, [HEAD|VISITED], TO_BE_VISITED),
      subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
      append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
      always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
