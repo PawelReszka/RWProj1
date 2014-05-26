@@ -8,8 +8,12 @@ namespace Rw.AdeSystem.Core
     {
         static void Main()
         {
+            //Parsowanie wyrazenia logicznego - w literals sa fluenty, a drzewo wyrazenia w logicTree
             List<Token> literals;
-            LogicFormulaParser.Parse("!((A&B)|C|D)", out literals);
+            var expr = "!(A|C<->D&(R|T))";
+            BoolExpr logicTree = LogicFormulaParser.Parse(expr, out literals);
+
+
             // ------------
             // przyklad z instrukcji do wrappera SwiPlCs :
 

@@ -10,6 +10,8 @@ namespace Rw.AdeSystem.Core
     {
         public static BoolExpr Parse(string expr, out List<Token> literals)
         {
+            expr = expr.Trim();
+            expr = expr.Replace(" ", "");
             literals = new List<Token>();
             var tokens = new List<Token>();
             var reader = new StringReader(expr);
@@ -70,6 +72,20 @@ namespace Rw.AdeSystem.Core
                         var right = Make(ref polishNotationTokensEnumerator);
                         return BoolExpr.CreateOr(left, right);
                     }
+                case "IF":
+                    {
+                        polishNotationTokensEnumerator.MoveNext();
+                        var left = Make(ref polishNotationTokensEnumerator);
+                        var right = Make(ref polishNotationTokensEnumerator);
+                        return BoolExpr.CreateIf(left, right);
+                    }
+                case "IFONLYIF":
+                    {
+                        polishNotationTokensEnumerator.MoveNext();
+                        var left = Make(ref polishNotationTokensEnumerator);
+                        var right = Make(ref polishNotationTokensEnumerator);
+                        return BoolExpr.CreateIfOnlyIf(left, right);
+                    }
             }
             return null;
         }
@@ -84,6 +100,7 @@ namespace Rw.AdeSystem.Core
             {
                 var t = infixTokenList[index];
 
+                //TODO: zobaczyc tutaj priorytety 
                 switch (t.Type)
                 {
                     case Token.TokenType.Literal:
@@ -94,10 +111,27 @@ namespace Rw.AdeSystem.Core
                     case Token.TokenType.OpenParen:
                         stack.Push(t);
                         break;
-                    case Token.TokenType.CloseParen:
-                        while (stack.Peek().Type != Token.TokenType.OpenParen)
+                    case Token.TokenType.IfOp:
+                        Console.WriteLine();
+                        while (stack.Count > 0 && stack.Peek().Type != Token.TokenType.OpenParen)
                         {
                             outputQueue.Enqueue(stack.Pop());
+                        }
+                        stack.Push(t);
+                        break;
+                    case Token.TokenType.CloseParen:
+                        while (stack.Peek().Type != Token.TokenType.OpenParen && stack.Peek().Type != Token.TokenType.IfOp)
+                        {
+                            outputQueue.Enqueue(stack.Pop());
+                        }
+                        if (stack.Peek().Type == Token.TokenType.IfOp)
+                        {
+                            var token = stack.Pop();
+                            while (stack.Peek().Type != Token.TokenType.OpenParen)
+                            {
+                                outputQueue.Enqueue(stack.Pop());
+                            }
+                            outputQueue.Enqueue(token);
                         }
                         stack.Pop();
                         if (stack.Count > 0 && stack.Peek().Type == Token.TokenType.UnaryOp)
@@ -139,6 +173,16 @@ namespace Rw.AdeSystem.Core
             if (expr.Op == BoolExpr.Bop.And)
             {
                 return Eval(expr.Left) && Eval(expr.Right);
+            }
+
+            if (expr.Op == BoolExpr.Bop.If)
+            {
+                return !Eval(expr.Left) || Eval(expr.Right);
+            }
+
+            if (expr.Op == BoolExpr.Bop.IfOnlyIf)
+            {
+                return (!Eval(expr.Left) || Eval(expr.Right)) && (Eval(expr.Left) || !Eval(expr.Right));
             }
 
             throw new ArgumentException();
@@ -191,22 +235,28 @@ namespace Rw.AdeSystem.Core
 
     public class Token
     {
-        static readonly Dictionary<char, KeyValuePair<TokenType, string>> Dict = new Dictionary<char, KeyValuePair<TokenType, string>>
+        static readonly Dictionary<string, KeyValuePair<TokenType, string>> Dict = new Dictionary<string, KeyValuePair<TokenType, string>>
         {
         {
-            '(', new KeyValuePair<TokenType, string>(TokenType.OpenParen, "(")
+            "(", new KeyValuePair<TokenType, string>(TokenType.OpenParen, "(")
         },
         {
-            ')', new KeyValuePair<TokenType, string>(TokenType.CloseParen, ")")
+            ")", new KeyValuePair<TokenType, string>(TokenType.CloseParen, ")")
         },
         {
-            '!', new KeyValuePair<TokenType, string>(TokenType.UnaryOp, "NOT")
+            "!", new KeyValuePair<TokenType, string>(TokenType.UnaryOp, "NOT")
         },
         {
-            '&', new KeyValuePair<TokenType, string>(TokenType.BinaryOp, "AND")
+            "&", new KeyValuePair<TokenType, string>(TokenType.BinaryOp, "AND")
         },
         {
-            '|', new KeyValuePair<TokenType, string>(TokenType.BinaryOp, "OR")
+            "|", new KeyValuePair<TokenType, string>(TokenType.BinaryOp, "OR")
+        },
+        {
+            "->", new KeyValuePair<TokenType, string>(TokenType.IfOp, "IF")
+        },
+        {
+            "<->", new KeyValuePair<TokenType, string>(TokenType.IfOp, "IFONLYIF")
         }
     };
 
@@ -214,6 +264,7 @@ namespace Rw.AdeSystem.Core
         {
             OpenParen,
             CloseParen,
+            IfOp,
             UnaryOp,
             BinaryOp,
             Literal,
@@ -233,7 +284,7 @@ namespace Rw.AdeSystem.Core
                 return;
             }
 
-            var ch = (char)c;
+            var ch = ((char)c).ToString();
 
             if (Dict.ContainsKey(ch))
             {
@@ -245,9 +296,17 @@ namespace Rw.AdeSystem.Core
                 //TODO: tu bedzie trzeba zmienic cus zeby kilka znakow czytalo
                 var str = "";
                 str += ch;
-                while (s.Peek() != -1 && !Dict.ContainsKey((char)s.Peek()))
+                //Tu dac cos zeby czytalo poprawnie <->
+                while (s.Peek() != -1 && !Dict.ContainsKey(((char)s.Peek()).ToString()) && ((char)s.Peek() != '-' || ((char)s.Peek() == '-' && str == "<")) && (char)s.Peek() != '<')
                 {
                     str += (char)s.Read();
+                    
+                    if (Dict.ContainsKey(str))
+                    {
+                        Type = Dict[str].Key;
+                        Value = Dict[str].Value;
+                        return;
+                    }
                 }
                 Type = TokenType.Literal;
                 Value = str;
@@ -257,7 +316,7 @@ namespace Rw.AdeSystem.Core
 
     public class BoolExpr
     {
-        public enum Bop { Leaf, And, Or, Not };
+        public enum Bop { Leaf, And, Or, Not, If, IfOnlyIf };
 
         //
         //  inner state
@@ -275,8 +334,8 @@ namespace Rw.AdeSystem.Core
         private BoolExpr(Bop op, BoolExpr left, BoolExpr right)
         {
             _op = op;
-            _left = left;
-            _right = right;
+            _left = right;
+            _right = left;
             _lit = null;
         }
 
@@ -325,9 +384,19 @@ namespace Rw.AdeSystem.Core
             return new BoolExpr(Bop.And, left, right);
         }
 
+        public static BoolExpr CreateIf(BoolExpr left, BoolExpr right)
+        {
+            return new BoolExpr(Bop.If, left, right);
+        }
+
+        public static BoolExpr CreateIfOnlyIf(BoolExpr left, BoolExpr right)
+        {
+            return new BoolExpr(Bop.IfOnlyIf, left, right);
+        }
+
         public static BoolExpr CreateNot(BoolExpr child)
         {
-            return new BoolExpr(Bop.Not, child, null);
+            return new BoolExpr(Bop.Not, null, child);
         }
 
         public static BoolExpr CreateOr(BoolExpr left, BoolExpr right)
