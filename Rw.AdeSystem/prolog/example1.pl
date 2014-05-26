@@ -18,7 +18,7 @@ sneg(alive, not_alive).
 sinertial(has_gun_mietus).
 sinertial(has_gun_hador).
 sinertial(loaded).
-sinertial(chown).
+sinertial(alive).
 
 initially([has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
