@@ -390,7 +390,8 @@ always_executable_continue(_, _, []).
 
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
-    always_accessible_continue(STATES_FROM,[], GOAL).
+    always_accessible_continue(STATES_FROM,[], GOAL),
+    !.
 
 always_accessible_continue([],_, _) :- !,fail.
 
@@ -410,6 +411,15 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
     % i sprawdzić czy dla każdego z nich idzie dojść ;)
     all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
+
+all_continue_ways_check([], _,_,_).
+all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
+     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
+     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
+     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
+     always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
+     all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
+
 
 get_res_list_for_causes(_,[],[]).
 
@@ -432,18 +442,11 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     )
     ,!.
 
-all_continue_ways_check([], _,_,_).
-all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
-     subtract(STATES, [HEAD|VISITED], TO_BE_VISITED),
-     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
-     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-     always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
-     all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
-
 
 possibly_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
-    possibly_accessible_continue(STATES_FROM,[], GOAL).
+    possibly_accessible_continue(STATES_FROM,[], GOAL),
+    !.
 
 possibly_accessible_continue([],_, _) :- !,fail.
 
