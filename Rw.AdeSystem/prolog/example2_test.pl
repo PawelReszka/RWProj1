@@ -120,7 +120,7 @@ test(shoot_hador_1) :-
 
 test(shoot_hador_2) :-
     resN(shoot,hador,state2,[state4]),
-    resAb(shoot,hador,state2,[state0]).
+    resAb(shoot,hador,state2,[state2]).
 
 test(shoot_hador_3) :-
     resN(shoot,hador,state3,[state3]),
@@ -128,7 +128,7 @@ test(shoot_hador_3) :-
 
 test(shoot_hador_4) :-
     resN(shoot,hador,state4,[state4]),
-    resAb(shoot,hador,state4,[state0]).
+    resAb(shoot,hador,state4,[]).
 
 test(shoot_hador_5) :-
     resN(shoot,hador,state5,[state5]),
