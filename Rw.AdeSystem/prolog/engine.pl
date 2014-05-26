@@ -9,6 +9,16 @@ inertial(X) :- sinertial(X).
 inertial(X) :- neg(X,Y),
                sinertial(Y).
 
+calculate([], _, _,[]).
+calculate(STATES,[],[],STATES).
+calculate([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
+    calculate(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
+    calculate(STATES, ACTIONS, EXECUTORS, STATES2),
+    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    !.
+
 noninertial(X) :- not(inertial(X)).
 
 released_fluents(ACTION, EXECUTOR, STATE_FROM, OUTPUT) :-
