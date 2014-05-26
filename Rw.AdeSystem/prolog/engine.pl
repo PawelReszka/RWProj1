@@ -157,7 +157,7 @@ possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
 
 possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R1),
-    findall([X,Y], causes(ACTION, epsilon, X, Y), R2),
+    findall([X,Y], typically_causes(ACTION, epsilon, X, Y), R2),
     append(R1,R2,R),
     length(R,R_LENGTH),
     R_LENGTH > 0,
@@ -166,13 +166,17 @@ possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
 
 possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
-    findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R),
-    length(R,R_LENGTH),
+    findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R1),
+    findall([X,Y], typically_causes(ACTION, epsilon, X, Y), R2),
+    append(R1,R2,R3),
+    length(R3,R_LENGTH),
     R_LENGTH == 0,
-    findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R2),
+    findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R5),
+    findall([X,Y], causes(ACTION, epsilon, X, Y), R6),
+    append(R5,R6,R7),
     state(STATE1, STATE1_LIST),
     state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R2, STATE1_LIST, STATE2_LIST).
+    possible_causes_fto_states2(R7, STATE1_LIST, STATE2_LIST).
 
 possible_causes_fto_states2([], _, _).
 possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2) :-
