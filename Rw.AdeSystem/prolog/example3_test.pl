@@ -124,9 +124,9 @@ test(turn2_mietus_1) :-
     res0_min(turn2, mietus, state1, [state2]),
     res0_plus(turn2, mietus, state1, [state2,state3]),
     resN(turn2,mietus,state1,[state2]),
-    resAb(turn2, mietus, state1, [state0]),
+    resAb(turn2, mietus, state1, []),
     resN_trunc(turn2,mietus,state1,[state2]),
-    resAb_trunc(turn2, mietus, state1, [state0]).
+    resAb_trunc(turn2, mietus, state1, []).
 
 test(turn2_mietus_2) :-
     res0(turn2, mietus, state2, [state0, state1,state2,state3]),
