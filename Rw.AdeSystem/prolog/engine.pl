@@ -389,7 +389,7 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 always_executable_continue(_, _, []).
 
 always_accessible(GOAL, FLUENTS) :-
-    possible_states(FLUENTS, STATES_FROM),
+    all_possible_states(FLUENTS, STATES_FROM),
     accessible_continue(STATES_FROM,[], GOAL).
 
 always_accessible_continue([],_, _) :- !,fail.
@@ -442,7 +442,7 @@ all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOA
 
 
 possibly_accessible(GOAL, FLUENTS) :-
-    possible_states(FLUENTS, STATES_FROM),
+    all_possible_states(FLUENTS, STATES_FROM),
     possibly_accessible_continue(STATES_FROM,[], GOAL).
 
 possibly_accessible_continue([],_, _) :- !,fail.
