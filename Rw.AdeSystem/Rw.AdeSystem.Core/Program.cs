@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SbsSW.SwiPlCs;
 
 namespace Rw.AdeSystem.Core
@@ -7,6 +8,8 @@ namespace Rw.AdeSystem.Core
     {
         static void Main()
         {
+            List<Token> literals;
+            LogicFormulaParser.Parse("!((A&B)|C|D)", out literals);
             // ------------
             // przyklad z instrukcji do wrappera SwiPlCs :
 
