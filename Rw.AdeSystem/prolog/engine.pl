@@ -1,4 +1,4 @@
-:-  dynamic(releases/4).
+:-  dynamic(releases/4),dynamic(preserve/3).
 
 neg(X,Y) :- sneg(Y,X).
 neg(X,Y) :- sneg(X,Y).
@@ -223,11 +223,16 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
-
 new(STATE1, STATE2,OUTPUT) :-
     state(STATE1, LIST1),
     state(STATE2, LIST2),
-    subtract(LIST1, LIST2, OUTPUT).
+    subtract(LIST1, LIST2, OUTPUT2),
+    findall(X,fluent(X),FLUENTS),
+    findall(Y,sinertial(Y),INERTIAL),
+    subtract(FLUENTS, INERTIAL, NONINERTIAL2),
+    convert_negatives(NONINERTIAL2, NEGNONINERTIAL2),
+    append(NONINERTIAL2, NEGNONINERTIAL2, NONINERTIAL),
+    subtract(OUTPUT2, NONINERTIAL, OUTPUT).
 
 minimal_length_new_of_res0([X], STATE, Y) :-
     new(X, STATE, OUTPUT),
