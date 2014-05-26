@@ -19,6 +19,31 @@ calculate([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STAT
     append(STATES_TO2,STATES_TO_ADD,STATES_TO),
     !.
 
+always_executable([], _, _,[]).
+always_executable(STATES,[],[],STATES).
+always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
+    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
+    length(STATES, STATES_LENGTH),
+    STATES_LENGTH > 0, % jeżeli chociaż jedno, gdziekolwiek będzie miało pusty wysypie sie całość
+    always_executable(STATES, ACTIONS, EXECUTORS, STATES2),
+    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    !.
+
+possibly_executable([], _, _,[]).
+possibly_executable(STATES,[],[],STATES).
+possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
+    possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
+    possibly_executable(STATES, ACTIONS, EXECUTORS, STATES2),
+    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    length(STATES_TO, COUNT),
+    COUNT > 0, % jeżeli nie dostaliśmy nic z startów początkowych - nie ma żadnego wykonywalnego dla tego poziomu.
+    !.
+
+
 noninertial(X) :- not(inertial(X)).
 
 released_fluents(ACTION, EXECUTOR, STATE_FROM, OUTPUT) :-
