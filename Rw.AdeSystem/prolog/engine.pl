@@ -210,7 +210,8 @@ state_valid_continue([HEAD|FORMULAS], STATE) :-
 state_valid_continue([], _).
 
 state_valid_with_formula(STATE, FORMULA) :-
-    formula_valid(FORMULA, STATE).
+    state(STATE, FLUENTS),
+    formula_valid(FORMULA, FLUENTS).
 
 fluents_valid(X) :-
     findall([Y], always(Y), R),
@@ -347,12 +348,12 @@ res0(ACTION, EXECUTOR, STATE, STATES) :-
 filter_only_correct_states([],[]).
 
 filter_only_correct_states([HEAD|STATE_LISTS], [HEAD|CORRECT]) :-
-    state_valid(HEAD),
+    fluents_valid(HEAD),
     filter_only_correct_states(STATE_LISTS,CORRECT),
     !.
 
 filter_only_correct_states([HEAD|STATE_LISTS], CORRECT) :-
-    not(state_valid(HEAD)),
+    not(fluents_valid(HEAD)),
     filter_only_correct_states(STATE_LISTS,CORRECT),
     !.
 
