@@ -49,14 +49,17 @@ namespace Rw.AdeSystem.Core
             //Na razie nie trzeba robic nic Prologowego
             foreach (var line in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
             {
-                if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)]*"))
+                //Always
+                if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)<=>]*"))
                 {
                     DomainPhrases.Add(new AlwaysExpression(line));
                 }
+                //Initially
                 else if (Regex.IsMatch(line, @"initially [a-z,&,!,\s]*"))
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
                 }
+                //by EPSILON Causes
                 else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]*"))
                 {
                     throw new NotImplementedException();
@@ -66,7 +69,8 @@ namespace Rw.AdeSystem.Core
                     //var format = ReverseStringFormat("{0} causes {1}", line);
                     //Actions.Add(format[0]);
                 }
-                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z]+ causes [a-z,&,!,\s]*"))
+                // by EXECUTORS Causes
+                else if (Regex.IsMatch(line,  @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z&!\s]*"))
                 {
                     throw new NotImplementedException();
 
@@ -75,6 +79,46 @@ namespace Rw.AdeSystem.Core
                     //var format = ReverseStringFormat("{0} by {1} causes {2}", line);
                     //Actions.Add(format[0]);
                     //Executors.Add(format[1]);
+                }
+                //by EPSILON Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //by EXECUTORS Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //by EPSILON Typically Causes
+                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                // by EXECUTORS Typically Causes
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z&!\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //by EPSILON Typically Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //by EXECUTORS Typically Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //by EXECUTORS preserves xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ preserves [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
+                //noninertial x
+                else if (Regex.IsMatch(line, @"noninertial [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
                 }
                 else
                 {
