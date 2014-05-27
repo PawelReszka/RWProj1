@@ -106,9 +106,9 @@ test(shoot_hador_4) :-
     res0_min(shoot,hador, state4, [state0,state4]), % state4 ma na pewno 0 różnicy, a takich jest tylko 1
     res0_plus(shoot, hador, state4, [state4,state5]),
     resN(shoot, hador, state4, [state4]),
-    resAb(shoot, hador, state4, []),
+    resAb(shoot, hador, state4, [state0]),
     resN_trunc(shoot, hador, state4, [state4]),
-    resAb_trunc(shoot, hador, state4, []).
+    resAb_trunc(shoot, hador, state4, [state0]).
 
 test(shoot_mietus_5) :-
     res0(shoot, mietus, state5, [state4,state5]),
