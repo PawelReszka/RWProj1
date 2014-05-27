@@ -427,17 +427,13 @@ minimal_length_new_of_res0([HEAD|LIST], STATE, LENGTH) :-
 copy_res0_state_if_minimal_new([],_,_,[]).
 
 copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, [HEAD|OUTPUT]) :-
-    state(HEAD, HEAD_LIST),
-    state(STATE, STATE_LIST),
-    new(HEAD_LIST, STATE_LIST, OUTPUT1),
+    new(HEAD, STATE, OUTPUT1),
     length(OUTPUT1, OUTPUT_LENGTH),
     MINIMAL == OUTPUT_LENGTH,
     copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
 
 copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
-    state(HEAD, HEAD_LIST),
-    state(STATE, STATE_LIST),
-    new(HEAD_LIST, STATE_LIST, OUTPUT1),
+    new(HEAD, STATE, OUTPUT1),
     length(OUTPUT1, OUTPUT_LENGTH),
     MINIMAL < OUTPUT_LENGTH,
     copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
@@ -448,7 +444,8 @@ res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    convert_states_to_lists(STATES_0,STATES_0LIST),
    state(STATE,STATE_LIST),
    minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
+   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
+   convert_list_to_state(STATES2_LIST, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
    release_fluents(STATES2, FLUENTS, STATES3),
    sort(STATES3,STATES),
@@ -459,7 +456,8 @@ resN(ACTION, EXECUTOR, STATE, STATES) :-
    convert_states_to_lists(STATES_0,STATES_0LIST),
    state(STATE,STATE_LIST),
    minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
+   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
+   convert_list_to_state(STATES2_LIST, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
    release_fluents(STATES2, FLUENTS, STATES3),
    sort(STATES3,STATES),
