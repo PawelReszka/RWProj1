@@ -59,10 +59,20 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
                 }
+                //by EPSILON Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    DomainPhrases.Add(new CausesIfExpression(line));
+                }
+                //by EXECUTORS Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    throw new NotImplementedException();
+                }
                 //by EPSILON Causes
                 else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]*"))
                 {
-                    throw new NotImplementedException();
+                    DomainPhrases.Add(new CausesExpression(line));
 
                     //W komentarzu jest jakies nasze podejscie do czytania akcji etc z wyrazenia
 
@@ -80,16 +90,7 @@ namespace Rw.AdeSystem.Core
                     //Actions.Add(format[0]);
                     //Executors.Add(format[1]);
                 }
-                //by EPSILON Causes xxx if...
-                else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
-                {
-                    throw new NotImplementedException();
-                }
-                //by EXECUTORS Causes xxx if...
-                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
-                {
-                    throw new NotImplementedException();
-                }
+                
                 //by EPSILON Typically Causes
                 else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]*"))
                 {
