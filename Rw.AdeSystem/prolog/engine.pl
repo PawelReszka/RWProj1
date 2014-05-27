@@ -157,7 +157,9 @@ release_fluent([HEAD|STATES], FLUENT, OUTPUT) :-
     state(HEAD,STATE_LIST),
     force_cause_change([FLUENT], STATE_LIST, STATE1_LIST),
     force_cause_change([NEG_FLUENT], STATE_LIST, STATE2_LIST),
-    join_possible_states(OUTPUT2, [STATE1_LIST, STATE2_LIST], OUTPUT),
+    nth0(0,STATE1_LIST,S1),
+    nth0(0,STATE2_LIST,S2),
+    join_possible_states(OUTPUT2, [S1,S2], OUTPUT),
     !. 
 
 join_possible_states(LIST, [], LIST) :- !.
