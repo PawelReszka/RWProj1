@@ -330,10 +330,7 @@ res0(ACTION, EXECUTOR, STATE, STATES) :-
     all_calculated_states(RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
     convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES3),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES3, FLUENTS, STATES4),
-    sort(STATES4,STATES),
+    sort(STATES2,STATES),
     !.
 
 filter_only_correct_states([],[]).
@@ -385,10 +382,7 @@ res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     all_calculated_states(STATES_0_LISTS,RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
     convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES3),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES3, FLUENTS, STATES4),
-    sort(STATES4,STATES),
+    sort(STATES2,STATES),
     !.
 
 
@@ -460,9 +454,7 @@ resN(ACTION, EXECUTOR, STATE, STATES) :-
    minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
    copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
    convert_list_to_state(STATES2_LIST, STATES2),
-   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-   release_fluents(STATES2, FLUENTS, STATES3),
-   sort(STATES3,STATES),
+   sort(STATES2,STATES),
    !.
 
 
