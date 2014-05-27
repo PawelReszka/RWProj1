@@ -114,6 +114,18 @@ all_calculated_states(FLUENTS, X) :-
     prod(LISTS, X2),
     append_fluents(FLUENTS, X2, X).
 
+all_calculated_states(STATES,FLUENTS, X) :-
+    normalize(FLUENTS, POSITIVE_FLUENTS),
+    findall(A, fluent(A), ALL_FLUENTS),
+    subtract(ALL_FLUENTS, POSITIVE_FLUENTS, REST),
+    convert_negatives(REST, NEGATIVES),
+    pair_lists(REST, NEGATIVES, LISTS),
+    prod(LISTS, X2),
+    append_fluents(FLUENTS, X2, X3),
+    subtract(X3, STATES, STATES_NOT_IN),
+    subtract(X3, STATES_NOT_IN,X).
+
+
 noninertial(X) :- not(inertial(X)).
 
 released_fluents(ACTION, EXECUTOR, STATE_FROM, OUTPUT) :-
@@ -355,12 +367,35 @@ res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
+convert_states_to_lists([],[]).
+
+convert_states_to_lists([HEAD|STATE], [ELEM|LISTS]) :-
+    state(HEAD,ELEM),
+    convert_states_to_lists(STATE,LISTS).
+
 res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
-    res0(ACTION, EXECUTOR, STATE, ALL),
-    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES2, FLUENTS, STATES3),
-    sort(STATES3,STATES),
+    findall([X,Y], typically_causes(ACTION, EXECUTOR, X,Y),R1),
+    length(R1, R1_LENGTH),
+    (
+        R1_LENGTH > 0 -> R = R1
+    ;
+        R1_LENGTH == 0,
+        findall([X,Y],causes(ACTION, EXECUTOR, X,Y),R2),
+        R = R2
+    ),
+    state(STATE, STATE_FLUENTS),
+    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    merge_results(R_ACTIVE, RESULTS),
+    res0(ACTION, EXECUTOR, STATE,STATES_0),
+    convert_states_to_lists(STATES_0, STATES_0_LISTS),
+    all_calculated_states(STATES_0_LISTS,RESULTS, STATES_LIST),
+    filter_only_correct_states(STATES_LIST,STATES_LIST2),
+    convert_list_to_state(STATES_LIST2, STATES2),
+    sort(STATES2,STATES),
+%   res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
+%   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+%   release_fluents(STATES2, FLUENTS, STATES3),
+%    sort(STATES3,STATES),
     !.
 
 
