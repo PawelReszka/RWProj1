@@ -29,6 +29,11 @@ formula(f, [s1,s2]).
 
 always(f).
 
+order(0, has_gun_hador).
+order(1, has_gun_mietus).
+order(2, loaded).
+order(3, alive).
+
 state(state0, [has_gun_hador, not_has_gun_mietus, not_loaded, alive]).
 state(state1, [not_has_gun_hador, has_gun_mietus, not_loaded, alive]).
 state(state2, [has_gun_hador, not_has_gun_mietus, loaded, alive]). 
@@ -38,8 +43,8 @@ state(state5, [not_has_gun_hador, has_gun_mietus, not_loaded, not_alive]).
 state(state6, [has_gun_hador, not_has_gun_mietus, loaded, not_alive]).
 state(state7, [not_has_gun_hador, has_gun_mietus, loaded, not_alive]).
 
-causes(chown, hador, [has_gun_mietus, not_has_gun_hador], []).
-causes(chown, mietus, [has_gun_hador, not_has_gun_mietus], []).
+causes(chown, hador, [has_gun_mietus], []).
+causes(chown, mietus, [has_gun_hador], []).
 causes(load, epsilon, [loaded], []).
 
 causes(shoot, mietus, [not_loaded], [has_gun_mietus]).

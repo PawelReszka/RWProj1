@@ -20,6 +20,11 @@ sinertial(has_gun_hador).
 sinertial(alive).
 sinertial(walking).
 
+order(0,has_gun_hador).
+order(1,has_gun_mietus).
+order(2,alive).
+order(3,walking).
+
 initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).
@@ -41,8 +46,8 @@ state(state3, [not_has_gun_hador, has_gun_mietus, alive, not_walking]).
 state(state4, [has_gun_hador, not_has_gun_mietus, not_alive, not_walking]).
 state(state5, [not_has_gun_hador, has_gun_mietus, not_alive, not_walking]).
 
-causes(chown, mietus, [has_gun_hador, not_has_gun_mietus],[]).
-causes(chown, hador, [not_has_gun_hador, has_gun_mietus], []).
+causes(chown, mietus, [has_gun_hador],[]).
+causes(chown, hador, [has_gun_mietus], []).
 causes(shoot, mietus, [not_alive], [has_gun_mietus]).
 causes(entice, hador, [walking],[]).
 

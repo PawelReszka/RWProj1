@@ -43,6 +43,88 @@ possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUT
     COUNT > 0, % jeżeli nie dostaliśmy nic z startów początkowych - nie ma żadnego wykonywalnego dla tego poziomu.
     !.
 
+pair_lists([],[],[]).
+pair_lists([HEAD1|L1], [HEAD2|L2], [ELEM|X]) :-
+    ELEM = [HEAD1,HEAD2],
+    pair_lists(L1,L2,X).
+
+all_calculated_states(X) :-
+    findall(Y,fluent(Y), R),
+    convert_negatives(R,R2),
+    pair_lists(R,R2,R3),
+    prod(R3,X2),
+    append_fluents([],X2,X), % przy okazji sortujemy fluenty ;)
+    !.
+
+
+accRev([H|T],A,R):-  accRev(T,[H|A],R).
+accRev([],A,A). 
+
+reverse(LIST1, LIST2) :- accRev(LIST1,[],LIST2).
+
+reorder_fluents(LIST, RES) :-
+    length(LIST, LENGTH),
+    LENGTH2 is LENGTH - 1,
+    reorder_fluents_cont(LIST, RES2, LENGTH2),
+    reverse(RES2,RES),
+    !.
+
+reorder_fluents_cont(_, [], -1).
+
+reorder_fluents_cont(LIST, [HEAD2|LIST2], POS) :-
+    POS > -1,
+    order(POS, FLUENT),
+    (
+        member(FLUENT, LIST),
+        HEAD2 = FLUENT
+    ;
+        not(member(FLUENT,LIST)),
+        neg(FLUENT, NEGATIVE),
+        HEAD2 = NEGATIVE
+    ),
+    POS2 is POS - 1,
+    reorder_fluents_cont(LIST, LIST2, POS2),
+    !.
+
+append_fluents(_, [], []).
+
+append_fluents(FLUENTS, [HEAD|L], [ELEM|L2]) :-
+    append(FLUENTS, HEAD, ELEM2),
+    reorder_fluents(ELEM2, ELEM),
+    append_fluents(FLUENTS, L, L2).
+
+normalize([],[]).
+
+normalize([HEAD|FLUENTS], [HEAD|NORMALIZED]) :-
+    fluent(HEAD),
+    normalize(FLUENTS, NORMALIZED).
+
+normalize([HEAD|FLUENTS], [NEG|NORMALIZED]) :-
+    not(fluent(HEAD)),
+    neg(HEAD, NEG),
+    normalize(FLUENTS, NORMALIZED).
+
+
+all_calculated_states(FLUENTS, X) :-
+    normalize(FLUENTS, POSITIVE_FLUENTS),
+    findall(A, fluent(A), ALL_FLUENTS),
+    subtract(ALL_FLUENTS, POSITIVE_FLUENTS, REST),
+    convert_negatives(REST, NEGATIVES),
+    pair_lists(REST, NEGATIVES, LISTS),
+    prod(LISTS, X2),
+    append_fluents(FLUENTS, X2, X).
+
+all_calculated_states(STATES,FLUENTS, X) :-
+    normalize(FLUENTS, POSITIVE_FLUENTS),
+    findall(A, fluent(A), ALL_FLUENTS),
+    subtract(ALL_FLUENTS, POSITIVE_FLUENTS, REST),
+    convert_negatives(REST, NEGATIVES),
+    pair_lists(REST, NEGATIVES, LISTS),
+    prod(LISTS, X2),
+    append_fluents(FLUENTS, X2, X3),
+    subtract(X3, STATES, STATES_NOT_IN),
+    subtract(X3, STATES_NOT_IN,X).
+
 
 noninertial(X) :- not(inertial(X)).
 
@@ -67,8 +149,6 @@ released_fluents_continue(STATE, [HEAD|FLUENTS], OUTPUT) :-
     OUTPUT = OUTPUT2,
     !.
 
-
-
 release_fluent([], _,[]).
 
 release_fluent([HEAD|STATES], FLUENT, OUTPUT) :- 
@@ -77,7 +157,9 @@ release_fluent([HEAD|STATES], FLUENT, OUTPUT) :-
     state(HEAD,STATE_LIST),
     force_cause_change([FLUENT], STATE_LIST, STATE1_LIST),
     force_cause_change([NEG_FLUENT], STATE_LIST, STATE2_LIST),
-    join_possible_states(OUTPUT2, [STATE1_LIST, STATE2_LIST], OUTPUT),
+    nth0(0,STATE1_LIST,S1),
+    nth0(0,STATE2_LIST,S2),
+    join_possible_states(OUTPUT2, [S1,S2], OUTPUT),
     !. 
 
 join_possible_states(LIST, [], LIST) :- !.
@@ -117,12 +199,15 @@ formula_valid_continue([HEAD|STMT], FLUENTS) :-
     formula_valid_continue(STMT, FLUENTS).
 
 state_valid(X) :-
-    findall([X], always(X), R),
-    state_valid_continue(R, X).
+    findall([Y], always(Y), R),
+    state_valid_continue(R, X),
+    !.
 
-state_valid_continue([HEAD|_], STATE) :-
+state_valid_continue([HEAD|FORMULAS], STATE) :-
     nth0(0, HEAD, FORMULA),
-    state_valid_with_formula(STATE, FORMULA).
+    state_valid_with_formula(STATE, FORMULA),
+    state_valid_continue(FORMULAS,STATE),
+    !.
 
 state_valid_continue([], _).
 
@@ -164,23 +249,13 @@ all_possible_states(LIST_OF_FLUENTS,X) :-
     list_of_states(LIST_OF_ALL_STATES),
     possible_states(LIST_OF_FLUENTS, LIST_OF_ALL_STATES, X).
 
-cause_change(LIST, STATE2, STATE1) :-
-    state(STATE1, STATE1_LIST),
-    force_cause_change(LIST, STATE1_LIST, STATE2_LIST),
-    state(STATE2, STATE2_LIST),
-    !.
 
-force_cause_change(_,[],[]).
+force_cause_change(LIST,STATE1_LIST,STATE2_LIST) :-
+    all_calculated_states(LIST, STATE_LISTS),
+    filter_only_correct_states(STATE_LISTS, CORRECT_LISTS),
+    minimal_length_new_of_res0(CORRECT_LISTS, STATE1_LIST, MINIMAL),
+    copy_res0_state_if_minimal_new(CORRECT_LISTS, STATE1_LIST, MINIMAL, STATE2_LIST).
 
-force_cause_change(LIST,[TOP1|X],[TOP2|Y]) :-
-    neg(TOP1,TOP2),
-    member(TOP2,LIST),
-    force_cause_change(LIST,X,Y).
-
-force_cause_change(LIST,[TOP1|X],[TOP1|Y]) :-
-    neg(TOP1,TOP2),
-    not(member(TOP2,LIST)),
-    force_cause_change(LIST,X,Y).
 
 possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R1),
@@ -221,12 +296,53 @@ possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2) :-
     (not(subset(HEAD2, LIST2)); subset(HEAD1, LIST1)),
     possible_causes_fto_states2(TAIL, LIST1, LIST2).
 
+filter_active(_, [], []).
+
+filter_active(STATE, [HEAD|CAUSES_ALL], [HEAD|CAUSES_ACTIVE]) :-
+    nth0(1, HEAD, ACTION_REQ),
+    subset(ACTION_REQ, STATE),
+    filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
+    !.
+
+filter_active(STATE, [HEAD|CAUSES_ALL], CAUSES_ACTIVE) :-
+    nth0(1, HEAD, ACTION_REQ),
+    not(subset(ACTION_REQ, STATE)),
+    filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
+    !.
+
+merge_results([],[]).
+
+merge_results([HEAD|CAUSES], RESULTS) :-
+    nth0(0, HEAD, RESULTS1),
+    merge_results(CAUSES, RESULTS2),
+    append(RESULTS1, RESULTS2,RESULTS).
+
+convert_list_to_state([],[]).
+convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
+    state(HEAD2,HEAD1),
+    convert_list_to_state(LISTS,STATES).
+
 res0(ACTION, EXECUTOR, STATE, STATES) :-
-    list_of_states(ALL),
-    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES2, FLUENTS, STATES3),
-    sort(STATES3,STATES),
+    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
+    state(STATE, STATE_FLUENTS),
+    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    merge_results(R_ACTIVE, RESULTS),
+    all_calculated_states(RESULTS, STATES_LIST),
+    filter_only_correct_states(STATES_LIST,STATES_LIST2),
+    convert_list_to_state(STATES_LIST2, STATES2),
+    sort(STATES2,STATES),
+    !.
+
+filter_only_correct_states([],[]).
+
+filter_only_correct_states([HEAD|STATE_LISTS], [HEAD|CORRECT]) :-
+    fluents_valid(HEAD),
+    filter_only_correct_states(STATE_LISTS,CORRECT),
+    !.
+
+filter_only_correct_states([HEAD|STATE_LISTS], CORRECT) :-
+    not(fluents_valid(HEAD)),
+    filter_only_correct_states(STATE_LISTS,CORRECT),
     !.
 
 
@@ -242,12 +358,31 @@ res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
+convert_states_to_lists([],[]).
+
+convert_states_to_lists([HEAD|STATE], [ELEM|LISTS]) :-
+    state(HEAD,ELEM),
+    convert_states_to_lists(STATE,LISTS).
+
 res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
-    res0(ACTION, EXECUTOR, STATE, ALL),
-    res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES2, FLUENTS, STATES3),
-    sort(STATES3,STATES),
+    findall([X,Y], typically_causes(ACTION, EXECUTOR, X,Y),R1),
+    length(R1, R1_LENGTH),
+    (
+        R1_LENGTH > 0 -> R = R1
+    ;
+        R1_LENGTH == 0,
+        findall([X,Y],causes(ACTION, EXECUTOR, X,Y),R2),
+        R = R2
+    ),
+    state(STATE, STATE_FLUENTS),
+    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    merge_results(R_ACTIVE, RESULTS),
+    res0(ACTION, EXECUTOR, STATE,STATES_0),
+    convert_states_to_lists(STATES_0, STATES_0_LISTS),
+    all_calculated_states(STATES_0_LISTS,RESULTS, STATES_LIST),
+    filter_only_correct_states(STATES_LIST,STATES_LIST2),
+    convert_list_to_state(STATES_LIST2, STATES2),
+    sort(STATES2,STATES),
     !.
 
 
@@ -263,9 +398,7 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
-new(STATE1, STATE2,OUTPUT) :-
-    state(STATE1, LIST1),
-    state(STATE2, LIST2),
+new(LIST1, LIST2,OUTPUT) :-
     subtract(LIST1, LIST2, OUTPUT2),
     findall(X,fluent(X),FLUENTS),
     findall(Y,sinertial(Y),INERTIAL),
@@ -304,8 +437,11 @@ copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
 
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
-   minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
+   convert_states_to_lists(STATES_0,STATES_0LIST),
+   state(STATE,STATE_LIST),
+   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
+   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
+   convert_list_to_state(STATES2_LIST, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
    release_fluents(STATES2, FLUENTS, STATES3),
    sort(STATES3,STATES),
@@ -313,11 +449,12 @@ res0_min(ACTION, EXECUTOR, STATE, STATES) :-
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
-   minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
-   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-   release_fluents(STATES2, FLUENTS, STATES3),
-   sort(STATES3,STATES),
+   convert_states_to_lists(STATES_0,STATES_0LIST),
+   state(STATE,STATE_LIST),
+   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
+   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
+   convert_list_to_state(STATES2_LIST, STATES2),
+   sort(STATES2,STATES),
    !.
 
 
