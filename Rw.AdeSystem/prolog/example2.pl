@@ -20,6 +20,11 @@ sinertial(has_gun_hador).
 sinertial(alive).
 sinertial(walking).
 
+order(0,has_gun_hador).
+order(1,has_gun_mietus).
+order(2,alive).
+order(3,walking).
+
 initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).

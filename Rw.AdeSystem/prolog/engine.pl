@@ -201,9 +201,11 @@ state_valid(X) :-
     state_valid_continue(R, X),
     !.
 
-state_valid_continue([HEAD|_], STATE) :-
+state_valid_continue([HEAD|FORMULAS], STATE) :-
     nth0(0, HEAD, FORMULA),
-    state_valid_with_formula(STATE, FORMULA).
+    state_valid_with_formula(STATE, FORMULA),
+    state_valid_continue(FORMULAS,STATE),
+    !.
 
 state_valid_continue([], _).
 
