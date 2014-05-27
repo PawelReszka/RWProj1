@@ -8,11 +8,35 @@ namespace Rw.AdeSystem.Core
 {
     public static class LogicFormulaParser
     {
-        public static BoolExpr Parse(string expr, out List<Token> literals)
+        public static BoolExpr Parse(string expr, out List<Token> literals, out List<string> literalValues)
         {
             expr = expr.Trim();
             expr = expr.Replace(" ", "");
+            bool isChange;
+            //do
+            //{
+            //    isChange = false;
+                for (int i = 0; i < expr.Length; i++)
+                {
+                    if (expr[i] == '!')
+                    {
+                        if (expr[i + 1] != '(')
+                        {
+                            int j = i + 1;
+                            while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&')
+                                j++;
+                            expr = expr.Insert(i, "(");
+                            expr = expr.Insert(j+1, ")");
+                            //isChange = true;
+                            //break;
+                        }
+                    }
+                    i++;
+                }
+           // } while (isChange);
+
             literals = new List<Token>();
+            literalValues = new List<string>();
             var tokens = new List<Token>();
             var reader = new StringReader(expr);
 
@@ -33,9 +57,30 @@ namespace Rw.AdeSystem.Core
             enumerator.MoveNext();
             var root = Make(ref enumerator);
 
+            TraverseTree(root, null, literalValues);
             return root;
             //Eval the expression tree
             //Console.WriteLine(@"Eval: {0}", Eval(root));
+        }
+
+        static void TraverseTree(BoolExpr expr, BoolExpr parent, List<string> tokens)
+        {
+            if (expr.IsLeaf())
+            {
+                if (parent != null && parent.Op == BoolExpr.Bop.Not)
+                {
+                    tokens.Add("!" + expr.Lit);
+                }
+                else
+                {
+                    tokens.Add(expr.Lit);
+                }
+                return;
+            }
+            if (expr.Left != null)
+                TraverseTree(expr.Left, expr, tokens);
+            if (expr.Right != null)
+                TraverseTree(expr.Right, expr, tokens);
         }
 
         static BoolExpr Make(ref List<Token>.Enumerator polishNotationTokensEnumerator)
@@ -106,8 +151,8 @@ namespace Rw.AdeSystem.Core
                     case Token.TokenType.Literal:
                         outputQueue.Enqueue(t);
                         break;
-                    case Token.TokenType.BinaryOp:
                     case Token.TokenType.UnaryOp:
+                    case Token.TokenType.BinaryOp:
                     case Token.TokenType.OpenParen:
                         stack.Push(t);
                         break;
@@ -233,7 +278,7 @@ namespace Rw.AdeSystem.Core
 
     public class Token
     {
-        static readonly Dictionary<string, KeyValuePair<TokenType, string>> Dict = new Dictionary<string, KeyValuePair<TokenType, string>>
+        public static readonly Dictionary<string, KeyValuePair<TokenType, string>> Dict = new Dictionary<string, KeyValuePair<TokenType, string>>
         {
         {
             "(", new KeyValuePair<TokenType, string>(TokenType.OpenParen, "(")
@@ -298,7 +343,7 @@ namespace Rw.AdeSystem.Core
                 while (s.Peek() != -1 && !Dict.ContainsKey(((char)s.Peek()).ToString()) && ((char)s.Peek() != '-' || ((char)s.Peek() == '-' && str == "<")) && (char)s.Peek() != '<')
                 {
                     str += (char)s.Read();
-                    
+
                     if (Dict.ContainsKey(str))
                     {
                         Type = Dict[str].Key;
@@ -425,11 +470,11 @@ namespace Rw.AdeSystem.Core
             return (_op == Bop.Leaf);
         }
 
-/*
-        Boolean IsAtomic()
-        {
-            return (IsLeaf() || (_op == Bop.Not && _left.IsLeaf()));
-        }
-*/
+        /*
+                Boolean IsAtomic()
+                {
+                    return (IsLeaf() || (_op == Bop.Not && _left.IsLeaf()));
+                }
+        */
     }
 }

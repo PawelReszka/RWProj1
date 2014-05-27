@@ -8,7 +8,8 @@ namespace Rw.AdeSystem.Core.Expressions
         {
             line = line.Trim().Remove(0, "always".Length);
             List<Token> tokens;
-            var expression = LogicFormulaParser.Parse(line, out tokens);
+            List<string> tokenValues;
+            var expression = LogicFormulaParser.Parse(line, out tokens, out tokenValues);
             BoolExpr l, r;
             l = expression.Left;
             r = expression.Right;
