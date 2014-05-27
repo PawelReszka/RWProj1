@@ -15,6 +15,10 @@ sneg(switch2_on, switch2_off).
 sinertial(switch1_on).
 sinertial(switch2_on).
 
+order(0,light_on).
+order(1,switch1_on).
+order(2,switch2_on).
+
 initially([switch1_on, switch2_on, light_on]).
 
 stmt(s1, [light_on, switch1_on, switch2_on]).
