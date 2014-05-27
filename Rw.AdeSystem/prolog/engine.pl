@@ -112,7 +112,7 @@ all_calculated_states(FLUENTS, X) :-
     convert_negatives(REST, NEGATIVES),
     pair_lists(REST, NEGATIVES, LISTS),
     prod(LISTS, X2),
-    append_fluents(POSITIVE_FLUENTS, X2, X).
+    append_fluents(FLUENTS, X2, X).
 
 noninertial(X) :- not(inertial(X)).
 
@@ -185,8 +185,9 @@ formula_valid_continue([HEAD|STMT], FLUENTS) :-
     formula_valid_continue(STMT, FLUENTS).
 
 state_valid(X) :-
-    findall([X], always(X), R),
-    state_valid_continue(R, X).
+    findall([Y], always(Y), R),
+    state_valid_continue(R, X),
+    !.
 
 state_valid_continue([HEAD|_], STATE) :-
     nth0(0, HEAD, FORMULA),
@@ -195,8 +196,7 @@ state_valid_continue([HEAD|_], STATE) :-
 state_valid_continue([], _).
 
 state_valid_with_formula(STATE, FORMULA) :-
-    state(STATE, FLUENTS),
-    formula_valid(FORMULA, FLUENTS).
+    formula_valid(FORMULA, STATE).
 
 fluents_valid(X) :-
     findall([Y], always(Y), R),
@@ -289,12 +289,57 @@ possible_causes_fto_states2([HEAD|TAIL],LIST1, LIST2) :-
     (not(subset(HEAD2, LIST2)); subset(HEAD1, LIST1)),
     possible_causes_fto_states2(TAIL, LIST1, LIST2).
 
+filter_active(_, [], []).
+
+filter_active(STATE, [HEAD|CAUSES_ALL], [HEAD|CAUSES_ACTIVE]) :-
+    nth0(1, HEAD, ACTION_REQ),
+    subset(ACTION_REQ, STATE),
+    filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
+    !.
+
+filter_active(STATE, [HEAD|CAUSES_ALL], CAUSES_ACTIVE) :-
+    nth0(1, HEAD, ACTION_REQ),
+    not(subset(ACTION_REQ, STATE)),
+    filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
+    !.
+
+merge_results([],[]).
+
+merge_results([HEAD|CAUSES], RESULTS) :-
+    nth0(0, HEAD, RESULTS1),
+    merge_results(CAUSES, RESULTS2),
+    append(RESULTS1, RESULTS2,RESULTS).
+
+convert_list_to_state([],[]).
+convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
+    state(HEAD2,HEAD1),
+    convert_list_to_state(LISTS,STATES).
+
 res0(ACTION, EXECUTOR, STATE, STATES) :-
-    list_of_states(ALL),
-    res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-    release_fluents(STATES2, FLUENTS, STATES3),
-    sort(STATES3,STATES),
+    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
+    state(STATE, STATE_FLUENTS),
+    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    merge_results(R_ACTIVE, RESULTS),
+    all_calculated_states(RESULTS, STATES_LIST),
+    filter_only_correct_states(STATES_LIST,STATES_LIST2),
+    convert_list_to_state(STATES_LIST2, STATES2),
+    sort(STATES2,STATES),
+%   res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
+%   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+%   release_fluents(STATES2, FLUENTS, STATES3),
+%    sort(STATES3,STATES),
+    !.
+
+filter_only_correct_states([],[]).
+
+filter_only_correct_states([HEAD|STATE_LISTS], [HEAD|CORRECT]) :-
+    state_valid(HEAD),
+    filter_only_correct_states(STATE_LISTS,CORRECT),
+    !.
+
+filter_only_correct_states([HEAD|STATE_LISTS], CORRECT) :-
+    not(state_valid(HEAD)),
+    filter_only_correct_states(STATE_LISTS,CORRECT),
     !.
 
 
