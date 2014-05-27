@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SbsSW.SwiPlCs;
 
 namespace Rw.AdeSystem.Core
@@ -10,10 +11,11 @@ namespace Rw.AdeSystem.Core
         {
             //Parsowanie wyrazenia logicznego - w literals sa fluenty, a drzewo wyrazenia w logicTree
             List<Token> literals;
-            var expr = "!(A|C<->D&(R|T))";
+            var expr = "A&B->C";
             BoolExpr logicTree = LogicFormulaParser.Parse(expr, out literals);
-
-
+            var dict = literals.ToDictionary(i => i.Value, i => i.Value == "A" || i.Value == "B");
+            var b = LogicFormulaParser.Eval(logicTree, dict);
+            Console.WriteLine(b);
             // ------------
             // przyklad z instrukcji do wrappera SwiPlCs :
 

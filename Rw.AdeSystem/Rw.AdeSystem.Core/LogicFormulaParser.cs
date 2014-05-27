@@ -151,38 +151,36 @@ namespace Rw.AdeSystem.Core
             return outputQueue.Reverse().ToList();
         }
 
-        
-
-        static bool Eval(BoolExpr expr)
+        public static bool Eval(BoolExpr expr, Dictionary<string, bool> fluentValues)
         {
             if (expr.IsLeaf())
             {
-                return false;//booleanValues[expr.Lit];
+                return fluentValues[expr.Lit];
             }
 
             if (expr.Op == BoolExpr.Bop.Not)
             {
-                return !Eval(expr.Left);
+                return !Eval(expr.Left, fluentValues);
             }
 
             if (expr.Op == BoolExpr.Bop.Or)
             {
-                return Eval(expr.Left) || Eval(expr.Right);
+                return Eval(expr.Left, fluentValues) || Eval(expr.Right, fluentValues);
             }
 
             if (expr.Op == BoolExpr.Bop.And)
             {
-                return Eval(expr.Left) && Eval(expr.Right);
+                return Eval(expr.Left, fluentValues) && Eval(expr.Right, fluentValues);
             }
 
             if (expr.Op == BoolExpr.Bop.If)
             {
-                return !Eval(expr.Left) || Eval(expr.Right);
+                return !Eval(expr.Left, fluentValues) || Eval(expr.Right, fluentValues);
             }
 
             if (expr.Op == BoolExpr.Bop.IfOnlyIf)
             {
-                return (!Eval(expr.Left) || Eval(expr.Right)) && (Eval(expr.Left) || !Eval(expr.Right));
+                return (!Eval(expr.Left, fluentValues) || Eval(expr.Right, fluentValues)) && (Eval(expr.Left, fluentValues) || !Eval(expr.Right, fluentValues));
             }
 
             throw new ArgumentException();
