@@ -65,13 +65,13 @@ reverse(LIST1, LIST2) :- accRev(LIST1,[],LIST2).
 reorder_fluents(LIST, RES) :-
     length(LIST, LENGTH),
     LENGTH2 is LENGTH - 1,
-    reorder_fluents(LIST, RES2, LENGTH2),
+    reorder_fluents_cont(LIST, RES2, LENGTH2),
     reverse(RES2,RES),
-    .
+    !.
 
-reorder_fluents(_, [], -1).
+reorder_fluents_cont(_, [], -1).
 
-reorder_fluents(LIST, [HEAD2|LIST2], POS) :-
+reorder_fluents_cont(LIST, [HEAD2|LIST2], POS) :-
     POS > -1,
     order(POS, FLUENT),
     (
@@ -83,7 +83,7 @@ reorder_fluents(LIST, [HEAD2|LIST2], POS) :-
         HEAD2 = NEGATIVE
     ),
     POS2 is POS - 1,
-    reorder_fluents(LIST, LIST2, POS2),
+    reorder_fluents_cont(LIST, LIST2, POS2),
     !.
 
 append_fluents(_, [], []).
