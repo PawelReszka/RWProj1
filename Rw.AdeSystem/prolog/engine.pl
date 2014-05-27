@@ -247,23 +247,13 @@ all_possible_states(LIST_OF_FLUENTS,X) :-
     list_of_states(LIST_OF_ALL_STATES),
     possible_states(LIST_OF_FLUENTS, LIST_OF_ALL_STATES, X).
 
-cause_change(LIST, STATE2, STATE1) :-
-    state(STATE1, STATE1_LIST),
-    force_cause_change(LIST, STATE1_LIST, STATE2_LIST),
-    state(STATE2, STATE2_LIST),
-    !.
 
-force_cause_change(_,[],[]).
+force_cause_change(LIST,STATE1_LIST,STATE2_LIST) :-
+    all_calculated_states(LIST, STATE_LISTS),
+    filter_only_correct_states(STATE_LISTS, CORRECT_LISTS),
+    minimal_length_new_of_res0(CORRECT_LISTS, STATE1_LIST, MINIMAL),
+    copy_res0_state_if_minimal_new(CORRECT_LISTS, STATE1_LIST, MINIMAL, STATE2_LIST).
 
-force_cause_change(LIST,[TOP1|X],[TOP2|Y]) :-
-    neg(TOP1,TOP2),
-    member(TOP2,LIST),
-    force_cause_change(LIST,X,Y).
-
-force_cause_change(LIST,[TOP1|X],[TOP1|Y]) :-
-    neg(TOP1,TOP2),
-    not(member(TOP2,LIST)),
-    force_cause_change(LIST,X,Y).
 
 possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R1),
