@@ -328,11 +328,10 @@ res0(ACTION, EXECUTOR, STATE, STATES) :-
     all_calculated_states(RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
     convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES),
-%   res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-%   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-%   release_fluents(STATES2, FLUENTS, STATES3),
-%    sort(STATES3,STATES),
+    sort(STATES2,STATES3),
+    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+    release_fluents(STATES3, FLUENTS, STATES4),
+    sort(STATES4,STATES),
     !.
 
 filter_only_correct_states([],[]).
@@ -384,11 +383,10 @@ res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     all_calculated_states(STATES_0_LISTS,RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
     convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES),
-%   res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES2),
-%   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-%   release_fluents(STATES2, FLUENTS, STATES3),
-%    sort(STATES3,STATES),
+    sort(STATES2,STATES3),
+    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+    release_fluents(STATES3, FLUENTS, STATES4),
+    sort(STATES4,STATES),
     !.
 
 
@@ -414,15 +412,11 @@ new(LIST1, LIST2,OUTPUT) :-
     subtract(OUTPUT2, NONINERTIAL, OUTPUT).
 
 minimal_length_new_of_res0([X], STATE, Y) :-
-    state(X, XLIST),
-    state(STATE, STATE_LIST),
-    new(XLIST, STATE_LIST, OUTPUT),
+    new(X, STATE, OUTPUT),
     length(OUTPUT,Y).
 
 minimal_length_new_of_res0([HEAD|LIST], STATE, LENGTH) :-
-    state(HEAD, HEAD_LIST),
-    state(STATE,STATE_LIST),
-    new(HEAD_LIST, STATE_LIST, OUTPUT),
+    new(HEAD, STATE, OUTPUT),
     length(OUTPUT, OUTPUT_LENGTH),
     minimal_length_new_of_res0(LIST, STATE, OUTPUT_LENGTH2),
     (
@@ -451,7 +445,9 @@ copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
 
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
-   minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
+   convert_states_to_lists(STATES_0,STATES_0LIST),
+   state(STATE,STATE_LIST),
+   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
    copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
    release_fluents(STATES2, FLUENTS, STATES3),
@@ -460,7 +456,9 @@ res0_min(ACTION, EXECUTOR, STATE, STATES) :-
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
-   minimal_length_new_of_res0(STATES_0, STATE, MINIMAL),
+   convert_states_to_lists(STATES_0,STATES_0LIST),
+   state(STATE,STATE_LIST),
+   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
    copy_res0_state_if_minimal_new(STATES_0, STATE, MINIMAL, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
    release_fluents(STATES2, FLUENTS, STATES3),
