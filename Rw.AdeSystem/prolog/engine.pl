@@ -43,6 +43,76 @@ possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUT
     COUNT > 0, % jeżeli nie dostaliśmy nic z startów początkowych - nie ma żadnego wykonywalnego dla tego poziomu.
     !.
 
+pair_lists([],[],[]).
+pair_lists([HEAD1|L1], [HEAD2|L2], [ELEM|X]) :-
+    ELEM = [HEAD1,HEAD2],
+    pair_lists(L1,L2,X).
+
+all_calculated_states(X) :-
+    findall(Y,fluent(Y), R),
+    convert_negatives(R,R2),
+    pair_lists(R,R2,R3),
+    prod(R3,X2),
+    append_fluents([],X2,X), % przy okazji sortujemy fluenty ;)
+    !.
+
+
+accRev([H|T],A,R):-  accRev(T,[H|A],R).
+accRev([],A,A). 
+
+reverse(LIST1, LIST2) :- accRev(LIST1,[],LIST2).
+
+reorder_fluents(LIST, RES) :-
+    length(LIST, LENGTH),
+    LENGTH2 is LENGTH - 1,
+    reorder_fluents(LIST, RES2, LENGTH2),
+    reverse(RES2,RES),
+    .
+
+reorder_fluents(_, [], -1).
+
+reorder_fluents(LIST, [HEAD2|LIST2], POS) :-
+    POS > -1,
+    order(POS, FLUENT),
+    (
+        member(FLUENT, LIST),
+        HEAD2 = FLUENT
+    ;
+        not(member(FLUENT,LIST)),
+        neg(FLUENT, NEGATIVE),
+        HEAD2 = NEGATIVE
+    ),
+    POS2 is POS - 1,
+    reorder_fluents(LIST, LIST2, POS2),
+    !.
+
+append_fluents(_, [], []).
+
+append_fluents(FLUENTS, [HEAD|L], [ELEM|L2]) :-
+    append(FLUENTS, HEAD, ELEM2),
+    reorder_fluents(ELEM2, ELEM),
+    append_fluents(FLUENTS, L, L2).
+
+normalize([],[]).
+
+normalize([HEAD|FLUENTS], [HEAD|NORMALIZED]) :-
+    fluent(HEAD),
+    normalize(FLUENTS, NORMALIZED).
+
+normalize([HEAD|FLUENTS], [NEG|NORMALIZED]) :-
+    not(fluent(HEAD)),
+    neg(HEAD, NEG),
+    normalize(FLUENTS, NORMALIZED).
+
+
+all_calculated_states(FLUENTS, X) :-
+    normalize(FLUENTS, POSITIVE_FLUENTS),
+    findall(A, fluent(A), ALL_FLUENTS),
+    subtract(ALL_FLUENTS, POSITIVE_FLUENTS, REST),
+    convert_negatives(REST, NEGATIVES),
+    pair_lists(REST, NEGATIVES, LISTS),
+    prod(LISTS, X2),
+    append_fluents(POSITIVE_FLUENTS, X2, X).
 
 noninertial(X) :- not(inertial(X)).
 
@@ -66,8 +136,6 @@ released_fluents_continue(STATE, [HEAD|FLUENTS], OUTPUT) :-
     not(state_valid_with_formula(STATE, FORMULA)),
     OUTPUT = OUTPUT2,
     !.
-
-
 
 release_fluent([], _,[]).
 
