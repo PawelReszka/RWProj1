@@ -404,9 +404,7 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
-new(STATE1, STATE2,OUTPUT) :-
-    state(STATE1, LIST1),
-    state(STATE2, LIST2),
+new(LIST1, LIST2,OUTPUT) :-
     subtract(LIST1, LIST2, OUTPUT2),
     findall(X,fluent(X),FLUENTS),
     findall(Y,sinertial(Y),INERTIAL),
@@ -416,11 +414,15 @@ new(STATE1, STATE2,OUTPUT) :-
     subtract(OUTPUT2, NONINERTIAL, OUTPUT).
 
 minimal_length_new_of_res0([X], STATE, Y) :-
-    new(X, STATE, OUTPUT),
+    state(X, XLIST),
+    state(STATE, STATE_LIST),
+    new(XLIST, STATE_LIST, OUTPUT),
     length(OUTPUT,Y).
 
 minimal_length_new_of_res0([HEAD|LIST], STATE, LENGTH) :-
-    new(HEAD, STATE, OUTPUT),
+    state(HEAD, HEAD_LIST),
+    state(STATE,STATE_LIST),
+    new(HEAD_LIST, STATE_LIST, OUTPUT),
     length(OUTPUT, OUTPUT_LENGTH),
     minimal_length_new_of_res0(LIST, STATE, OUTPUT_LENGTH2),
     (
@@ -431,13 +433,17 @@ minimal_length_new_of_res0([HEAD|LIST], STATE, LENGTH) :-
 copy_res0_state_if_minimal_new([],_,_,[]).
 
 copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, [HEAD|OUTPUT]) :-
-    new(HEAD, STATE, OUTPUT1),
+    state(HEAD, HEAD_LIST),
+    state(STATE, STATE_LIST),
+    new(HEAD_LIST, STATE_LIST, OUTPUT1),
     length(OUTPUT1, OUTPUT_LENGTH),
     MINIMAL == OUTPUT_LENGTH,
     copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
 
 copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
-    new(HEAD, STATE, OUTPUT1),
+    state(HEAD, HEAD_LIST),
+    state(STATE, STATE_LIST),
+    new(HEAD_LIST, STATE_LIST, OUTPUT1),
     length(OUTPUT1, OUTPUT_LENGTH),
     MINIMAL < OUTPUT_LENGTH,
     copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
