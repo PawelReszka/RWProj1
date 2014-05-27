@@ -38,8 +38,8 @@ state(state5, [not_has_gun_hador, has_gun_mietus, not_loaded, not_alive]).
 state(state6, [has_gun_hador, not_has_gun_mietus, loaded, not_alive]).
 state(state7, [not_has_gun_hador, has_gun_mietus, loaded, not_alive]).
 
-causes(chown, hador, [has_gun_mietus, not_has_gun_hador], []).
-causes(chown, mietus, [has_gun_hador, not_has_gun_mietus], []).
+causes(chown, hador, [has_gun_mietus], []).
+causes(chown, mietus, [has_gun_hador], []).
 causes(load, epsilon, [loaded], []).
 
 causes(shoot, mietus, [not_loaded], [has_gun_mietus]).
