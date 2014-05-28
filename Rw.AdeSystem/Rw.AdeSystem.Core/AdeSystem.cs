@@ -59,6 +59,11 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
                 }
+                // zakladam ze slowa kluczowe sa zabronione jako nazwy akcji, fluentow, etc -> mniej kodu
+                else if (line.Contains(" releases "))
+                {
+                    DomainPhrases.Add(new ReleasesExpression(line));    
+                }                    
                 //by EPSILON Causes xxx if...
                 else if (Regex.IsMatch(line, @"[A-Z]+ causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
                 {

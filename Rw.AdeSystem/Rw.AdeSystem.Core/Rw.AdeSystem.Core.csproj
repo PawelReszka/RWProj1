@@ -79,9 +79,9 @@
     <Compile Include="Expressions\NoninertialExpression.cs" />
     <Compile Include="Expressions\PreservesExpression.cs" />
     <Compile Include="Expressions\ReleasesExpression.cs" />
-    <Compile Include="Expressions\ReleasesIfExpression.cs" />
     <Compile Include="Expressions\TypicallyCausesExpression.cs" />
     <Compile Include="Expressions\TypicallyCausesIfExpression.cs" />
+    <Compile Include="FluentParser.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="LogicFormulaParser.cs" />
     <Compile Include="Program.cs" />
