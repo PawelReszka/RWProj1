@@ -400,15 +400,15 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
 
 new(LIST1, LIST2,RELEASED, OUTPUT) :-
     values_of_state(LIST1, RELEASED, RELEASEDX),
-    subtract(LIST1, LIST2, OUTPUT2),
+    subtract(LIST1, LIST2, CHANGE),
     findall(X,fluent(X),FLUENTS),
     findall(Y,sinertial(Y),INERTIAL),
     subtract(FLUENTS, INERTIAL, NONINERTIAL2),
     convert_negatives(NONINERTIAL2, NEGNONINERTIAL2),
     append(NONINERTIAL2, NEGNONINERTIAL2, NONINERTIAL),
-    subtract(OUTPUT2, NONINERTIAL, OUTPUT2),
-    subtract(RELEASEDX, OUTPUT2, RELEASED2),
-    append(OUTPUT2, RELEASED2, OUTPUT).
+    subtract(CHANGE, NONINERTIAL, CHANGE2),
+    subtract(RELEASEDX, CHANGE2, RELEASED2),
+    append(CHANGE2, RELEASED2, OUTPUT).
 
 minimal_length_new_of_res0([X], STATE, FLUENTS, Y) :-
     values_of_state(X, FLUENTS,Z),
