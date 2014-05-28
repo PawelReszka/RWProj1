@@ -572,29 +572,41 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 
 always_executable_continue(_, _, []).
 
+
+always_executable_continue([],_,_).
+
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
     always_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
-always_accessible_continue([],_, _) :- !,fail.
 
-always_accessible_continue([HEAD|_], _, GOAL) :-
+always_accessible_continue([], _, _).
+
+always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
+    subset(GOAL, FLUENTS),
+    always_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
     not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    get_res_list_for_causes(HEAD, R1, STATES1),
-    get_res_list_for_causes(HEAD, R2, STATES2),
-    append(STATES1,STATES2, STATES),
-    prod(STATES, POSSIBLE_FUNCTION_VALUES),
-    % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
-    % i sprawdzić czy dla każdego z nich idzie dojść ;)
-    all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
+    append(R1,R2,R),
+    member(MOVE, R),
+    nth0(0, MOVE, ACTION),
+    nth0(1, MOVE, EXECUTOR),
+    res0_trunc(ACTION, EXECUTOR, HEAD, STATES),
+    subtract(STATES, [HEAD|VISITED], STATES_TO_VISIT),
+    length(STATES, S_LENGTH),
+    S_LENGTH > 0,
+    length(STATES_TO_VISIT, STATES_TO_VISIT_LENGTH),
+    STATES_TO_VISIT_LENGTH > 0,
+    always_accessible_continue(STATES_TO_VISIT, [HEAD|VISITED], GOAL),
+    always_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
 
 all_continue_ways_check([], _,_,_).
 all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
