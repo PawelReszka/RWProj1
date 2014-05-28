@@ -4,6 +4,12 @@ using System.Text;
 
 namespace Rw.AdeSystem.Core.Expressions
 {
+
+    
+//releases(shoot,mietus,[walking], f3).
+//releases(shoot,hador,[walking], f4).
+
+
     public class CausesExpression : Expression
     {
         public string ActionName { get; set; }
