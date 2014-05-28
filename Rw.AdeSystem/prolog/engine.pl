@@ -454,31 +454,21 @@ calc_new([HEAD|STATES], STATE, FLUENTS, [NEW_SET|OUTPUT]) :-
         NEW_SET = [HEAD, NEW],
         calc_new(STATES, STATE, FLUENTS, OUTPUT).
 
-minimals_sets(LIST, MINIMAL) :-
-    minimals_sets(LIST, LIST, MINIMAL).
-
-minimals_sets([], _, []).
-
-minimals_sets([HEAD|LIST1], LIST2, [HEAD|MINIMAL]) :-
-    smallest(HEAD, LIST2),
-    minimals_sets(LIST1, LIST2, MINIMAL),
-    !.
-
-minimals_sets([HEAD|LIST1], LIST2, MINIMAL) :-
-    not(smallest(HEAD, LIST2)),
-    minimals_sets(LIST1, LIST2, MINIMAL),
-    !.
-
-
-smallest(ELEM, [ELEM2|LIST]) :-
-    nth0(1, ELEM, TELEM),
-    nth0(1, ELEM2, TELEM2),
-    subset(TELEM, TELEM2),
-    smallest(ELEM, LIST).
-
-
-
-
+minimals_sets(LIST, MINIMALS) :-
+    findall(Y1,
+    (
+        member(Y,LIST),
+        nth0(0,Y,Y1),
+        nth0(1,Y,Y2),
+        forall(
+        (
+            member(X,LIST),
+            nth0(1,X,X2),
+            X2\=Y2
+        ),
+        not(subset(X2,Y2)
+        ))),
+    MINIMALS).
 
 states_valid([],[]).
 
