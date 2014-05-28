@@ -608,6 +608,38 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     always_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
+typically_accessible(GOAL, FLUENTS) :-
+    all_possible_states(FLUENTS, STATES_FROM),
+    typically__accessible_continue(STATES_FROM,[], GOAL),
+    !.
+
+
+typically_accessible_continue([], _, _).
+
+typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    subset(GOAL, FLUENTS),
+    typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
+
+typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    not(subset(GOAL, FLUENTS)),
+    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R),
+    member(MOVE, R),
+    nth0(0, MOVE, ACTION),
+    nth0(1, MOVE, EXECUTOR),
+    resN_trunc(ACTION, EXECUTOR, HEAD, STATES),
+    subtract(STATES, [HEAD|VISITED], STATES_TO_VISIT),
+    length(STATES, S_LENGTH),
+    S_LENGTH > 0,
+    length(STATES_TO_VISIT, STATES_TO_VISIT_LENGTH),
+    STATES_TO_VISIT_LENGTH > 0,
+    typically_accessible_continue(STATES_TO_VISIT, [HEAD|VISITED], GOAL),
+    typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
+
+
 all_continue_ways_check([], _,_,_).
 all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
      list_to_set(STATES2,STATES),
@@ -616,36 +648,6 @@ all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GO
      append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
      always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
      all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
-
-typically_accessible(GOAL, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES_FROM),
-    typically_accessible_continue(STATES_FROM,[], GOAL),
-    !.
-
-typically_accessible_continue([],_, _) :- !,fail.
-
-typically_accessible_continue([HEAD|_], _, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
-
-typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
-    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    get_res_list_for_causes(HEAD, R2, STATES2),
-    prod(STATES2, POSSIBLE_FUNCTION_VALUES),
-    % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
-    % i sprawdzić czy dla każdego z nich idzie dojść ;)
-    typically_all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
-
-typically_all_continue_ways_check([], _,_,_).
-typically_all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
-     list_to_set(STATES,STATES2),
-     subtract(STATES2, [HEAD|VISITED], TO_BE_VISITED),
-     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
-     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-     always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
-     typically_all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
 
 
 get_res_list_for_causes(_,[],[]).
