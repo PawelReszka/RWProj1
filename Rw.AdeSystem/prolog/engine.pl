@@ -323,7 +323,12 @@ convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
     convert_list_to_state(LISTS,STATES).
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
-    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
+    EXECUTOR \= epsilon ->
+    (
+        findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R)
+    ;
+        findall([X,Y], causes(ACTION, _, X,Y),R)
+    ),
     state(STATE, STATE_FLUENTS),
     filter_active(STATE_FLUENTS, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
