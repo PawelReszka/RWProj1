@@ -1,6 +1,6 @@
-:- [engine], [example2].
+:- [engine], [example3].
 
-:- begin_tests(example2_queries).
+:- begin_tests(example3_queries).
 
 test(possibly_1) :-
     possibly([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on]).
@@ -17,4 +17,4 @@ test(typically_2) :-
     not(typically([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on])).
 
 
-:- end_tests(example2_queries).
+:- end_tests(example3_queries).
