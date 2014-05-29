@@ -788,20 +788,24 @@ always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :
     (
         (
             EXECUTOR \= epsilon,
-            res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION)
+            POSS_EXECUTORS = [EXECUTOR]
         )
     ;
         (
             EXECUTOR == epsilon,
-            findall(X, executor(X),POSS_EXECUTORS),
-            member(POSS_EXECUTOR,POSS_EXECUTORS),
-            res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
+            findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    length(STATES_ACTION, N),
-    N > 0,
-    always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO),
-    always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    (
+        foreach(member(Y,POSS_EXECUTORS),
+            (
+                res0_trunc(ACTION, Y, HEAD, STATES_ACTION),
+                length(STATES_ACTION, N),
+                N > 0,
+                always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+            )),
+        always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+    ),
     !.
 
 always_cont([],_,_,_).
