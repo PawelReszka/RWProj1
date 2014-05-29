@@ -764,6 +764,8 @@ possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
             res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
         )
     ),
+    length(STATES_ACTION, N),
+    N > 0,
     (
         possibly_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
     ;
@@ -796,6 +798,8 @@ always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :
             res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
         )
     ),
+    length(STATES_ACTION, N),
+    N > 0,
     always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO),
     always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
     !.
@@ -827,6 +831,8 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
             resN_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
         )
     ),
+    length(STATES_ACTION, N),
+    N > 0,
     typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO),
     typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
     !.
