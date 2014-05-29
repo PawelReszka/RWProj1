@@ -737,7 +737,8 @@ possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
 
 possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
     (
-        subset(FLUENTS_TO, HEAD)
+        state(HEAD,HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST)
     ;
         possibly_cont(STATES, [], [], FLUENTS_TO)
     ).
@@ -745,7 +746,7 @@ possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
 possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION),
     (
-        possibly_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO)
+        possibly_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
     ;
         possibly_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
     ).
