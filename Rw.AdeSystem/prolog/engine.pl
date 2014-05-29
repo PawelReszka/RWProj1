@@ -773,11 +773,14 @@ possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
 
 always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    always_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO).
+    always_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
 
 always_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
-        subset(FLUENTS_TO, HEAD),
-        always_cont(STATES, [], [], FLUENTS_TO).
+        state(HEAD,HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST),
+        always_cont(STATES, [], [], FLUENTS_TO),
+        !.
 
 always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     (
@@ -793,16 +796,22 @@ always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :
             res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
         )
     ),
-    always_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO),
-    always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
+    always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO),
+    always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    !.
+
+always_cont([],_,_,_).
 
 typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO).
+    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
 
 typically_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
-        subset(FLUENTS_TO, HEAD),
-        typically_cont(STATES, [], [], FLUENTS_TO).
+        state(HEAD, HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST),
+        typically_cont(STATES, [], [], FLUENTS_TO),
+        !.
 
 typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     (
@@ -818,7 +827,8 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
             resN_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
         )
     ),
-    typically_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO),
-    typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
-
+    typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO),
+    typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    !.
+typically_cont([],_,_,_).
 
