@@ -731,7 +731,26 @@ prod([L|Ls],Out) :-
 % always_involved(EXECUTOR, ACTIONS, EXECUTORS).
 % typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
 
-% possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
+    possibly_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO).
+
+possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+    (
+        subset(FLUENTS_TO, HEAD)
+    ;
+        possibly_cont(STATES, [], [], FLUENTS_TO)
+    ).
+
+possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+    res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION),
+    (
+        possibly_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO)
+    ;
+        possibly_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+    ).
+
+
 % always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
 % typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
 
