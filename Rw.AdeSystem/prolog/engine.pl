@@ -738,7 +738,8 @@ prod([L|Ls],Out) :-
 
 possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    possibly_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO).
+    possibly_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
 
 possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
     (
@@ -746,15 +747,29 @@ possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
         subset(FLUENTS_TO, HEAD_LIST)
     ;
         possibly_cont(STATES, [], [], FLUENTS_TO)
-    ).
+    ),
+    !.
 
 possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
-    res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION),
+    (
+        (
+            EXECUTOR \= epsilon,
+            res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS),
+            member(POSS_EXECUTOR,POSS_EXECUTORS),
+            res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ),
     (
         possibly_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
     ;
         possibly_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
-    ).
+    ),
+    !.
 
 always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
@@ -765,7 +780,19 @@ always_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
         always_cont(STATES, [], [], FLUENTS_TO).
 
 always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
-    res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION),
+    (
+        (
+            EXECUTOR \= epsilon,
+            res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS),
+            member(POSS_EXECUTOR,POSS_EXECUTORS),
+            res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ),
     always_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO),
     always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
 
@@ -778,7 +805,19 @@ typically_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
         typically_cont(STATES, [], [], FLUENTS_TO).
 
 typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
-    resN_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION),
+    (
+        (
+            EXECUTOR \= epsilon,
+            resN_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS),
+            member(POSS_EXECUTOR,POSS_EXECUTORS),
+            resN_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ),
     typically_cont(STATES_ACTION, ACTIONS, EXECUTOR, FLUENTS_TO),
     typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
 
