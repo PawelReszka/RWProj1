@@ -92,6 +92,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Queries\AlwaysAccessibleQuery.cs" />
+    <Compile Include="Queries\AlwaysAfterQuery.cs" />
+    <Compile Include="Queries\AlwaysExecutableQuery.cs" />
+    <Compile Include="Queries\AlwaysInvolvedQuery.cs" />
+    <Compile Include="Queries\PossiblyAccessibleQuery.cs" />
+    <Compile Include="Queries\PossiblyAfterQuery.cs" />
+    <Compile Include="Queries\PossiblyExecutableQuery.cs" />
+    <Compile Include="Queries\PossiblyInvolvedQuery.cs" />
+    <Compile Include="Queries\Query.cs" />
+    <Compile Include="Queries\TypicallyAccessibleQuery.cs" />
+    <Compile Include="Queries\TypicallyAfterQuery.cs" />
+    <Compile Include="Queries\TypicallyInvolvedQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -119,9 +131,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Queries\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
