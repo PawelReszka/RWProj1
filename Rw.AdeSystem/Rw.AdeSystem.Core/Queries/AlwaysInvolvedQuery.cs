@@ -6,7 +6,7 @@
         {
         }
 
-        public override void ToProlog()
+        public override string ToProlog()
         {
             throw new System.NotImplementedException();
         }

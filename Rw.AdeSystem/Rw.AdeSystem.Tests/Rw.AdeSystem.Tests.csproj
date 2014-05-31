@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SwiPlCs">
+      <HintPath>..\..\External\SwiPlCs.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -52,6 +55,12 @@
   <ItemGroup>
     <Compile Include="QueriesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Rw.AdeSystem.Core\Rw.AdeSystem.Core.csproj">
+      <Project>{760e6dd4-449e-4e83-a2eb-d35203fbf093}</Project>
+      <Name>Rw.AdeSystem.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

@@ -47,8 +47,9 @@ namespace Rw.AdeSystem.Core
             //Na razie wystarczy, żeby rozróżniać wyrażenia i załadować akcje/wykonawcow do odpowiednich list - Actions, Executors
             //Fluenty na razie można zostawić - parser wyrażen logicznych zrobi Konrad i Paweł
             //Na razie nie trzeba robic nic Prologowego
-            foreach (var line in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
+            foreach (var lineNotTrimmed in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
             {
+                var line = lineNotTrimmed.Trim();
                 //Always
                 if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)<=>]*"))
                 {

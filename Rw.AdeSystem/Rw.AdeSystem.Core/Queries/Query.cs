@@ -22,6 +22,6 @@
         /// <summary>
         /// Metoda, ktora wykonuje zapytanie do bazy wiedzy Prologa
         /// </summary>
-        public abstract void ToProlog();
+        public abstract string ToProlog();
     }
 }
