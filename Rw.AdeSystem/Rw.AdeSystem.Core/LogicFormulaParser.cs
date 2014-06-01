@@ -12,28 +12,22 @@ namespace Rw.AdeSystem.Core
         {
             expr = expr.Trim();
             expr = expr.Replace(" ", "");
-            bool isChange;
-            //do
-            //{
-            //    isChange = false;
-                for (int i = 0; i < expr.Length; i++)
+
+            for (int i = 0; i < expr.Length; i++)
+            {
+                if (expr[i] == '!')
                 {
-                    if (expr[i] == '!')
+                    if (expr[i + 1] != '(')
                     {
-                        if (expr[i + 1] != '(')
-                        {
-                            int j = i + 1;
-                            while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&' && j<expr.Length-1)
-                                j++;
-                            expr = expr.Insert(i, "(");
-                            expr = expr.Insert(j+1, ")");
-                            //isChange = true;
-                            //break;
-                        }
+                        int j = i + 1;
+                        while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&' && j < expr.Length - 1)
+                            j++;
+                        expr = expr.Insert(i, "(");
+                        expr = expr.Insert(j + 1, ")");
                     }
-                    i++;
                 }
-           // } while (isChange);
+                i++;
+            }
 
             literals = new List<Token>();
             literalValues = new List<string>();

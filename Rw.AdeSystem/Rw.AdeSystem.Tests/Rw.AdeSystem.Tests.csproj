@@ -53,7 +53,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="QueriesTests.cs" />
+    <Compile Include="QueriesYaleProblemWithReleasesTests.cs" />
+    <Compile Include="QueriesLightbulbsTests.cs" />
+    <Compile Include="QueriesYaleProblemTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
