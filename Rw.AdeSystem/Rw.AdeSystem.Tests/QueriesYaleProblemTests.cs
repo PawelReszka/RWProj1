@@ -8,6 +8,8 @@ namespace Rw.AdeSystem.Tests
     [TestClass]
     public class QueriesYaleProblemTests
     {
+        private const string FalseString = "False";
+        private const string TrueString = "True";
         private const string YaleProblem = @"initially h & a & w
                                             always h <-> !m
                                             always w -> a
@@ -33,7 +35,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "False");
+            Assert.Equals(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -53,7 +55,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "False");
+            Assert.Equals(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -73,7 +75,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -93,7 +95,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -113,7 +115,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -133,7 +135,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -153,7 +155,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -173,7 +175,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -192,7 +194,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -212,7 +214,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -232,7 +234,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -252,7 +254,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -272,7 +274,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "False");
+            Assert.Equals(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -292,7 +294,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -311,7 +313,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -331,7 +333,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "False");
+            Assert.Equals(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -351,7 +353,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, "True");
+            Assert.Equals(result, TrueString);
 
             PlEngine.PlCleanup();
         }
