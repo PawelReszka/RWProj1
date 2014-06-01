@@ -4,6 +4,7 @@ namespace Rw.AdeSystem.Core.Expressions
 {
     public class AlwaysExpression : Expression
     {
+        public BoolExpr Expression { get; set; }
         public AlwaysExpression(string line) : base(line)
         {
             line = line.Trim().Remove(0, "always".Length);
@@ -17,7 +18,8 @@ namespace Rw.AdeSystem.Core.Expressions
             {
                 
             }
-            expression = expression;
+            
+            Expression = expression;
         }
 
         public override void ToProlog()

@@ -14,7 +14,7 @@ namespace Rw.AdeSystem.Core
     {
         #region Fields & ctors
 
-        public static readonly List<Expression> DomainPhrases = new List<Expression>(); 
+        public static readonly List<Expression> DomainPhrases = new List<Expression>();
         public static readonly PrologEngine PrologEngine = PrologEngine.Instance;
         public static readonly AdeSignature Signature = new AdeSignature();
 
@@ -47,7 +47,7 @@ namespace Rw.AdeSystem.Core
             //Na razie wystarczy, żeby rozróżniać wyrażenia i załadować akcje/wykonawcow do odpowiednich list - Actions, Executors
             //Fluenty na razie można zostawić - parser wyrażen logicznych zrobi Konrad i Paweł
             //Na razie nie trzeba robic nic Prologowego
-            foreach (var line in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
+            foreach (var line in domainInAdeString.Split(new[] { Environment.NewLine }, StringSplitOptions.None))
             {
                 //Always
                 if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)<=>]*"))
@@ -80,7 +80,7 @@ namespace Rw.AdeSystem.Core
                     //Actions.Add(format[0]);
                 }
                 // by EXECUTORS Causes
-                else if (Regex.IsMatch(line,  @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z&!\s]*"))
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ causes [a-z&!\s]*"))
                 {
                     throw new NotImplementedException();
 
@@ -90,7 +90,7 @@ namespace Rw.AdeSystem.Core
                     //Actions.Add(format[0]);
                     //Executors.Add(format[1]);
                 }
-                
+
                 //by EPSILON Typically Causes
                 else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]*"))
                 {
@@ -140,15 +140,48 @@ namespace Rw.AdeSystem.Core
             //Na razie sa tu jakies przykladowe, proste reguly
             foreach (var f in Fluents.Distinct())
             {
-                PrologEngine.AssertFact("fluent("+f+")");
+                PrologEngine.AssertFact("fluent(" + f + ")");
             }
             foreach (var f in Fluents.Distinct())
             {
-                PrologEngine.AssertFact("sneg(" + f +",not_"+ f +")");
+                PrologEngine.AssertFact("sneg(" + f + ",not_" + f + ")");
             }
         }
 
+        public static void InitializeStates(List<AlwaysExpression> expressions)
+        {
+            int stateCounter = 0;
+            for (int i = 0; i < Math.Pow(2,Fluents.Count()); i++)
+            {
+                var toProlog = true;
+                var dictionary = new Dictionary<string, bool>();
+                for (int j = 0; j < Fluents.Count; j++)
+                {
+                    dictionary.Add(Fluents[j], GetBitValue(i, j));
+                }
+                foreach (var e in expressions)
+                {
+                    
+                    if (!LogicFormulaParser.Eval(e.Expression, dictionary))
+                    {
+                        toProlog = false;
+                        break;
+                    }
 
+                }
+                if(!toProlog) continue;
+                var fs = dictionary.Where(a => a.Value).Select(a => a.Key).ToList();
+                fs.AddRange(dictionary.Where(a => !a.Value).Select(a => "not_"+a.Key));
+                var fluents = String.Join(",", fs);
+                PrologEngine.AssertFact("state(state"+stateCounter+",["+fluents+"])");
+                stateCounter++;
+            }
+        }
+
+        private static bool GetBitValue(int number, int position)
+        {
+            return (number & (1 << position - 1)) != 0;
+        }
         #endregion
     }
 }
