@@ -796,32 +796,35 @@ always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    (
-        foreach(member(Y,POSS_EXECUTORS),
-            (
-                res0_trunc(ACTION, Y, HEAD, STATES_ACTION),
-                length(STATES_ACTION, N),
-                N > 0,
-                always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
-            )),
-        always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
-    ),
+    always_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
     !.
 
 always_cont([],_,_,_).
+always_cont2([],_,_,_,_).
+
+always_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+    res0_trunc(ACTION,PEXECUTOR, STATE, STATES),
+    length(STATES, LENGTH),
+    LENGTH > 0,
+    always_cont(STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    always_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
 
 typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,0),
     !.
 
-typically_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+typically_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
         state(HEAD, HEAD_LIST),
-        subset(FLUENTS_TO, HEAD_LIST),
-        typically_cont(STATES, [], [], FLUENTS_TO),
+        (
+            K \= MIN;
+            subset(FLUENTS_TO, HEAD_LIST)
+        ),
+        typically_cont(STATES, [], [], FLUENTS_TO, K,MIN),
         !.
 
-typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO,K,MIN) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -836,19 +839,33 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
     (
         foreach(member(Y,POSS_EXECUTORS),
             (
-                res0_trunc(ACTION, Y, HEAD, STATES_ACTION),
+                resN_trunc(ACTION, Y, HEAD, STATES_ACTION),
+                resAb_trunc(ACTION, Y, HEAD, STATES_ACTION_2),
                 length(STATES_ACTION, N),
-                N > 0,
-                typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+                length(STATES_ACTION_2, N2),
+                N3 is N+N2,
+                (
+                    N3 > 0,
+                    (
+                        N > 0,
+                        typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO,K,MIN)
+                    ;
+                        N2 > 0,
+                        K2 is K+1,
+                        typically_cont(STATES_ACTION_2, ACTIONS, EXECUTORS, FLUENTS_TO,K2,MIN)
+                    )
+                ;
+                    N3 < 1
+                )
             )),
-        typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+        typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO,K,MIN)
     ),
     !.
 
-typically_cont([],_,_,_).
+typically_cont([],_,_,_,_,_).
 
-possibly_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
-always_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
-typically_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
+possibly_involved(_,_,_). % stuby auhor_invlolved, actions, executors
+always_involved(_,_,_). % stuby auhor_invlolved, actions, executors
+typically_involved(_,_,_). % stuby auhor_invlolved, actions, executors
 
 

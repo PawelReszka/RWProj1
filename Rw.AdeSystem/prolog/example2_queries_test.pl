@@ -24,11 +24,11 @@ test(typically_3) :-
     not(typically([alive],[entice,shoot],[epsilon,hador],[not_alive])).
 
 
-test(possibly_3) :-
+test(possibly_3x) :-
     possibly_involved(mietus,[shoot,entice], [epsilon,epsilon]).
-test(always_3) :-
+test(always_3x) :-
     not(always_involved(mietus,[shoot,entice], [epsilon,epsilon])).
-test(typically_3) :-
+test(typically_3x) :-
     typically_involved(mietus,[shoot,entice], [epsilon,epsilon]).
 
 test(possibly_4) :-
