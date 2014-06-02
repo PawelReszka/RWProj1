@@ -323,12 +323,7 @@ convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
     convert_list_to_state(LISTS,STATES).
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
-    EXECUTOR \= epsilon ->
-    (
-        findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R)
-    ;
-        findall([X,Y], causes(ACTION, _, X,Y),R)
-    ),
+    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
     state(STATE, STATE_FLUENTS),
     filter_active(STATE_FLUENTS, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
@@ -779,14 +774,20 @@ minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
     !.
 
 minimal_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
-        minimal_cont(STATES, [], [], FLUENTS_TO, K, MIN),
+        minimal_cont(STATES, [], [], FLUENTS_TO, K, MIN1),
         state(HEAD,HEAD_LIST),
-        subset(FLUENTS_TO, HEAD_LIST) -> MIN = min(MIN,K),
+        (
+            subset(FLUENTS_TO, HEAD_LIST),
+            MIN is min(MIN1,K)
+        ;
+            not(subset(FLUENTS_TO, HEAD_LIST)),
+            MIN is MIN1
+        ),
     !.
 
 minimal_cont([],_,_,_,K,K).
 minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
-    minimal_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    minimal_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN1),
     (
         (
             EXECUTOR \= epsilon,
@@ -805,17 +806,18 @@ minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, 
     length(STATES_ACTION_N, N1),
     N1 > 0 ->
         (
-            minimal_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
-            MIN = min(MIN,MIN2)
+            minimal_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
+            MIN is min(MIN1,MIN2)
         )
-    ,
+    ;
     length(STATES_ACTION_AB, N2),
     N2 > 0 ->
         (
-            minimal_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
-            MIN = min(MIN,MIN3)
+            minimal_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
+            MIN is min(MIN1,MIN3)
         )
-    ,
+    ;
+        MIN is MIN1,
     !.
 
 
@@ -858,19 +860,21 @@ always_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTOR
 
 typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,0),
+    minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN),
+    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,MIN),
     !.
 
 typically_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
-        state(HEAD, HEAD_LIST),
+        state(HEAD,HEAD_LIST),
         (
-            K \= MIN;
+            K \= MIN
+        ;
             subset(FLUENTS_TO, HEAD_LIST)
         ),
-        typically_cont(STATES, [], [], FLUENTS_TO, K,MIN),
+        typically_cont(STATES, [], [], FLUENTS_TO, K, MIN),
         !.
 
-typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO,K,MIN) :-
+typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -882,33 +886,28 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    (
-        foreach(member(Y,POSS_EXECUTORS),
-            (
-                resN_trunc(ACTION, Y, HEAD, STATES_ACTION),
-                resAb_trunc(ACTION, Y, HEAD, STATES_ACTION_2),
-                length(STATES_ACTION, N),
-                length(STATES_ACTION_2, N2),
-                N3 is N+N2,
-                (
-                    N3 > 0,
-                    (
-                        N > 0,
-                        typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO,K,MIN)
-                    ;
-                        N2 > 0,
-                        K2 is K+1,
-                        typically_cont(STATES_ACTION_2, ACTIONS, EXECUTORS, FLUENTS_TO,K2,MIN)
-                    )
-                ;
-                    N3 < 1
-                )
-            )),
-        typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO,K,MIN)
-    ),
+    typically_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
     !.
 
-typically_cont([],_,_,_,_,_).
+typically_cont([],_,_,_, K, K).
+typically_cont2([],_,_,_,_, K, K).
+
+typically_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+    resN_trunc(ACTION,PEXECUTOR, STATE, STATES1),
+    resAb_trunc(ACTION,PEXECUTOR, STATE, STATES2),
+    length(STATES1, LENGTH1),
+
+    LENGTH1 > 0 -> 
+        typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN);
+    length(STATES2, LENGTH2),
+    LENGTH2 > 0 ->
+    (
+        K2 is K + 1,
+        typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN )
+    );
+    typically_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN).
+
 
 possibly_involved(_,_,_). % stuby auhor_invlolved, actions, executors
 always_involved(_,_,_). % stuby auhor_invlolved, actions, executors
