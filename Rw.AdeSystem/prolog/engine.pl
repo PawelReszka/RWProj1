@@ -847,3 +847,8 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
 
 typically_cont([],_,_,_).
 
+possibly_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
+always_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
+typically_involved(_,_,_) :- !,false. % stuby auhor_invlolved, actions, executors
+
+
