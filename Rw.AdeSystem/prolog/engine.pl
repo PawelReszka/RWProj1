@@ -773,6 +773,52 @@ possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
     ),
     !.
 
+minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
+    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
+    minimal_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO, 0, MIN),
+    !.
+
+minimal_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
+        minimal_cont(STATES, [], [], FLUENTS_TO, K, MIN),
+        state(HEAD,HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST) -> MIN = min(MIN,K),
+    !.
+
+minimal_cont([],_,_,_,K,K).
+minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+    minimal_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    (
+        (
+            EXECUTOR \= epsilon,
+            resN_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION_N),
+            resAb_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION_AB)
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS),
+            member(POSS_EXECUTOR,POSS_EXECUTORS),
+            resN_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION_N),
+            resAb_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION_AB)
+        )
+    ),
+    length(STATES_ACTION_N, N1),
+    N1 > 0 ->
+        (
+            minimal_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
+            MIN = min(MIN,MIN2)
+        )
+    ,
+    length(STATES_ACTION_AB, N2),
+    N2 > 0 ->
+        (
+            minimal_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
+            MIN = min(MIN,MIN3)
+        )
+    ,
+    !.
+
+
 always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
     always_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
