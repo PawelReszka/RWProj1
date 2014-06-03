@@ -899,13 +899,13 @@ typically_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECU
     length(STATES1, LENGTH1),
 
     LENGTH1 > 0 -> 
-        typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN);
+        typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
     length(STATES2, LENGTH2),
     LENGTH2 > 0 ->
     (
         K2 is K + 1,
         typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN )
-    );
+    ),
     typically_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN).
 
 

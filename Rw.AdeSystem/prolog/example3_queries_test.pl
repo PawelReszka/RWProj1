@@ -7,7 +7,7 @@ test(possibly_1) :-
 test(always_1) :-
     not(always([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on])).
 test(typically_1) :-
-    typically([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on]).
+    not(typically([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on])).
 
 test(possibly_2) :-
     possibly([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on]).
