@@ -803,21 +803,10 @@ minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, 
             resAb_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION_AB)
         )
     ),
-    length(STATES_ACTION_N, N1),
-    N1 > 0 ->
-        (
-            minimal_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
-            MIN is min(MIN1,MIN2)
-        )
-    ;
-    length(STATES_ACTION_AB, N2),
-    N2 > 0 ->
-        (
-            minimal_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
-            MIN is min(MIN1,MIN3)
-        )
-    ;
-        MIN is MIN1,
+    minimal_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
+    minimal_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
+    MIN4 is min(MIN2,MIN3),
+    MIN is min(MIN1, MIN4),
     !.
 
 
@@ -890,23 +879,16 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
     typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
     !.
 
-typically_cont([],_,_,_, K, K).
-typically_cont2([],_,_,_,_, K, K).
+typically_cont([],_,_,_, _, _).
+typically_cont2([],_,_,_,_, _, _).
 
 typically_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+    typically_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
     resN_trunc(ACTION,PEXECUTOR, STATE, STATES1),
+    typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
     resAb_trunc(ACTION,PEXECUTOR, STATE, STATES2),
-    length(STATES1, LENGTH1),
-
-    LENGTH1 > 0 -> 
-        typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
-    length(STATES2, LENGTH2),
-    LENGTH2 > 0 ->
-    (
-        K2 is K + 1,
-        typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN )
-    ),
-    typically_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN).
+    K2 is K + 1,
+    typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN ).
 
 
 possibly_involved(_,_,_). % stuby auhor_invlolved, actions, executors
