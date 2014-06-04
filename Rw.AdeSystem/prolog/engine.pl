@@ -1,9 +1,9 @@
 :-  dynamic(releases/4),dynamic(preserve/3).
 
-neg(X,Y) :- sneg(Y,X).
-neg(X,Y) :- sneg(X,Y).
+neg(X,Y) :- sneg(Y,X).%
+neg(X,Y) :- sneg(X,Y).%
 
-neg(X,X) :- !,fail.
+neg(X,X) :- !,fail.%nie moze byc fluentu i jego negacji
 
 inertial(X) :- sinertial(X).
 inertial(X) :- neg(X,Y),
@@ -575,6 +575,14 @@ always_executable_continue(_, _, []).
 
 always_executable_continue([],_,_).
 
+
+
+always_accessible(GOAL) :-
+	initially(FLUENTS_FROM),
+	always_accessible(GOAL, FLUENTS_FROM),
+	!.
+	
+	
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
     always_accessible_continue(STATES_FROM,[], GOAL),
@@ -608,6 +616,13 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     always_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
+typically_accessible(GOAL) :-
+	initially(FLUENTS_FROM),
+	typically_accessible(GOAL, FLUENTS_FROM),
+	!.
+	
+	
+	
 typically_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
     typically__accessible_continue(STATES_FROM,[], GOAL),
@@ -671,6 +686,11 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     )
     ,!.
 
+possibly_accessible(GOAL) :-
+	initially(FLUENTS_FROM),
+	possibly_accessible(GOAL, FLUENTS_FROM),
+	!.
+	
 
 possibly_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
