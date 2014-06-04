@@ -891,7 +891,37 @@ typically_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECU
     typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN ).
 
 
-possibly_involved(_,_,_). % stuby auhor_invlolved, actions, executors
+possibly_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
+    initially(INITIAL_FLUENTS),
+    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    possibly_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
+    !.
+
+possibly_involved_cont([], _, _, _, _).
+
+possibly_involved_cont(_, INVOLVED, [], [], CURRENTS) :-
+    subset(INVOLVED, CURRENTS),
+    !.
+
+possibly_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS) :-
+    (
+        EXECUTOR == epsilon ->
+            findall(X, executor(X), POSS_EXECUTORS)
+        ;
+            POSS_EXECUTORS = [EXECUTOR]
+    ),
+    (
+        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
+        res0_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
+        length(OUTPUT_STATES, N),
+        N > 0,
+        possibly_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS])
+    ;
+        possibly_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS)
+    ),
+    !.
+
+
 always_involved(_,_,_). % stuby auhor_invlolved, actions, executors
 typically_involved(_,_,_). % stuby auhor_invlolved, actions, executors
 
