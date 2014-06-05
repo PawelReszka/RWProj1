@@ -8,6 +8,7 @@ namespace Rw.AdeSystem.Core
 {
     public static class LogicFormulaParser
     {
+        //metoda parsuje wyrazenie logiczne do drzewa
         public static BoolExpr Parse(string expr, out List<Token> literals, out List<string> literalValues)
         {
             expr = expr.Trim();
@@ -57,6 +58,7 @@ namespace Rw.AdeSystem.Core
             //Console.WriteLine(@"Eval: {0}", Eval(root));
         }
 
+        //metoda usuwa implikacje i rownowaznosci
         public static BoolExpr SimplifyIf(BoolExpr tree)
         {
             var result = new BoolExpr(tree);
@@ -95,6 +97,7 @@ namespace Rw.AdeSystem.Core
                 _SimplifyIf(result.Right);
         }
 
+        //metoda zamienia wyrazenie(drzewo) w postac koniunkcji oddzielonych alternatywami np. (a&b)|(a&c)
         public static BoolExpr AndOrReformTree(BoolExpr tree)
         {
             var result = new BoolExpr(tree);
@@ -170,6 +173,7 @@ namespace Rw.AdeSystem.Core
             return result;
         }
 
+        //metoda zwraca koniunkcje fluentow jako stringi
         public static List<string> GetFluentStrings(BoolExpr tree)
         {
             var list = new List<string>();
