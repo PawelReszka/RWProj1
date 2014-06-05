@@ -971,7 +971,71 @@ always_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECU
     ),
     !.
 
+involved_minimal([], _, _, _, _, _, 1000000). % stała duża - rozwiązanie nie istnieje.
 
-typically_involved(_,_,_). % stuby auhor_invlolved, actions, executors
+involved_minimal([_|STATES], INVOLVED, [],[], CURRENTS, K, MINIMAL) :-
+    member(INVOLVED, CURRENTS) ->
+        involved_minimal(STATES, INVOLVED, [], [], CURRENTS, K, MINIMAL1),
+        MINIMAL is min(MINIMAL1, K)
+    ;
+        involved_minimal(STATES, INVOLVED, [], [], CURRENTS, K, MINIMAL1),
+        MINIMAL is MINIMAL1,
+    !.
+
+involved_minimal([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL) :-
+    (
+        EXECUTOR == epsilon ->
+            findall(X, executor(X), POSS_EXECUTORS)
+        ;
+            POSS_EXECUTORS = [EXECUTOR]
+    ),
+    (
+        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
+        resN_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
+        resAb_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES2),
+        K2 is K + 1,
+        involved_minimal(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K, MINIMAL1),
+        involved_minimal(OUTPUT_STATES2, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K2, MINIMAL2),
+        involved_minimal(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL3),
+        MINIMAL4 is min(MINIMAL1, MINIMAL2),
+        MINIMAL is min(MINIMAL4, MINIMAL3)
+    ),
+    !.
+
+
+typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
+    initially(INITIAL_FLUENTS),
+    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    involved_minimal(POSSIBLE_STATES, EXECUTORS, ACTIONS, EXECUTORS, [], 0, MINIMAL),
+    typically_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
+    !.
+
+
+typically_involved_cont([], _, _,_,_).
+
+typically_involved_cont(_, INVOLVED, [], [], CURRENTS, K, MINIMAL) :-
+       subset(INVOLVED, CURRENTS)
+    ;
+       K \= MINIMAL,
+    !.
+
+typically_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL) :-
+    (
+        EXECUTOR == epsilon ->
+            findall(X, executor(X), POSS_EXECUTORS)
+        ;
+            POSS_EXECUTORS = [EXECUTOR]
+    ),
+    (
+        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
+        resN_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
+        resAb_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES2),
+        K2 is K + 1,
+        typically_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K, MINIMAL),
+        typically_involved_cont(OUTPUT_STATES2, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K2, MINIMAL),
+        typically_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL)
+    ),
+    !.
+
 
 
