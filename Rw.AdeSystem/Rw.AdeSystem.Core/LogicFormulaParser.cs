@@ -8,32 +8,27 @@ namespace Rw.AdeSystem.Core
 {
     public static class LogicFormulaParser
     {
+        //metoda parsuje wyrazenie logiczne do drzewa
         public static BoolExpr Parse(string expr, out List<Token> literals, out List<string> literalValues)
         {
             expr = expr.Trim();
             expr = expr.Replace(" ", "");
-            bool isChange;
-            //do
-            //{
-            //    isChange = false;
-                for (int i = 0; i < expr.Length; i++)
+
+            for (int i = 0; i < expr.Length; i++)
+            {
+                if (expr[i] == '!')
                 {
-                    if (expr[i] == '!')
+                    if (expr[i + 1] != '(')
                     {
-                        if (expr[i + 1] != '(')
-                        {
-                            int j = i + 1;
-                            while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&' && j<expr.Length-1)
-                                j++;
-                            expr = expr.Insert(i, "(");
-                            expr = expr.Insert(j+1, ")");
-                            //isChange = true;
-                            //break;
-                        }
+                        int j = i + 1;
+                        while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&' && j < expr.Length - 1)
+                            j++;
+                        expr = expr.Insert(i, "(");
+                        expr = expr.Insert(j + 1, ")");
                     }
-                    i++;
                 }
-           // } while (isChange);
+                i++;
+            }
 
             literals = new List<Token>();
             literalValues = new List<string>();
@@ -61,6 +56,155 @@ namespace Rw.AdeSystem.Core
             return root;
             //Eval the expression tree
             //Console.WriteLine(@"Eval: {0}", Eval(root));
+        }
+
+        //metoda usuwa implikacje i rownowaznosci
+        public static BoolExpr SimplifyIf(BoolExpr tree)
+        {
+            var result = new BoolExpr(tree);
+
+            _SimplifyIf(result);
+
+            return result;
+
+        }
+
+        private static void _SimplifyIf(BoolExpr result)
+        {
+            if (result.IsLeaf())
+            {
+                return;
+            }
+            if (result.Op == BoolExpr.Bop.If)
+            {
+                var nowy = BoolExpr.CreateOr(result.Right, BoolExpr.CreateNot(result.Left));
+                result.Left = nowy.Left;
+                result.Right = nowy.Right;
+                result.Op = nowy.Op;
+                result.Lit = nowy.Lit;
+            }
+            else if (result.Op == BoolExpr.Bop.IfOnlyIf)
+            {
+                var nowy = BoolExpr.CreateAnd(BoolExpr.CreateIf(result.Left, result.Right), BoolExpr.CreateIf(result.Right, result.Left));
+                result.Left = nowy.Left;
+                result.Right = nowy.Right;
+                result.Op = nowy.Op;
+                result.Lit = nowy.Lit;
+            }
+            if (result.Left != null)
+                _SimplifyIf(result.Left);
+            if (result.Right != null)
+                _SimplifyIf(result.Right);
+        }
+
+        //metoda zamienia wyrazenie(drzewo) w postac koniunkcji oddzielonych alternatywami np. (a&b)|(a&c)
+        public static BoolExpr AndOrReformTree(BoolExpr tree)
+        {
+            var result = new BoolExpr(tree);
+
+            var queue = new Queue<BoolExpr>();
+
+            bool isChanged;
+            do
+            {
+                queue.Enqueue(result);
+                do
+                {
+                    isChanged = false;
+                    var expr = queue.Dequeue();
+                    if (expr.IsLeaf())
+                        break;
+                    if (expr.Op == BoolExpr.Bop.And)
+                    {
+                        if (expr.Left.Op == BoolExpr.Bop.Or)
+                        {
+                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateAnd(expr.Left.Right, expr.Right),
+                                BoolExpr.CreateAnd(expr.Left.Left, expr.Right));
+                            expr.Left = nowy.Left;
+                            expr.Right = nowy.Right;
+                            expr.Op = nowy.Op;
+                            expr.Lit = nowy.Lit;
+                            isChanged = true;
+                            break;
+                        }
+                        if (expr.Right.Op == BoolExpr.Bop.Or)
+                        {
+                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateAnd(expr.Right.Right, expr.Right),
+                                BoolExpr.CreateAnd(expr.Right.Left, expr.Right));
+                            expr.Left = nowy.Left;
+                            expr.Right = nowy.Right;
+                            expr.Op = nowy.Op;
+                            expr.Lit = nowy.Lit;
+                            isChanged = true;
+                            break;
+                        }
+                    }
+                    if (expr.Op == BoolExpr.Bop.Not)
+                    {
+                        if (expr.Left.Op == BoolExpr.Bop.And)
+                        {
+                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateNot(expr.Right),
+                                BoolExpr.CreateNot(expr.Left));
+                            expr.Left = nowy.Left;
+                            expr.Right = nowy.Right;
+                            expr.Op = nowy.Op;
+                            expr.Lit = nowy.Lit;
+                            isChanged = true;
+                            break;
+                        }
+                        if (expr.Left.Op == BoolExpr.Bop.Or)
+                        {
+                            BoolExpr nowy = BoolExpr.CreateAnd(BoolExpr.CreateNot(expr.Right),
+                                BoolExpr.CreateNot(expr.Left));
+                            expr.Left = nowy.Left;
+                            expr.Right = nowy.Right;
+                            expr.Op = nowy.Op;
+                            expr.Lit = nowy.Lit;
+                            isChanged = true;
+                            break;
+                        }
+                    }
+                    queue.Enqueue(expr.Left);
+                    queue.Enqueue(expr.Right);
+                } while (true);
+                queue.Clear();
+            } while (isChanged);
+
+            return result;
+        }
+
+        //metoda zwraca koniunkcje fluentow jako stringi
+        public static List<string> GetFluentStrings(BoolExpr tree)
+        {
+            var list = new List<string>();
+
+            _strings(tree, null, list);
+
+            return list;
+        }
+
+        static string _strings(BoolExpr expr, BoolExpr parent, List<string> tokens)
+        {
+            if (expr.IsLeaf())
+            {
+                return expr.Lit;
+            }
+            if (expr.Op == BoolExpr.Bop.Not)
+            {
+                return "!" + expr.Left.Lit;
+            }
+            if (expr.Op == BoolExpr.Bop.And)
+            {
+                if (parent != null && parent.Op == BoolExpr.Bop.Or)
+                    tokens.Add(_strings(expr.Left, expr, tokens) + "&" + _strings(expr.Right, expr, tokens));
+                else if (parent != null && parent.Op == BoolExpr.Bop.And)
+                    return _strings(expr.Left, expr, tokens) + "&" + _strings(expr.Right, expr, tokens);
+            }
+            if (expr.Left != null)
+                _strings(expr.Left, expr, tokens);
+            if (expr.Right != null)
+                _strings(expr.Right, expr, tokens);
+            return "";
         }
 
         static void TraverseTree(BoolExpr expr, BoolExpr parent, List<string> tokens)

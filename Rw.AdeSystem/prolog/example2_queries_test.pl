@@ -24,11 +24,11 @@ test(typically_3) :-
     not(typically([alive],[entice,shoot],[epsilon,hador],[not_alive])).
 
 
-test(possibly_3) :-
+test(possibly_3x) :-
     possibly_involved(mietus,[shoot,entice], [epsilon,epsilon]).
-test(always_3) :-
+test(always_3x) :-
     not(always_involved(mietus,[shoot,entice], [epsilon,epsilon])).
-test(typically_3) :-
+test(typically_3x) :-
     typically_involved(mietus,[shoot,entice], [epsilon,epsilon]).
 
 test(possibly_4) :-
@@ -39,42 +39,42 @@ test(typically_4) :-
     not(typically_involved(hador,[shoot,entice], [epsilon,epsilon])).
 
 test(possibly_5) :-
-    possibly_involved(mietus,[shoot,shootentice], [hador,mietus,mietus]).
+    possibly_involved(mietus,[shoot,shoot, entice], [hador,mietus,mietus]).
 test(always_5) :-
     always_involved(mietus,[shoot,shoot,entice], [hador,mietus,mietus]).
 test(typically_5) :-
     typically_involved(mietus,[shoot,shoot,entice], [hador,mietus,mietus]).
 
 test(possibly_6) :-
-    possibly_involved(hador,[shoot,shootentice], [hador,mietus,mietus]).
+    possibly_involved(hador,[shoot,shoot, entice], [hador,mietus,mietus]).
 test(always_6) :-
     always_involved(hador,[shoot,shoot,entice], [hador,mietus,mietus]).
 test(typically_6) :-
     typically_involved(hador,[shoot,shoot,entice], [hador,mietus,mietus]).
 
 test(possibly_7) :-
-    possibly_involved(mietus,[shoot,shootentice], [hador,mietus,hador]).
+    possibly_involved(mietus,[shoot,shoot, entice], [hador,mietus,hador]).
 test(always_7) :-
     no(always_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador])).
 test(typically_7) :-
     typically_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador]).
 
 test(possibly_8) :-
-    possibly_involved(hador,[shoot,shootentice], [hador,mietus,hador]).
+    possibly_involved(hador,[shoot,shoot, entice], [hador,mietus,hador]).
 test(always_8) :-
     not(always_involved(hador,[shoot,shoot,entice], [hador,mietus,hador])).
 test(typically_8) :-
     typically_involved(hador,[shoot,shoot,entice], [hador,mietus,hador]).
 
 test(possibly_9) :-
-    possibly_involved(mietus,[shoot,shootentice], [hador,mietus,hador]).
+    possibly_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador]).
 test(always_9) :-
     not(always_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador])).
 test(typically_9) :-
     typically_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador]).
 
 test(possibly_10) :-
-    possibly_involved(hador,[shoot,shootentice], [hador,mietus,epsilon]).
+    possibly_involved(hador,[shoot,shoot, entice], [hador,mietus,epsilon]).
 test(always_10) :-
     not(always_involved(hador,[shoot,shoot,entice], [hador,mietus,epsilon])).
 test(typically_10) :-
