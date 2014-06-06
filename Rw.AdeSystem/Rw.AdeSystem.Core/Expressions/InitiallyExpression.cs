@@ -1,16 +1,24 @@
-﻿namespace Rw.AdeSystem.Core.Expressions
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Rw.AdeSystem.Core.Expressions
 {
     public class InitiallyExpression : Expression
     {
+        private List<string> Fluents { get; set; }
         public InitiallyExpression(string line) : base(line)
         {
-            var fluents = line.Trim().Remove(0, "initially".Length).Trim().Replace(" ", "");
-            AdeSystem.Fluents.Add(fluents);
+            var fs = line.Trim().Remove(0, "initially".Length).Trim().Replace(" ", "").Split('&').ToList();
+            Fluents = fs.Select(i => i.Replace("!", "not_")).ToList();
+            AdeSystem.Fluents.AddRange(fs.Select(i=>i.Replace("!","")));
+
         }
 
         public override void ToProlog()
         {
-            throw new System.NotImplementedException();
+            var fluents = String.Join(", ", Fluents);
+            AdeSystem.PrologEngine.AssertFact("initially(["+fluents+"])");
         }
     }
 }

@@ -11,20 +11,13 @@ namespace Rw.AdeSystem.Core.Expressions
             List<Token> tokens;
             List<string> tokenValues;
             var expression = LogicFormulaParser.Parse(line, out tokens, out tokenValues);
-            BoolExpr l, r;
-            l = expression.Left;
-            r = expression.Right;
-            if (l.IsLeaf() && r.IsLeaf())
-            {
-                
-            }
             
             Expression = expression;
         }
 
         public override void ToProlog()
         {
-            throw new System.NotImplementedException();
+            
         }
     }
 }

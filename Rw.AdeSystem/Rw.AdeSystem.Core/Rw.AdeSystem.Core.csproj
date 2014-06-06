@@ -71,7 +71,11 @@
     <Compile Include="AdeSystem.cs" />
     <Compile Include="AdeForm.cs" />
     <Compile Include="Expressions\AlwaysExpression.cs" />
+    <Compile Include="Expressions\ByCausesExpression.cs" />
+    <Compile Include="Expressions\ByCausesIfExpression.cs" />
     <Compile Include="Expressions\ByExpression.cs" />
+    <Compile Include="Expressions\ByTypicallyCausesExpression.cs" />
+    <Compile Include="Expressions\ByTypicallyCausesIfExpression.cs" />
     <Compile Include="Expressions\CausesExpression.cs" />
     <Compile Include="Expressions\CausesIfExpression.cs" />
     <Compile Include="Expressions\Expression.cs" />
@@ -79,9 +83,9 @@
     <Compile Include="Expressions\NoninertialExpression.cs" />
     <Compile Include="Expressions\PreservesExpression.cs" />
     <Compile Include="Expressions\ReleasesExpression.cs" />
-    <Compile Include="Expressions\ReleasesIfExpression.cs" />
     <Compile Include="Expressions\TypicallyCausesExpression.cs" />
     <Compile Include="Expressions\TypicallyCausesIfExpression.cs" />
+    <Compile Include="FluentParser.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="LogicFormulaParser.cs" />
     <Compile Include="Program.cs" />
@@ -92,6 +96,18 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Queries\AlwaysAccessibleQuery.cs" />
+    <Compile Include="Queries\AlwaysAfterQuery.cs" />
+    <Compile Include="Queries\AlwaysExecutableQuery.cs" />
+    <Compile Include="Queries\AlwaysInvolvedQuery.cs" />
+    <Compile Include="Queries\PossiblyAccessibleQuery.cs" />
+    <Compile Include="Queries\PossiblyAfterQuery.cs" />
+    <Compile Include="Queries\PossiblyExecutableQuery.cs" />
+    <Compile Include="Queries\PossiblyInvolvedQuery.cs" />
+    <Compile Include="Queries\Query.cs" />
+    <Compile Include="Queries\TypicallyAccessibleQuery.cs" />
+    <Compile Include="Queries\TypicallyAfterQuery.cs" />
+    <Compile Include="Queries\TypicallyInvolvedQuery.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -119,9 +135,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Queries\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

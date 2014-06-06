@@ -323,7 +323,12 @@ convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
     convert_list_to_state(LISTS,STATES).
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
-    findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
+    EXECUTOR \= epsilon ->
+    (
+        findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R)
+    ;
+        findall([X,Y], causes(ACTION, _, X,Y),R)
+    ),
     state(STATE, STATE_FLUENTS),
     filter_active(STATE_FLUENTS, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
@@ -398,65 +403,77 @@ res0_plus_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_plus_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
-new(LIST1, LIST2,OUTPUT) :-
-    subtract(LIST1, LIST2, OUTPUT2),
+new(LIST1, LIST2,RELEASED, OUTPUT) :-
+    values_of_state(LIST1, RELEASED, RELEASEDX),
+    subtract(LIST1, LIST2, CHANGE),
     findall(X,fluent(X),FLUENTS),
     findall(Y,sinertial(Y),INERTIAL),
     subtract(FLUENTS, INERTIAL, NONINERTIAL2),
     convert_negatives(NONINERTIAL2, NEGNONINERTIAL2),
     append(NONINERTIAL2, NEGNONINERTIAL2, NONINERTIAL),
-    subtract(OUTPUT2, NONINERTIAL, OUTPUT).
+    subtract(CHANGE, NONINERTIAL, CHANGE2),
+    subtract(RELEASEDX, CHANGE2, RELEASED2),
+    append(CHANGE2, RELEASED2, OUTPUT).
 
-minimal_length_new_of_res0([X], STATE, Y) :-
-    new(X, STATE, OUTPUT),
-    length(OUTPUT,Y).
+values_of_state(_,[],[]).
 
-minimal_length_new_of_res0([HEAD|LIST], STATE, LENGTH) :-
-    new(HEAD, STATE, OUTPUT),
-    length(OUTPUT, OUTPUT_LENGTH),
-    minimal_length_new_of_res0(LIST, STATE, OUTPUT_LENGTH2),
-    (
-        OUTPUT_LENGTH < OUTPUT_LENGTH2, LENGTH is OUTPUT_LENGTH ;
-        OUTPUT_LENGTH >= OUTPUT_LENGTH2, LENGTH is OUTPUT_LENGTH2
-    ).
+values_of_state(STATE_LIST, [HEAD1|FLUENTS], [HEAD2|OUTPUT]) :-
+    member(HEAD1, STATE_LIST),
+    HEAD2 = HEAD1,
+    values_of_state(STATE_LIST, FLUENTS, OUTPUT).
 
-copy_res0_state_if_minimal_new([],_,_,[]).
-
-copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, [HEAD|OUTPUT]) :-
-    new(HEAD, STATE, OUTPUT1),
-    length(OUTPUT1, OUTPUT_LENGTH),
-    MINIMAL == OUTPUT_LENGTH,
-    copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
-
-copy_res0_state_if_minimal_new([HEAD|LIST], STATE, MINIMAL, OUTPUT) :-
-    new(HEAD, STATE, OUTPUT1),
-    length(OUTPUT1, OUTPUT_LENGTH),
-    MINIMAL < OUTPUT_LENGTH,
-    copy_res0_state_if_minimal_new(LIST, STATE, MINIMAL, OUTPUT).
-
+values_of_state(STATE_LIST, [HEAD1|FLUENTS], [HEAD2|OUTPUT]) :-
+    not(member(HEAD1, STATE_LIST)),
+    neg(HEAD1,HEAD2),
+    values_of_state(STATE_LIST, FLUENTS, OUTPUT).
 
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
    convert_states_to_lists(STATES_0,STATES_0LIST),
    state(STATE,STATE_LIST),
-   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
-   convert_list_to_state(STATES2_LIST, STATES2),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-   release_fluents(STATES2, FLUENTS, STATES3),
-   sort(STATES3,STATES),
+   minimals(STATES_0LIST, STATE_LIST, FLUENTS,MINIMAL),
+   convert_list_to_state(MINIMAL, STATES2),
+   sort(STATES2,STATES),
    !.
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
    convert_states_to_lists(STATES_0,STATES_0LIST),
    state(STATE,STATE_LIST),
-   minimal_length_new_of_res0(STATES_0LIST, STATE_LIST, MINIMAL),
-   copy_res0_state_if_minimal_new(STATES_0LIST, STATE_LIST, MINIMAL, STATES2_LIST),
-   convert_list_to_state(STATES2_LIST, STATES2),
+   released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
+   minimals(STATES_0LIST, STATE_LIST, FLUENTS,MINIMAL),
+   convert_list_to_state(MINIMAL, STATES2),
    sort(STATES2,STATES),
    !.
 
+
+minimals(STATES, STATE, FLUENTS, OUTPUT) :-
+    calc_new(STATES, STATE, FLUENTS, LIST),
+    minimals_sets(LIST, OUTPUT).
+
+calc_new([],_,_,[]).
+
+calc_new([HEAD|STATES], STATE, FLUENTS, [NEW_SET|OUTPUT]) :-
+        new(HEAD, STATE, FLUENTS, NEW),
+        NEW_SET = [HEAD, NEW],
+        calc_new(STATES, STATE, FLUENTS, OUTPUT).
+
+minimals_sets(LIST, MINIMALS) :-
+    findall(Y1,
+    (
+        member(Y,LIST),
+        nth0(0,Y,Y1),
+        nth0(1,Y,Y2),
+        forall(
+        (
+            member(X,LIST),
+            nth0(1,X,X2),
+            X2\=Y2
+        ),
+        not(subset(X2,Y2)
+        ))),
+    MINIMALS).
 
 states_valid([],[]).
 
@@ -560,29 +577,73 @@ always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-
 
 always_executable_continue(_, _, []).
 
+
+always_executable_continue([],_,_).
+
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
     always_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
-always_accessible_continue([],_, _) :- !,fail.
 
-always_accessible_continue([HEAD|_], _, GOAL) :-
+always_accessible_continue([], _, _).
+
+always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
+    subset(GOAL, FLUENTS),
+    always_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     state(HEAD, FLUENTS),
     not(subset(GOAL, FLUENTS)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    get_res_list_for_causes(HEAD, R1, STATES1),
-    get_res_list_for_causes(HEAD, R2, STATES2),
-    append(STATES1,STATES2, STATES),
-    prod(STATES, POSSIBLE_FUNCTION_VALUES),
-    % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
-    % i sprawdzić czy dla każdego z nich idzie dojść ;)
-    all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
+    append(R1,R2,R),
+    member(MOVE, R),
+    nth0(0, MOVE, ACTION),
+    nth0(1, MOVE, EXECUTOR),
+    res0_trunc(ACTION, EXECUTOR, HEAD, STATES),
+    subtract(STATES, [HEAD|VISITED], STATES_TO_VISIT),
+    length(STATES, S_LENGTH),
+    S_LENGTH > 0,
+    length(STATES_TO_VISIT, STATES_TO_VISIT_LENGTH),
+    STATES_TO_VISIT_LENGTH > 0,
+    always_accessible_continue(STATES_TO_VISIT, [HEAD|VISITED], GOAL),
+    always_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
+
+typically_accessible(GOAL, FLUENTS) :-
+    all_possible_states(FLUENTS, STATES_FROM),
+    typically__accessible_continue(STATES_FROM,[], GOAL),
+    !.
+
+
+typically_accessible_continue([], _, _).
+
+typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    subset(GOAL, FLUENTS),
+    typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
+
+typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
+    state(HEAD, FLUENTS),
+    not(subset(GOAL, FLUENTS)),
+    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R),
+    member(MOVE, R),
+    nth0(0, MOVE, ACTION),
+    nth0(1, MOVE, EXECUTOR),
+    resN_trunc(ACTION, EXECUTOR, HEAD, STATES),
+    subtract(STATES, [HEAD|VISITED], STATES_TO_VISIT),
+    length(STATES, S_LENGTH),
+    S_LENGTH > 0,
+    length(STATES_TO_VISIT, STATES_TO_VISIT_LENGTH),
+    STATES_TO_VISIT_LENGTH > 0,
+    typically_accessible_continue(STATES_TO_VISIT, [HEAD|VISITED], GOAL),
+    typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
+    !.
+
 
 all_continue_ways_check([], _,_,_).
 all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
@@ -592,36 +653,6 @@ all_continue_ways_check([STATES2|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GO
      append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
      always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
      all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
-
-typically_accessible(GOAL, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES_FROM),
-    typically_accessible_continue(STATES_FROM,[], GOAL),
-    !.
-
-typically_accessible_continue([],_, _) :- !,fail.
-
-typically_accessible_continue([HEAD|_], _, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
-
-typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
-    findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
-    get_res_list_for_causes(HEAD, R2, STATES2),
-    prod(STATES2, POSSIBLE_FUNCTION_VALUES),
-    % tu musisz dla każdej z POSS* odpalić coś podobnego do acc*_continue
-    % i sprawdzić czy dla każdego z nich idzie dojść ;)
-    typically_all_continue_ways_check(POSSIBLE_FUNCTION_VALUES,[HEAD|NOT_VISITED], VISITED, GOAL).
-
-typically_all_continue_ways_check([], _,_,_).
-typically_all_continue_ways_check([STATES|POSSIBLE_CONT], [HEAD|NOT_VISITED], VISITED, GOAL) :-
-     list_to_set(STATES,STATES2),
-     subtract(STATES2, [HEAD|VISITED], TO_BE_VISITED),
-     subtract(TO_BE_VISITED, NOT_VISITED, TO_BE_VISITED2),
-     append(NOT_VISITED, TO_BE_VISITED2, NOT_VISITED2),
-     always_accessible_continue(NOT_VISITED2, [HEAD | VISITED], GOAL),
-     typically_all_continue_ways_check(POSSIBLE_CONT, [HEAD|NOT_VISITED], VISITED, GOAL).
 
 
 get_res_list_for_causes(_,[],[]).
@@ -705,7 +736,114 @@ prod([L|Ls],Out) :-
 % always_involved(EXECUTOR, ACTIONS, EXECUTORS).
 % typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
 
-% possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-% always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-% typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
+    possibly_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
+
+possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+    (
+        state(HEAD,HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST)
+    ;
+        possibly_cont(STATES, [], [], FLUENTS_TO)
+    ),
+    !.
+
+possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+    (
+        (
+            EXECUTOR \= epsilon,
+            res0_trunc(ACTION, EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS),
+            member(POSS_EXECUTOR,POSS_EXECUTORS),
+            res0_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION)
+        )
+    ),
+    length(STATES_ACTION, N),
+    N > 0,
+    (
+        possibly_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+    ;
+        possibly_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+    ),
+    !.
+
+always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
+    always_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
+
+always_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+        state(HEAD,HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST),
+        always_cont(STATES, [], [], FLUENTS_TO),
+        !.
+
+always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+    (
+        (
+            EXECUTOR \= epsilon,
+            POSS_EXECUTORS = [EXECUTOR]
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS)
+        )
+    ),
+    (
+        foreach(member(Y,POSS_EXECUTORS),
+            (
+                res0_trunc(ACTION, Y, HEAD, STATES_ACTION),
+                length(STATES_ACTION, N),
+                N > 0,
+                always_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+            )),
+        always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+    ),
+    !.
+
+always_cont([],_,_,_).
+
+typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
+    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    !.
+
+typically_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+        state(HEAD, HEAD_LIST),
+        subset(FLUENTS_TO, HEAD_LIST),
+        typically_cont(STATES, [], [], FLUENTS_TO),
+        !.
+
+typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+    (
+        (
+            EXECUTOR \= epsilon,
+            POSS_EXECUTORS = [EXECUTOR]
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS)
+        )
+    ),
+    (
+        foreach(member(Y,POSS_EXECUTORS),
+            (
+                res0_trunc(ACTION, Y, HEAD, STATES_ACTION),
+                length(STATES_ACTION, N),
+                N > 0,
+                typically_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+            )),
+        typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+    ),
+    !.
+
+typically_cont([],_,_,_).
 

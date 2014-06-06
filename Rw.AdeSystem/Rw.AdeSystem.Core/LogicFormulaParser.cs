@@ -23,7 +23,7 @@ namespace Rw.AdeSystem.Core
                         if (expr[i + 1] != '(')
                         {
                             int j = i + 1;
-                            while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&')
+                            while (expr[j] != '-' && expr[j] != '<' && expr[j] != '|' && expr[j] != '&' && j<expr.Length-1)
                                 j++;
                             expr = expr.Insert(i, "(");
                             expr = expr.Insert(j+1, ")");

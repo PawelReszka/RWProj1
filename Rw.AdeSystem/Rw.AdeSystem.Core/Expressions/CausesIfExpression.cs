@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,25 +10,13 @@ namespace Rw.AdeSystem.Core.Expressions
         public CausesIfExpression(string line) : base(line.Substring(0,line.IndexOf("if")))
         {
             var con = line.Substring(line.IndexOf("if")+2).Trim();
-            Conditions.Add(con);
+            Conditions.Add(con.Replace("!", "not_"));
         }
 
         public override void ToProlog()
         {
-            var effects = new StringBuilder();
-            for (int i = 0; i < Effects.Count; i++)
-            {
-                effects.Append(Effects[i]);
-                if (i != Effects.Count - 1)
-                    effects.Append(", ");
-            }
-            var conditions = new StringBuilder();
-            for (int i = 0; i < Conditions.Count; i++)
-            {
-                conditions.Append(Conditions[i]);
-                if (i != Conditions.Count - 1)
-                    conditions.Append(", ");
-            }
+            var effects = String.Join(", ", Effects);
+            var conditions = String.Join(", ", Conditions);
             AdeSystem.PrologEngine.AssertFact("causes(" + ActionName + ", epsilon, [" + effects + "], [" + conditions + "])");
         }
     }
