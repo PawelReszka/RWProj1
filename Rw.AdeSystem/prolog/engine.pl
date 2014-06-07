@@ -541,56 +541,40 @@ pexecutable(STATE, ACTION, EXECUTOR) :-
     
     
 %czy z danej listy stanow mozna zawsze dojsc do wyjsciowej
-always_executable([], _, _,[]).
-always_executable(STATES,[],[],STATES).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
-always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
-    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),%czy dziala dla pozostalych
+
+always_executable2(FLUENTS, ACTIONS, EXECUTORS) :-
+    all_possible_states(FLUENTS, STATES),
+    always_executable(STATES, ACTIONS, EXECUTORS),
+    !.
+
+always_executable([], _, _).
+always_executable(_,[],[]).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
+always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
+    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych
     res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
     length(STATES, STATES_LENGTH),
     STATES_LENGTH > 0, % jezeli chociaz jedno, gdziekolwiek bedzie mialo pusty wysypie sie calosc
-    always_executable(STATES, ACTIONS, EXECUTORS, STATES2), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
-    subtract(STATES2, STATES_TO2,STATES_TO_ADD),%dzialamy wlasciwie na zbiorach nie na listach, wiec musimy pilnowac unikalnosci elementow
-    append(STATES_TO2,STATES_TO_ADD,STATES_TO), %to uzupelni nam liste STATES_TO - zostanie ona zwrocona wyzej jako states2
+    always_executable(STATES, ACTIONS, EXECUTORS), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
     !.
-    
-%to wszystko dziala na pojedynczej parze A,E    
-always_executable(ACTION, EXECUTOR, FLUENTS) :- 
-    all_possible_states(FLUENTS, STATES),
-    always_executable_continue(ACTION, EXECUTOR, STATES).
-
-always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
-    pexecutable(HEAD, ACTION, EXECUTOR),
-    always_executable_continue(ACTION, EXECUTOR, STATES).
-    
-always_executable_continue(_, _, []).
-
-always_executable_continue([],_,_).
         
-    
 %jw
-possibly_executable([], _, _,[]).
-possibly_executable(STATES,[],[],STATES).
-possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
-    possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
-    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
-    possibly_executable(STATES, ACTIONS, EXECUTORS, STATES2),
-    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
-    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
-    length(STATES_TO, COUNT),
-    COUNT > 0, % jezeli nie dostalismy nic ze stanow poczatkowych - nie ma zadnego wykonywalnego dla tego poziomu.
+
+
+possibly_executable2(FLUENTS, ACTIONS, EXECUTORS) :-
+    all_possible_states(FLUENTS, STATES),
+    possibly_executable(STATES, ACTIONS, EXECUTORS),
     !.
 
-possible_executable(ACTION, EXECUTOR, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES),
-    possible_executable_continue(ACTION, EXECUTOR, STATES).
 
-possible_executable_continue(ACTION, EXECUTOR, [HEAD|_]) :-   
-    pexecutable(HEAD, ACTION, EXECUTOR).
-
-possible_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
-    not(pexecutable(HEAD, ACTION, EXECUTOR)),
-    possible_executable_continue(ACTION, EXECUTOR, STATES).
-
+possibly_executable(_,[],[]). % tu wybiera stany dla których jest możliwy ciąg akcji
+possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
+        res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
+        length(STATES, STATES_LENGTH),
+        STATES_LENGTH > 0,
+        possibly_executable(STATES, ACTIONS, EXECUTORS)
+    ;
+        possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),
+    !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
