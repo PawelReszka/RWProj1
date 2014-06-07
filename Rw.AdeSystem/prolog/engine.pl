@@ -507,46 +507,54 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXECUTABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %czy jest wykonalna ta akcja w tym stanie - jest ok nawet jesli wracamy do tego samego stanu   
-pexecutable(STATE, ACTION, EXECUTOR) :-
+pexecutable(ACTION, EXECUTOR, STATE, X) :-
     res0_trunc(ACTION, EXECUTOR, STATE, X),
     length(X,Y),
     Y > 0.
     
     
-%czy z danej listy stanow mozna zawsze dojsc do wyjsciowej
 
-always_executable2(FLUENTS, ACTIONS, EXECUTORS) :-
+always_executable(ACTIONS, EXECUTORS) :-
+	initially(FLUENTS),
+	always_executable(FLUENTS, ACTIONS, EXECUTORS),
+	!.
+	
+%czy z danej listy stanow mozna zawsze dojsc do wyjsciowej	
+always_executable(FLUENTS, ACTIONS, EXECUTORS) :-
     all_possible_states(FLUENTS, STATES),
-    always_executable(STATES, ACTIONS, EXECUTORS),
+    always_executable_cont(STATES, ACTIONS, EXECUTORS),
     !.
 
-always_executable([], _, _).
-always_executable(_,[],[]).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
-always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
-    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych
+always_executable_cont([], _, _) .
+always_executable_cont(_,[],[]).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
+always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
+    always_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych
     res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
     length(STATES, STATES_LENGTH),
     STATES_LENGTH > 0, % jezeli chociaz jedno, gdziekolwiek bedzie mialo pusty wysypie sie calosc
-    always_executable(STATES, ACTIONS, EXECUTORS), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
+    always_executable_cont(STATES, ACTIONS, EXECUTORS), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
     !.
         
 %jw
+possibly_executable(ACTIONS, EXECUTORS) :-
+	initially(FLUENTS),
+	possibly_executable(FLUENTS, ACTIONS, EXECUTORS),
+	!.
 
-
-possibly_executable2(FLUENTS, ACTIONS, EXECUTORS) :-
+possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-
     all_possible_states(FLUENTS, STATES),
-    possibly_executable(STATES, ACTIONS, EXECUTORS),
+    possibly_executable_cont(STATES, ACTIONS, EXECUTORS),
     !.
 
 
-possibly_executable(_,[],[]). % tu wybiera stany dla których jest możliwy ciąg akcji
-possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
+possibly_executable_cont(_,[],[]). % tu wybiera stany dla ktorych jest mozliwy ciag akcji
+possibly_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
         res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
         length(STATES, STATES_LENGTH),
         STATES_LENGTH > 0,
-        possibly_executable(STATES, ACTIONS, EXECUTORS)
+        possibly_executable_cont(STATES, ACTIONS, EXECUTORS)
     ;
-        possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),
+        possibly_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),
     !.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
