@@ -168,8 +168,6 @@ test(turn2_mietus_0) :-
     state(state0, STATE0),
     state(state3, STATE3),
     state(state2, STATE2),
-    state(state4, STATE4),
-    state(state6, STATE6),
 
     res0(turn2, mietus, STATE0, [STATE2,STATE3]),
     res0_min(turn2, mietus, STATE0, [STATE3]),
@@ -180,14 +178,9 @@ test(turn2_mietus_0) :-
     resAb_trunc(turn2, mietus, STATE0, []).
 
 test(turn2_mietus_1) :-
-    state(state0, STATE0),
     state(state1, STATE1),
     state(state3, STATE3),
-    state(state5, STATE5),
-    state(state7, STATE7),
     state(state2, STATE2),
-    state(state4, STATE4),
-    state(state6, STATE6),
 
     res0(turn2, mietus, STATE1, [STATE2,STATE3]),
     res0_min(turn2, mietus, STATE1, [STATE2]),
@@ -201,11 +194,7 @@ test(turn2_mietus_2) :-
     state(state0, STATE0),
     state(state1, STATE1),
     state(state3, STATE3),
-    state(state5, STATE5),
-    state(state7, STATE7),
     state(state2, STATE2),
-    state(state4, STATE4),
-    state(state6, STATE6),
 
     res0(turn2, mietus, STATE2, [STATE0, STATE1,STATE2,STATE3]),
     res0_min(turn2, mietus, STATE2, [STATE2]),
@@ -219,11 +208,7 @@ test(turn2_mietus_3) :-
     state(state0, STATE0),
     state(state1, STATE1),
     state(state3, STATE3),
-    state(state5, STATE5),
-    state(state7, STATE7),
     state(state2, STATE2),
-    state(state4, STATE4),
-    state(state6, STATE6),
 
     res0(turn2, mietus, STATE3, [STATE0,STATE1, STATE2,STATE3]),
     res0_min(turn2, mietus, STATE3, [STATE3]),
