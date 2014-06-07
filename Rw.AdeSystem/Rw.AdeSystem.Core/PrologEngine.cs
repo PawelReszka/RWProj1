@@ -73,14 +73,7 @@ namespace Rw.AdeSystem.Core
 
         public void AssertFacts(string prologFacts)
         {
-            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"engine.pl");
-            PlQuery.PlCall("consult('" + "D:/engine.pl" + "')");
-            var x = 2;
-            //var facts = prologFacts.Split('\n');
-            //foreach (var prologFact in facts)
-            //{
-            //    PlQuery.PlCall("assert((" + prologFact + "))");                
-            //}
+            PlQuery.PlCall("consult('" + "engine.pl" + "')");
         }
 
 
