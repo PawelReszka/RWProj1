@@ -525,21 +525,48 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXECUTABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%czy jest wykonalna ta akcja w tym stanie - jest ok nawet jesli wracamy do tego samego stanu   
+pexecutable(STATE, ACTION, EXECUTOR) :-
+    res0_trunc(ACTION, EXECUTOR, STATE, X),
+    length(X,Y),
+    Y > 0.
+    
+    
 %czy z danej listy stanow mozna zawsze dojsc do wyjsciowej
 always_executable([], _, _,[]).
-always_executable(STATES,[],[],STATES).%dla pustych ciagow ladujemy w tych samych stanach
+always_executable(STATES,[],[],STATES).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
 always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
     always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),%czy dziala dla pozostalych
     res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
     length(STATES, STATES_LENGTH),
     STATES_LENGTH > 0, % jezeli chociaz jedno, gdziekolwiek bedzie mialo pusty wysypie sie calosc
-    always_executable(STATES, ACTIONS, EXECUTORS, STATES2), %czy dziala dalej idac 
+    always_executable(STATES, ACTIONS, EXECUTORS, STATES2), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
     subtract(STATES2, STATES_TO2,STATES_TO_ADD),%dzialamy wlasciwie na zbiorach nie na listach, wiec musimy pilnowac unikalnosci elementow
-    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO), %to uzupelni nam liste STATES_TO - zostanie ona zwrocona wyzej jako states2
     !.
+    
+%to wszystko dziala na pojedynczej parze A,E    
+always_executable(ACTION, EXECUTOR, FLUENTS) :- 
+    all_possible_states(FLUENTS, STATES),
+    always_executable_continue(ACTION, EXECUTOR, STATES).
+
+always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
+    pexecutable(HEAD, ACTION, EXECUTOR),
+    always_executable_continue(ACTION, EXECUTOR, STATES).
+    
+always_executable_continue(_, _, []).
+
+always_executable_continue([],_,_).
+        
+    
 %jw
 possibly_executable([], _, _,[]).
 possibly_executable(STATES,[],[],STATES).
@@ -552,13 +579,7 @@ possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUT
     length(STATES_TO, COUNT),
     COUNT > 0, % jezeli nie dostalismy nic ze stanow poczatkowych - nie ma zadnego wykonywalnego dla tego poziomu.
     !.
-%czy jest wykonalna ta akcja w tym stanie - jest ok nawet jesli wracamy do tego samego stanu   
-pexecutable(STATE, ACTION, EXECUTOR) :-
-    res0_trunc(ACTION, EXECUTOR, STATE, X),
-    length(X,Y),
-    Y > 0.
-    
-    
+
 possible_executable(ACTION, EXECUTOR, FLUENTS) :-
     all_possible_states(FLUENTS, STATES),
     possible_executable_continue(ACTION, EXECUTOR, STATES).
@@ -569,18 +590,6 @@ possible_executable_continue(ACTION, EXECUTOR, [HEAD|_]) :-
 possible_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
     not(pexecutable(HEAD, ACTION, EXECUTOR)),
     possible_executable_continue(ACTION, EXECUTOR, STATES).
-
-always_executable(ACTION, EXECUTOR, FLUENTS) :- 
-    all_possible_states(FLUENTS, STATES),
-    always_executable_continue(ACTION, EXECUTOR, STATES).
-
-always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
-    pexecutable(HEAD, ACTION, EXECUTOR),
-    always_executable_continue(ACTION, EXECUTOR, STATES).
-    
-always_executable_continue(_, _, []).
-
-always_executable_continue([],_,_).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -916,33 +925,34 @@ typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INVOLVED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%kwerendy dotyczace wykonawcow sa zawsze wzgledem stanu poczatkowego
 possibly_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    initially(INITIAL_FLUENTS),%standardowo wyciagamy fluenty okreslone w poczatkowej klauzuli
+    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),% standardowo stany im odpowiadajace
     possibly_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
     !.
 
 possibly_involved_cont([], _, _, _, _).
-
+%CURRENTS zbiera mozliwych executorow, na koniec sprawdzamy czy nasz jest wsrod nich, czemu involved jest lista?
 possibly_involved_cont(_, INVOLVED, [], [], CURRENTS) :-
-    subset(INVOLVED, CURRENTS),
+    subset(INVOLVED, CURRENTS),%czemu nie member?
     !.
 
 possibly_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS) :-
     (
-        EXECUTOR == epsilon ->
-            findall(X, executor(X), POSS_EXECUTORS)
-        ;
-            POSS_EXECUTORS = [EXECUTOR]
+        EXECUTOR == epsilon ->	%if 
+            findall(X, executor(X), POSS_EXECUTORS) % w poss executors umieszcza wszystkich executorow bo eps
+        ;						%else
+            POSS_EXECUTORS = [EXECUTOR] % przypisuje executor do poss executors
     ),
     (
-        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
-        res0_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
+        member(CURRENT_EXECUTOR, POSS_EXECUTORS),% konretyzacja excutora
+        res0_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),%sprawdza czy akcja jest wykonywalna ale czy tu sie uwzglednia akcje nietypowe?
         length(OUTPUT_STATES, N),
         N > 0,
-        possibly_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS])
+        possibly_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS])%sprawdzamy dla dalszej czesci sciezki
     ;
-        possibly_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS)
+        possibly_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS) %sprawdzamy dla innych stanow
     ),
     !.
 
