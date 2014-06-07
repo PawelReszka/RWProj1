@@ -139,6 +139,7 @@ namespace Rw.AdeSystem.Core
             Fluents = Fluents.Select(i=>i.ToLower()).Distinct().ToList();
             Actions = Actions.Select(i => i.ToLower()).Distinct().ToList();
             Executors = Executors.Select(i => i.ToLower()).Distinct().ToList();
+            NoninertialFluents = NoninertialFluents.Select(i => i.ToLower()).Distinct().ToList();
 
             foreach (var f in Fluents)
             {
@@ -157,7 +158,7 @@ namespace Rw.AdeSystem.Core
             {
                 PrologEngine.AssertFact("sneg(" + f + ",not_" + f + ")");
             }
-            foreach (var f in Fluents)
+            foreach (var f in Fluents.Where(i=>!NoninertialFluents.Contains(i)))
             {
                 PrologEngine.AssertFact("sinertial("+ f + ")");
             }
@@ -208,7 +209,7 @@ namespace Rw.AdeSystem.Core
         {
             query = query.ToLower();
             Query q = null;
-            if (query.Contains("always accesible"))
+            if (query.Contains("always accessible"))
             {
                 q = new AlwaysAccessibleQuery(query);
             }
@@ -224,7 +225,7 @@ namespace Rw.AdeSystem.Core
             {
                 q = new AlwaysInvolvedQuery(query);
             }
-            else if (query.Contains("possibly accesible"))
+            else if (query.Contains("possibly accessible"))
             {
                 q = new PossiblyAccessibleQuery(query);
             }
@@ -240,7 +241,7 @@ namespace Rw.AdeSystem.Core
             {
                 q = new PossiblyInvolvedQuery(query);
             }
-            else if (query.Contains("typically accesible"))
+            else if (query.Contains("typically accessible"))
             {
                 q = new TypicallyAccessibleQuery(query);
             }
@@ -253,7 +254,7 @@ namespace Rw.AdeSystem.Core
                 q = new TypicallyInvolvedQuery(query);
             }
             if(q!=null)
-                q.ToProlog();
+                return q.ToProlog();
             return "Nie rozpoznana kwerenda";
         }
 

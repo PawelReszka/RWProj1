@@ -10,14 +10,19 @@ namespace Rw.AdeSystem.Core.Expressions
         public CausesIfExpression(string line) : base(line.Substring(0,line.IndexOf("if")))
         {
             var con = line.Substring(line.IndexOf("if")+2).Trim();
-            Conditions.Add(con.Replace("!", "not_"));
+            List<string> litVal;
+            List<Token> lit;
+            var exp = LogicFormulaParser.Parse(con, out lit, out litVal);
+            Conditions = LogicFormulaParser.GetFluentStrings(exp);
         }
 
         public override void ToProlog()
         {
             var effects = String.Join(", ", Effects);
-            var conditions = String.Join(", ", Conditions);
-            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [" + conditions.ToLower() + "])");
+            foreach (var condition in Conditions)
+            {
+                AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [" + condition.ToLower() + "])");
+            }
         }
     }
 }

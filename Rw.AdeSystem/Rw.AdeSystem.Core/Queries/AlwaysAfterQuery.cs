@@ -1,35 +1,25 @@
-﻿namespace Rw.AdeSystem.Core.Queries
+﻿using System.Collections.Generic;
+
+namespace Rw.AdeSystem.Core.Queries
 {
-    public class AlwaysAfterQuery : Query
+    public class AlwaysAfterQuery : AfterQuery
     {
         public AlwaysAfterQuery(string line) : base(line)
         {
-            if (line.Contains("from"))
-            {
-                GoalString = FluentParser.GetSubstring(line, " always ", " after ");
-                ActionsString = FluentParser.GetSubstring(line, " after ", " by ");
-                ExecutorsString = FluentParser.GetSubstring(line, " by ", " from ");
-                ConditionsString = FluentParser.GetSubstring(line, " from ");
-            }
-            else
-            {
-                GoalString = FluentParser.GetSubstring(line, " always ", " after ");
-                ActionsString = FluentParser.GetSubstring(line, " after ", " by ");
-                ExecutorsString = FluentParser.GetSubstring(line, " by ");
-            }
+            
         }
-
-        public string ExecutorsString { get; set; }
-
-        public string ActionsString { get; set; }
-
-        public string ConditionsString { get; set; }
-
-        public string GoalString { get; set; }
 
         public override string ToProlog()
         {
-            return "Nie zdefiniowana kwerenda - trzeba zrobić";
+            var queries = base.GetQueries("always");
+            var result = false;
+            foreach (var query in queries)
+            {
+                result = PrologEngine.ExecuteQuery(query);
+                if (result)
+                    break;
+            }
+            return result.ToString();
         }
     }
 }

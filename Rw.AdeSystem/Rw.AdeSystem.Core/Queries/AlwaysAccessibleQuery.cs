@@ -1,33 +1,27 @@
-﻿namespace Rw.AdeSystem.Core.Queries
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Rw.AdeSystem.Core.Queries
 {
-    public class AlwaysAccessibleQuery : Query
+    public class AlwaysAccessibleQuery : AccessibleQuery
     {
         public AlwaysAccessibleQuery(string line)
             : base(line)
         {
-            if (line.Contains("from"))
-            {
-                GoalString = FluentParser.GetSubstring(line, " accesible ", " from ");
-                ConditionsString = FluentParser.GetSubstring(line, " from ");
-            }
-            else
-            {
-                GoalString = FluentParser.GetSubstring(line, " accesible ");
-            }
+            
         }
-
-        public string ConditionsString { get; set; }
-
-        public string GoalString { get; set; }
 
         public override string ToProlog()
         {
-            string query="";
-            if (ConditionsString == null)
-                query = "always_accessible(["+GoalString+"])";
-            else
-                query = "always_accessible([" + GoalString + "], ["+ConditionsString+"])";
-            return PrologEngine.ExecuteQuery(query);
+            var queries = base.GetQueries("always");
+            var result = false;
+            foreach (var query in queries)
+            {
+                result = PrologEngine.ExecuteQuery(query);
+                if (result)
+                    break;
+            }
+            return result.ToString();
         }
     }
 }

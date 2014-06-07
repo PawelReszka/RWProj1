@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using SbsSW.SwiPlCs;
 
 namespace Rw.AdeSystem.Core
@@ -59,33 +60,21 @@ namespace Rw.AdeSystem.Core
             SaveLine(prologFact);
         }
 
-        public static string ExecuteQuery(string query)
+        public static bool ExecuteQuery(string query)
         {
             //query = "inertial(huu)";
+            bool result = false;
             using (var q = new PlQuery(query))
             {
-                var x = q.NextSolution();
-                var y = q.NextSolution();
-                var z = q.NextSolution();
-                var d = q.NextSolution();
-                var a = q.NextSolution();
-                var ad = q.NextSolution();
-                var ass = q.NextSolution();
-                var aaa = q.NextSolution();
-                x = x;
-                foreach (var sol in q.Solutions)
-                {
-                    var asdaa = sol.ToString();
-                    x = x;
-                }
-                x = x;
+                result = q.NextSolution();
             }
-            return "";
+            return result;
         }
 
         public void AssertFacts(string prologFacts)
         {
-            PlQuery.PlCall("consult('" + "engine.pl" + "')");
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"engine.pl");
+            PlQuery.PlCall("consult('" + "D:/engine.pl" + "')");
             var x = 2;
             //var facts = prologFacts.Split('\n');
             //foreach (var prologFact in facts)

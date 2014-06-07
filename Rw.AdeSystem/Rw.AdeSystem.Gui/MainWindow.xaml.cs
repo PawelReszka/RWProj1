@@ -12,14 +12,15 @@ namespace Rw.AdeSystem.Gui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly List<string> _fluents = new List<string>();
-        private readonly List<string> _actions = new List<string>();
-        private readonly List<string> _executors = new List<string>();
+        private  List<string> _fluents = new List<string>();
+        private  List<string> _actions = new List<string>();
+        private  List<string> _executors = new List<string>();
 
         private List<string> _lastSuggestions;
 
         public MainWindow()
         {
+            
             InitializeComponent();
             queryLabel.Visibility = System.Windows.Visibility.Hidden;
             queryTextBox.Visibility = System.Windows.Visibility.Hidden;
@@ -27,17 +28,17 @@ namespace Rw.AdeSystem.Gui
             answerLabel.Visibility = System.Windows.Visibility.Hidden;
             historyListView.Visibility = System.Windows.Visibility.Hidden;
 
-            _fluents.Add("hasGunHador");
-            _fluents.Add("hasGunMiętus");
-            _fluents.Add("alive");
-            _fluents.Add("walking");
+            //_fluents.Add("hasGunHador");
+            //_fluents.Add("hasGunMiętus");
+            //_fluents.Add("alive");
+            //_fluents.Add("walking");
 
-            _actions.Add("SHOOT");
-            _actions.Add("CHOWN");
-            _actions.Add("ENTICE");
+            //_actions.Add("SHOOT");
+            //_actions.Add("CHOWN");
+            //_actions.Add("ENTICE");
 
-            _executors.Add("Hador");
-            _executors.Add("Miętus");
+            //_executors.Add("Hador");
+            //_executors.Add("Miętus");
         }
 
         private void loadModelButton_Click(object sender, RoutedEventArgs e)
@@ -57,7 +58,15 @@ namespace Rw.AdeSystem.Gui
                 // Open document 
                 string filename = dlg.FileName;
                 pathLabel.Content = filename;
+                String[] param = { /*"-q"*/ };
+                Core.AdeSystem.Initialize(param);
                 List<string> words = LoadModelFile(filename);
+                string text = System.IO.File.ReadAllText(filename);
+                Core.AdeSystem.LoadDomain(text);
+                Core.AdeSystem.ConstructSystemDomain();
+                _actions = Core.AdeSystem.Actions;
+                _fluents = Core.AdeSystem.Fluents;
+                _executors = Core.AdeSystem.Executors;
                 createModelButton.IsEnabled = true;
             }
         }
@@ -86,6 +95,8 @@ namespace Rw.AdeSystem.Gui
             answerLabel.Visibility = System.Windows.Visibility.Visible;
             historyListView.Visibility = System.Windows.Visibility.Visible;
             UpdateQueryTextBox();
+            queryButton.IsEnabled = true;
+
         }
 
         private void queryTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -401,5 +412,11 @@ namespace Rw.AdeSystem.Gui
             UpdateListBox();
         }*/
 
+        private void QueryButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var query = queryTextBox.GetLineText(0);
+            var answer = Core.AdeSystem.ParseQuery(query);
+            answerLabel.Content = answer;
+        }
     }
 }
