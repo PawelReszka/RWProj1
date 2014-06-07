@@ -24,7 +24,8 @@ namespace Rw.AdeSystem.Core
             //Parsowanie wyrazenia logicznego - w literals sa fluenty, a drzewo wyrazenia w logicTree
             List<Token> literals;
             List<string> literalValues;
-            var expr = "(A|!B)&C";
+            //var expr = "(A|!B)&C";
+            var expr = "!A";
             BoolExpr logicTree = LogicFormulaParser.Parse(expr, out literals, out literalValues);
             var dict = literals.ToDictionary(i => i.Value, i => i.Value == "A" || i.Value == "B");
             var b = LogicFormulaParser.Eval(logicTree, dict);
