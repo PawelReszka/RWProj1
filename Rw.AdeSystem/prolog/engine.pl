@@ -1029,3 +1029,16 @@ typically_involved_cont2([SEXECUTOR | SEXECUTORS],[STATE|STATES], INVOLVED, [ACT
     
 typically_involved_cont2([],_, _, _, _, _, _,_).
 
+proper_subset(X,Y) :- 
+    is_list(X) ->
+        subset(X,Y)
+        ;
+        gen_subset(Y,X).
+
+gen_subset([], []).
+gen_subset([E|Tail], [E|NTail]):-
+  gen_subset(Tail, NTail).
+  gen_subset([_|Tail], NTail):-
+    gen_subset(Tail, NTail).
+
+
