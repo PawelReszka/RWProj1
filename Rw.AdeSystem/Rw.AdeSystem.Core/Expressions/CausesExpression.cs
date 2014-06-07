@@ -1,14 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Rw.AdeSystem.Core.Expressions
 {
-
-    
-//releases(shoot,mietus,[walking], f3).
-//releases(shoot,hador,[walking], f4).
-
 
     public class CausesExpression : Expression
     {
@@ -20,19 +16,14 @@ namespace Rw.AdeSystem.Core.Expressions
             var tokens = line.Trim().Split(' ');
             AdeSystem.Actions.Add(tokens[0]);
             ActionName = tokens[0];
-            Effects.Add(tokens.Last());
+            Effects.Add(tokens.Last().Replace("!", "not_"));
+            AdeSystem.Fluents.Add(tokens.Last().Replace("!",""));
         }
 
         public override void ToProlog()
         {
-            var effects = new StringBuilder();
-            for (int i = 0; i < Effects.Count; i++)
-            {
-                effects.Append(Effects[i]);
-                if (i != Effects.Count - 1)
-                    effects.Append(", ");
-            }
-            AdeSystem.PrologEngine.AssertFact("causes("+ActionName+", epsilon, ["+effects+"], []).");
+            var effects = String.Join(", ", Effects);
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [])");
         }
     }
 }

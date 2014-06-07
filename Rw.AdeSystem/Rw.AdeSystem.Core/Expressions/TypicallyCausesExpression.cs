@@ -1,6 +1,8 @@
+using System;
+
 namespace Rw.AdeSystem.Core.Expressions
 {
-    public class TypicallyCausesExpression : Expression
+    public class TypicallyCausesExpression : CausesExpression
     {
         public TypicallyCausesExpression(string line) : base(line)
         {
@@ -8,7 +10,8 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            throw new System.NotImplementedException();
+            var effects = String.Join(", ", Effects);
+            AdeSystem.PrologEngine.AssertFact("typically_causes(" + ActionName + ", epsilon, [" + effects + "], [])");
         }
     }
 }

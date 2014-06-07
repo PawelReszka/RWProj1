@@ -21,6 +21,11 @@
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
             </Button.Foreground>
         </Button>
+        <Button x:Name="queryButton" Content="EXECUTE QUERY" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top" Width="200" BorderThickness="0" Click="QueryButton_OnClick" IsEnabled="True" BorderBrush="{x:Null}">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+            </Button.Foreground>
+        </Button>
         <Label x:Name="buildModelLabel" Content="" HorizontalAlignment="Left" Margin="233,29,0,0" VerticalAlignment="Top" Width="549" Grid.ColumnSpan="2"/>
         <ProgressBar x:Name="loadingProgressBar" HorizontalAlignment="Left" Height="10" Margin="10,238,0,0" VerticalAlignment="Top" Width="762"/>
         <TextBox x:Name="queryTextBox" HorizontalAlignment="Left" Height="23" Margin="12,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="760" TextChanged="queryTextBox_TextChanged"/>

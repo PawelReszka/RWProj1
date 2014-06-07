@@ -1,5 +1,7 @@
+﻿
 %definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
 :-  dynamic(releases/4),dynamic(preserve/3),dynamic(observable_after/3),dynamic(initially_after/3).
+
 
 neg(X,Y) :- sneg(Y,X).%laczy fluent z jego negacja, relacja jest symetryczna
 neg(X,Y) :- sneg(X,Y).

@@ -1,14 +1,24 @@
 ﻿namespace Rw.AdeSystem.Core.Queries
 {
-    public class PossiblyInvolvedQuery : Query
+    public class PossiblyInvolvedQuery : InvolvedQuery
     {
-        public PossiblyInvolvedQuery(string line) : base(line)
+        public PossiblyInvolvedQuery(string line)
+            : base(line)
         {
         }
 
+
         public override string ToProlog()
         {
-            throw new System.NotImplementedException();
+            var queries = base.GetQueries("possibly");
+            var result = false;
+            foreach (var query in queries)
+            {
+                result = PrologEngine.ExecuteQuery(query);
+                if (result)
+                    break;
+            }
+            return result.ToString();
         }
     }
 }
