@@ -191,7 +191,12 @@ namespace Rw.AdeSystem.Core
             }
             if (expr.Op == BoolExpr.Bop.Not)
             {
-                return "not_" + expr.Left.Lit;
+                if (parent != null && parent.Op == BoolExpr.Bop.And)
+                    return "not_" + expr.Left.Lit;
+
+                tokens.Add("not_" + expr.Left.Lit);
+                return "";
+
             }
             if (expr.Op == BoolExpr.Bop.And)
             {
