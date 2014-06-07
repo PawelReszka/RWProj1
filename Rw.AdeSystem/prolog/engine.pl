@@ -210,7 +210,8 @@ list_of_states(R) :-
     findall(X, fluent(X), POSITIVE),
     convert_negatives(POSITIVE, NEGATIVES),
     pair_lists(POSITIVE, NEGATIVES, PAIRS),
-    prod(PAIRS, R).
+    prod(PAIRS, R2),
+    states_valid(R2,R).
 
 possible_state(LIST_OF_FLUENTS, STATE) :-
     subset(LIST_OF_FLUENTS, STATE).
@@ -838,7 +839,7 @@ always_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EX
 
 typically_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN),
+    minimal_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN),
     typically_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,MIN),
     !.
 

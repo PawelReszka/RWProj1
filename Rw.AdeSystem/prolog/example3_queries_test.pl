@@ -5,14 +5,14 @@
 test(possibly_1) :-
     possibly_after([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on]).
 test(always_1) :-
-    not(always([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on])).
+    not(always_after([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on])).
 test(typically_1) :-
     typically_after([switch2_off,switch1_off],[turn1,turn2],[epsilon,epsilon], [switch1_on, switch2_on]).
 
 test(possibly_2) :-
     possibly_after([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on]).
 test(always_2) :-
-    not(always([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on])).
+    not(always_after([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on])).
 test(typically_2) :-
     typically_after([switch2_off,switch1_off],[turn2,turn1],[epsilon,epsilon], [switch1_on, switch2_on]).
 % powinno byc tu TRUE, poniewaz turn1 w stanie 3 przez hador prowadzi nie do 3 tylko 2 -N
