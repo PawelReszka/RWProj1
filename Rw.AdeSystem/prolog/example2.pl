@@ -25,7 +25,20 @@ order(1,has_gun_mietus).
 order(2,alive).
 order(3,walking).
 
-initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
+initially_after([shoot],[hador],[alive]).
+initially_after([shoot],[mietus],[has_gun_mietus]).
+initially(RES) :-
+	list_of_states(STATES),
+	findall(SET_OF_FLUENTS,
+		(
+		initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+		bagof(FLUENTS_FROM, (member(FLUENTS_FROM, STATES),always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM))	, SET_OF_FLUENTS)
+		),SET_OF_SETS)
+		,intersect(SET_OF_SETS,RES)
+	,!.
+	
+    
+%initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).
 stmt(s2, [not_has_gun_mietus,has_gun_hador]).
