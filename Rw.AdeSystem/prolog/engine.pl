@@ -498,6 +498,15 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO1),
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+sinitially(FLUENTS_FROM) :-
+ 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+ 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+    
+sinitially(FLUENTS_FROM) :-
+ 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+ 	possible_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -530,9 +539,7 @@ always_executable_cont([], _, _) .
 always_executable_cont(_,[],[]).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
 always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
     always_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych
-    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
-    length(STATES, STATES_LENGTH),
-    STATES_LENGTH > 0, % jezeli chociaz jedno, gdziekolwiek bedzie mialo pusty wysypie sie calosc
+    pexecutable(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
     always_executable_cont(STATES, ACTIONS, EXECUTORS), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
     !.
         
@@ -550,9 +557,7 @@ possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-
 
 possibly_executable_cont(_,[],[]). % tu wybiera stany dla ktorych jest mozliwy ciag akcji
 possibly_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
-        res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
-        length(STATES, STATES_LENGTH),
-        STATES_LENGTH > 0,
+        pexecutable(ACTION, EXECUTOR, STATE_FROM, STATES),
         possibly_executable_cont(STATES, ACTIONS, EXECUTORS)
     ;
         possibly_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),
