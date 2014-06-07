@@ -19,7 +19,8 @@ order(0,light_on).
 order(1,switch1_on).
 order(2,switch2_on).
 
-initially([switch1_on, switch2_on, light_on]).
+initially_after([],[],[]).
+initially_after([],[],[switch1_on, switch2_on, light_on]).
 
 stmt(s1, [light_on, switch1_on, switch2_on]).
 stmt(s2, [light_on, switch1_off, switch2_off]).
