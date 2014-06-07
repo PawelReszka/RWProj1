@@ -1,5 +1,5 @@
 %definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
-:-  dynamic(releases/4),dynamic(preserve/3).
+:-  dynamic(releases/4),dynamic(preserve/3),dynamic(observable_after/3),dynamic(initially_after/3).
 
 neg(X,Y) :- sneg(Y,X).%laczy fluent z jego negacja, relacja jest symetryczna
 neg(X,Y) :- sneg(X,Y).
@@ -25,7 +25,27 @@ pair_lists([],[],[]).
 pair_lists([HEAD1|L1], [HEAD2|L2], [ELEM|X]) :-
     ELEM = [HEAD1,HEAD2],
     pair_lists(L1,L2,X).
+    
+    
+intersect([H,H2|L],RES) :-
+	intersect(H,H2,H3),
+	intersect([H3|L],RES).
+	
+intersect([H],RES) :-
+	RES=H.
 
+intersect([H,H2],RES) :-
+	intersect(H,H2,RES).
+
+intersect([H|T],X,[H|S]) :-
+	member(H,X), 
+	intersect(T,X,S).
+	
+intersect([H|T],X,S) :- 
+	\+ member(H,X), 
+	intersect(T,X,S).
+	
+intersect([],_,[]).
 
 accRev([H|T],A,R):-  accRev(T,[H|A],R).%przerzuca heada z listy pierwszej na poczatek listy drugiej
 accRev([],A,A). %kiedy lista pierwsza jest pusta przepisuje ja do listy 3
@@ -499,14 +519,17 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%initially_after([],[],[]).
+%observable_after([],[],[]).
 
-sinitially(FLUENTS_FROM) :-
- 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
- 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-    
-sinitially(FLUENTS_FROM) :-
- 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
- 	possible_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+
+%initially(FLUENTS_FROM) :-
+% 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+% 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+%    
+%initially(FLUENTS_FROM) :-
+% 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+% 	possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
