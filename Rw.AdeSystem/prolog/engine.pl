@@ -1,5 +1,5 @@
 %definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
-:-  dynamic(releases/4),dynamic(preserve/3).
+:-  dynamic(releases/4),dynamic(preserve/3),dynamic(observable_after/3),dynamic(initially_after/3).
 
 neg(X,Y) :- sneg(Y,X).%laczy fluent z jego negacja, relacja jest symetryczna
 neg(X,Y) :- sneg(X,Y).
@@ -25,7 +25,27 @@ pair_lists([],[],[]).
 pair_lists([HEAD1|L1], [HEAD2|L2], [ELEM|X]) :-
     ELEM = [HEAD1,HEAD2],
     pair_lists(L1,L2,X).
+    
+    
+intersect([H,H2|L],RES) :-
+	intersect(H,H2,H3),
+	intersect([H3|L],RES).
+	
+intersect([H],RES) :-
+	RES=H.
 
+intersect([H,H2],RES) :-
+	intersect(H,H2,RES).
+
+intersect([H|T],X,[H|S]) :-
+	member(H,X), 
+	intersect(T,X,S).
+	
+intersect([H|T],X,S) :- 
+	\+ member(H,X), 
+	intersect(T,X,S).
+	
+intersect([],_,[]).
 
 accRev([H|T],A,R):-  accRev(T,[H|A],R).%przerzuca heada z listy pierwszej na poczatek listy drugiej
 accRev([],A,A). %kiedy lista pierwsza jest pusta przepisuje ja do listy 3
@@ -500,13 +520,36 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-sinitially(FLUENTS_FROM) :-
- 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
- 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-    
-sinitially(FLUENTS_FROM) :-
- 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
- 	possible_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+observable_after([],[],[]).
+initially_after([],[],[]).
+initially(RES) :-
+	list_of_states(STATES),
+	findall(SET_OF_FLUENTS,
+		(
+			(
+			initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		;
+			(
+			observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		)
+		,SET_OF_SETS)
+		,intersect(SET_OF_SETS,RES)
+	,!.
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -525,8 +568,8 @@ pexecutable(ACTION, EXECUTOR, STATE, X) :-
     
 
 always_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	always_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	always_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 	
 %czy z danej listy stanow mozna zawsze dojsc do wyjsciowej	
@@ -545,8 +588,8 @@ always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXE
         
 %jw
 possibly_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	possibly_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	possibly_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 
 possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-

@@ -89,5 +89,13 @@ test(executable_3) :-
 	possibly_executable([not_walking], [entice,entice], [mietus,hador]).
 test(executable_4) :-
 	not( always_executable([not_walking], [entice,entice], [mietus,hador])).
+test(executable_5) :-
+ 	always_executable([not_alive, not_walking], [shoot], [mietus]).
+test(executable_6) :-
+ 	 always_executable([not_alive, not_walking], [entice], [mietus]).
+test(executable_7) :-
+	not( always_executable([not_walking], [entice,entice], [mietus,hador])).
+test(executable_8) :-
+	not( always_executable([not_walking], [shoot,entice], [mietus,hador])).
 
 :- end_tests(example2_queries).
