@@ -132,9 +132,8 @@ release_fluent([], _,[]).
 release_fluent([HEAD|STATES], FLUENT, OUTPUT) :- 
     release_fluent(STATES, FLUENT, OUTPUT2),
     neg(FLUENT, NEG_FLUENT),
-    state(HEAD,STATE_LIST),
-    force_cause_change([FLUENT], STATE_LIST, STATE1_LIST),
-    force_cause_change([NEG_FLUENT], STATE_LIST, STATE2_LIST),
+    force_cause_change([FLUENT], HEAD, STATE1_LIST),
+    force_cause_change([NEG_FLUENT], HEAD, STATE2_LIST),
     nth0(0,STATE1_LIST,S1),
     nth0(0,STATE2_LIST,S2),
     join_possible_states(OUTPUT2, [S1,S2], OUTPUT),
@@ -143,12 +142,12 @@ release_fluent([HEAD|STATES], FLUENT, OUTPUT) :-
 join_possible_states(LIST, [], LIST) :- !.
 
 join_possible_states(LIST, [HEAD|REST], [STATE|OUTPUT]) :- 
-    state(STATE, HEAD),not(member(STATE,LIST)),
+    not(member(HEAD,LIST)),member(STATE, LIST),
     join_possible_states(LIST, REST, OUTPUT),
     !.
 
 join_possible_states(LIST, [HEAD|REST], OUTPUT) :- 
-    (not(state(_, HEAD));member(_,LIST)),
+    member(HEAD, LIST),
     join_possible_states(LIST, REST, OUTPUT),
     !.
 
@@ -190,8 +189,7 @@ state_valid_continue([HEAD|FORMULAS], STATE) :-
 state_valid_continue([], _).
 
 state_valid_with_formula(STATE, FORMULA) :-
-    state(STATE, FLUENTS),
-    formula_valid(FORMULA, FLUENTS).
+    formula_valid(FORMULA, STATE).
 
 fluents_valid(X) :-
     findall([Y], always(Y), R),
@@ -208,11 +206,14 @@ initial_states(STATES) :-
     initially(X),
     all_possible_states(X,STATES).
 
-list_of_states(R) :- findall(X, state(X,_),R).
+list_of_states(R) :- 
+    findall(X, fluent(X), POSITIVE),
+    convert_negatives(POSITIVE, NEGATIVES),
+    pair_lists(POSITIVE, NEGATIVES, PAIRS),
+    prod(PAIRS, R).
 
 possible_state(LIST_OF_FLUENTS, STATE) :-
-    state(STATE, LIST_OF_FLUENTS_OF_STATE),
-    subset(LIST_OF_FLUENTS, LIST_OF_FLUENTS_OF_STATE).
+    subset(LIST_OF_FLUENTS, STATE).
 
 possible_states(_, [], []).
 possible_states(LIST_OF_FLUENTS, [HEAD|STATES], [HEAD|POSSIBLE_STATES]) :-
@@ -239,9 +240,7 @@ possible_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R1),
     findall([X,Y], causes(ACTION, epsilon, X, Y), R2),
     append(R1,R2,R),
-    state(STATE1, STATE1_LIST),
-    state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
+    possible_causes_fto_states2(R, STATE1, STATE2).
 
 possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R1),
@@ -249,9 +248,7 @@ possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     append(R1,R2,R),
     length(R,R_LENGTH),
     R_LENGTH > 0,
-    state(STATE1, STATE1_LIST),
-    state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R, STATE1_LIST, STATE2_LIST).
+    possible_causes_fto_states2(R, STATE1, STATE2).
 
 possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X, Y), R1),
@@ -262,9 +259,7 @@ possible_typically_causes_fto_states(ACTION, EXECUTOR, STATE1, STATE2) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X, Y), R3),
     findall([X,Y], causes(ACTION, epsilon, X, Y), R4),
     append(R3,R4,R5),
-    state(STATE1, STATE1_LIST),
-    state(STATE2, STATE2_LIST),
-    possible_causes_fto_states2(R5, STATE1_LIST, STATE2_LIST).
+    possible_causes_fto_states2(R5, STATE1, STATE2).
 
 
 possible_causes_fto_states2([], _, _).
@@ -295,20 +290,14 @@ merge_results([HEAD|CAUSES], RESULTS) :-
     merge_results(CAUSES, RESULTS2),
     append(RESULTS1, RESULTS2,RESULTS).
 
-convert_list_to_state([],[]).
-convert_list_to_state([HEAD1|LISTS], [HEAD2|STATES]) :-
-    state(HEAD2,HEAD1),
-    convert_list_to_state(LISTS,STATES).
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
-    state(STATE, STATE_FLUENTS),
-    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    filter_active(STATE, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
     all_calculated_states(RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
-    convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES),
+    sort(STATES_LIST2,STATES),
     !.
 
 filter_only_correct_states([],[]).
@@ -336,12 +325,6 @@ res0_continue(ACTION, EXECUTOR, STATE, [HEAD|ALL], STATES) :-
     res0_continue(ACTION, EXECUTOR, STATE, ALL, STATES),
     !.
 
-convert_states_to_lists([],[]).
-
-convert_states_to_lists([HEAD|STATE], [ELEM|LISTS]) :-
-    state(HEAD,ELEM),
-    convert_states_to_lists(STATE,LISTS).
-
 res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     findall([X,Y], typically_causes(ACTION, EXECUTOR, X,Y),R1),
     length(R1, R1_LENGTH),
@@ -352,15 +335,12 @@ res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
         findall([X,Y],causes(ACTION, EXECUTOR, X,Y),R2),
         R = R2
     ),
-    state(STATE, STATE_FLUENTS),
-    filter_active(STATE_FLUENTS, R, R_ACTIVE),
+    filter_active(STATE, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
     res0(ACTION, EXECUTOR, STATE,STATES_0),
-    convert_states_to_lists(STATES_0, STATES_0_LISTS),
-    all_calculated_states(STATES_0_LISTS,RESULTS, STATES_LIST),
+    all_calculated_states(STATES_0,RESULTS, STATES_LIST),
     filter_only_correct_states(STATES_LIST,STATES_LIST2),
-    convert_list_to_state(STATES_LIST2, STATES2),
-    sort(STATES2,STATES),
+    sort(STATES_LIST2,STATES),
     !.
 
 
@@ -402,22 +382,16 @@ values_of_state(STATE_LIST, [HEAD1|FLUENTS], [HEAD2|OUTPUT]) :-
 
 res0_min(ACTION, EXECUTOR, STATE, STATES) :-
    res0(ACTION, EXECUTOR,STATE, STATES_0),
-   convert_states_to_lists(STATES_0,STATES_0LIST),
-   state(STATE,STATE_LIST),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-   minimals(STATES_0LIST, STATE_LIST, FLUENTS,MINIMAL),
-   convert_list_to_state(MINIMAL, STATES2),
-   sort(STATES2,STATES),
+   minimals(STATES_0, STATE, FLUENTS,MINIMAL),
+   sort(MINIMAL,STATES),
    !.
 
 resN(ACTION, EXECUTOR, STATE, STATES) :-
    res0_plus(ACTION, EXECUTOR,STATE, STATES_0),
-   convert_states_to_lists(STATES_0,STATES_0LIST),
-   state(STATE,STATE_LIST),
    released_fluents(ACTION, EXECUTOR, STATE, FLUENTS),
-   minimals(STATES_0LIST, STATE_LIST, FLUENTS,MINIMAL),
-   convert_list_to_state(MINIMAL, STATES2),
-   sort(STATES2,STATES),
+   minimals(STATES_0, STATE, FLUENTS,MINIMAL),
+   sort(MINIMAL,STATES),
    !.
 
 
@@ -461,8 +435,7 @@ states_valid([HEAD|X],Y) :-
     states_valid(X,Y).
 
 fluent_values(STATE, FLUENTS, VALUES) :-
-    state(STATE, STATE_FLUENTS),
-    subtract(FLUENTS, STATE_FLUENTS,  NEGATIVE),
+    subtract(FLUENTS, STATE,  NEGATIVE),
     subtract(FLUENTS, NEGATIVE, POSITIVE),
     convert_negatives(NEGATIVE, NPOSITIVES),
     append(POSITIVE, NPOSITIVES, VALUES).
@@ -591,14 +564,12 @@ always_accessible(GOAL, FLUENTS) :-
 always_accessible_continue([], _, _).
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS),
+    subset(GOAL, HEAD),
     always_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
+    not(subset(GOAL, HEAD)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
     append(R1,R2,R),
@@ -631,14 +602,12 @@ typically_accessible(GOAL, FLUENTS) :-
 typically_accessible_continue([], _, _).
 
 typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS),
+    subset(GOAL, HEAD),
     typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
 typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
+    not(subset(GOAL, HEAD)),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R),
     member(MOVE, R),
     nth0(0, MOVE, ACTION),
@@ -699,12 +668,10 @@ possibly_accessible(GOAL, FLUENTS) :-
 possibly_accessible_continue([],_, _) :- !,fail.
 
 possibly_accessible_continue([HEAD|_], _, GOAL) :-
-    state(HEAD, FLUENTS),
-    subset(GOAL, FLUENTS).
+    subset(GOAL, HEAD).
 
 possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    state(HEAD, FLUENTS),
-    not(subset(GOAL, FLUENTS)),
+    not(subset(GOAL, HEAD)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
     states_possible_with_causes(HEAD, R1, STATES1),
@@ -755,8 +722,7 @@ possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
 
 possibly_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
     (
-        state(HEAD,HEAD_LIST),
-        subset(FLUENTS_TO, HEAD_LIST)
+        subset(FLUENTS_TO, HEAD)
     ;
         possibly_after_cont(STATES, [], [], FLUENTS_TO)
     ),
@@ -792,12 +758,11 @@ minimal_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
 
 minimal_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
         minimal_after_cont(STATES, [], [], FLUENTS_TO, K, MIN1),
-        state(HEAD,HEAD_LIST),
         (
-            subset(FLUENTS_TO, HEAD_LIST),
+            subset(FLUENTS_TO, HEAD),
             MIN is min(MIN1,K)
         ;
-            not(subset(FLUENTS_TO, HEAD_LIST)),
+            not(subset(FLUENTS_TO, HEAD)),
             MIN is MIN1
         ),
     !.
@@ -833,8 +798,7 @@ always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     !.
 
 always_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
-        state(HEAD,HEAD_LIST),
-        subset(FLUENTS_TO, HEAD_LIST),
+        subset(FLUENTS_TO, HEAD),
         always_after_cont(STATES, [], [], FLUENTS_TO),
         !.
 
@@ -871,11 +835,10 @@ typically_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     !.
 
 typically_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
-        state(HEAD,HEAD_LIST),
         (
             K \= MIN
         ;
-            subset(FLUENTS_TO, HEAD_LIST)
+            subset(FLUENTS_TO, HEAD)
         ),
         typically_after_cont(STATES, [], [], FLUENTS_TO, K, MIN),
         !.

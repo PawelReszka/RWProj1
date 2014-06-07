@@ -3,102 +3,190 @@
 :- begin_tests(resy).
 
 test(chown_hador_0) :-
-    res0(chown, hador, state0, [state1, state3, state5, state7]),
-    res0_min(chown, hador, state0, [state1]),
-    res0_plus(chown, hador, state0, [state1, state3, state5, state7]),
-    resN(chown, hador, state0, [state1]),
-    resAb(chown, hador, state0, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state7, STATE7),
+    res0(chown, hador, STATE0, [STATE1, STATE3, STATE5, STATE7]),
+    res0_min(chown, hador, STATE0, [STATE1]),
+    res0_plus(chown, hador, STATE0, [STATE1, STATE3, STATE5, STATE7]),
+    resN(chown, hador, STATE0, [STATE1]),
+    resAb(chown, hador, STATE0, []).
 
 test(chown_mietus_0) :-
-    res0(chown, mietus, state0, [state0, state2, state4, state6]),
-    res0_min(chown, mietus, state0, [state0]),
-    res0_plus(chown, mietus, state0, [state0, state2, state4, state6]),
-    resN(chown, mietus, state0, [state0]),
-    resAb(chown, mietus, state0, []).
+    state(state0, STATE0),
+    state(state2, STATE2),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(chown, mietus, STATE0, [STATE0, STATE2, STATE4, STATE6]),
+    res0_min(chown, mietus, STATE0, [STATE0]),
+    res0_plus(chown, mietus, STATE0, [STATE0, STATE2, STATE4, STATE6]),
+    resN(chown, mietus, STATE0, [STATE0]),
+    resAb(chown, mietus, STATE0, []).
 
 test(load_epsilon_0) :-
-    res0(load, epsilon, state0, [state2, state3, state6, state7]),
-    res0_min(load, epsilon, state0, [state2]),
-    res0_plus(load, epsilon, state0, [state2, state3, state6, state7]),
-    resN(load, epsilon, state0, [state2]),
-    resAb(load, epsilon, state0, []).
+    state(state0, STATE0),
+    state(state3, STATE3),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state6, STATE6),
+
+    res0(load, epsilon, STATE0, [STATE2, STATE3, STATE6, STATE7]),
+    res0_min(load, epsilon, STATE0, [STATE2]),
+    res0_plus(load, epsilon, STATE0, [STATE2, STATE3, STATE6, STATE7]),
+    resN(load, epsilon, STATE0, [STATE2]),
+    resAb(load, epsilon, STATE0, []).
 
 test(load_epsilon_2) :-
-    res0(load, epsilon, state2, [state2, state3, state6, state7]),
-    res0_min(load, epsilon, state2, [state2]),
-    res0_plus(load, epsilon, state2, [state2, state3, state6, state7]),
-    resN(load, epsilon, state2, [state2]),
-    resAb(load, epsilon, state2, []).
+    state(state3, STATE3),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state6, STATE6),
+
+    res0(load, epsilon, STATE2, [STATE2, STATE3, STATE6, STATE7]),
+    res0_min(load, epsilon, STATE2, [STATE2]),
+    res0_plus(load, epsilon, STATE2, [STATE2, STATE3, STATE6, STATE7]),
+    resN(load, epsilon, STATE2, [STATE2]),
+    resAb(load, epsilon, STATE2, []).
 
 test(shoot_hador_0) :-
-    res0(shoot, hador, state0, [state0, state1, state4, state5]),
-    res0_min(shoot, hador, state0, [state0]),
-    res0_plus(shoot, hador, state0, [state0, state1, state4, state5]),
-    resN(shoot, hador, state0, [state0]),
-    resAb(shoot, hador, state0, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state5, STATE5),
+    state(state4, STATE4),
+
+    res0(shoot, hador, STATE0, [STATE0, STATE1, STATE4, STATE5]),
+    res0_min(shoot, hador, STATE0, [STATE0]),
+    res0_plus(shoot, hador, STATE0, [STATE0, STATE1, STATE4, STATE5]),
+    resN(shoot, hador, STATE0, [STATE0]),
+    resAb(shoot, hador, STATE0, []).
 
 test(shoot_hador_1) :-
-    res0(shoot, hador, state1, [state0, state1, state2, state3, state4,state5, state6, state7]),
-    res0_min(shoot, hador, state1, [state1]),
-    res0_plus(shoot, hador, state1, [state0, state1, state2, state3, state4, state5, state6, state7]),
-    resN(shoot, hador, state1, [state1]),
-    resAb(shoot, hador, state1, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(shoot, hador, STATE1, [STATE0, STATE1, STATE2, STATE3, STATE4,STATE5, STATE6, STATE7]),
+    res0_min(shoot, hador, STATE1, [STATE1]),
+    res0_plus(shoot, hador, STATE1, [STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7]),
+    resN(shoot, hador, STATE1, [STATE1]),
+    resAb(shoot, hador, STATE1, []).
 
 test(shoot_hador_2) :-
-    res0(shoot, hador, state2, [state0, state1, state4, state5]),
-    res0_min(shoot, hador, state2, [state0]),
-    res0_plus(shoot, hador, state2, [state4, state5]),
-    resN(shoot, hador, state2, [state4]),
-    resAb(shoot, hador, state2, [state0]).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state5, STATE5),
+    state(state2, STATE2),
+    state(state4, STATE4),
+
+    res0(shoot, hador, STATE2, [STATE0, STATE1, STATE4, STATE5]),
+    res0_min(shoot, hador, STATE2, [STATE0]),
+    res0_plus(shoot, hador, STATE2, [STATE4, STATE5]),
+    resN(shoot, hador, STATE2, [STATE4]),
+    resAb(shoot, hador, STATE2, [STATE0]).
 
 test(shoot_mietus_2) :-
-    res0(shoot, mietus, state2, [state0, state1, state2, state3,state4, state5,state6,state7]),
-    res0_min(shoot, mietus, state2, [state2]),
-    res0_plus(shoot, mietus, state2, [state0,state1,state2,state3,state4, state5,state6,state7]),
-    resN(shoot, mietus, state2, [state2]),
-    resAb(shoot, mietus, state2, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(shoot, mietus, STATE2, [STATE0, STATE1, STATE2, STATE3,STATE4, STATE5,STATE6,STATE7]),
+    res0_min(shoot, mietus, STATE2, [STATE2]),
+    res0_plus(shoot, mietus, STATE2, [STATE0,STATE1,STATE2,STATE3,STATE4, STATE5,STATE6,STATE7]),
+    resN(shoot, mietus, STATE2, [STATE2]),
+    resAb(shoot, mietus, STATE2, []).
 
 test(shoot_mietus_3) :-
-    res0(shoot, mietus, state3, [state4, state5]),
-    res0_min(shoot, mietus, state3, [state5]),
-    res0_plus(shoot, mietus, state3, [state4,state5]),
-    resN(shoot, mietus, state3, [state5]),
-    resAb(shoot, mietus, state3, []).
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state4, STATE4),
+
+    res0(shoot, mietus, STATE3, [STATE4, STATE5]),
+    res0_min(shoot, mietus, STATE3, [STATE5]),
+    res0_plus(shoot, mietus, STATE3, [STATE4,STATE5]),
+    resN(shoot, mietus, STATE3, [STATE5]),
+    resAb(shoot, mietus, STATE3, []).
 
 test(shoot_hador_6) :-
-    res0(shoot, hador, state6, [state0, state1, state4, state5]),
-    res0_min(shoot, hador, state6, [state4]),
-    res0_plus(shoot, hador, state6, [state4,state5]),
-    resN(shoot, hador, state6, [state4]),
-    resAb(shoot, hador, state6, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state5, STATE5),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(shoot, hador, STATE6, [STATE0, STATE1, STATE4, STATE5]),
+    res0_min(shoot, hador, STATE6, [STATE4]),
+    res0_plus(shoot, hador, STATE6, [STATE4,STATE5]),
+    resN(shoot, hador, STATE6, [STATE4]),
+    resAb(shoot, hador, STATE6, []).
 
 test(shoot_mietus_0) :-
-    res0(shoot, mietus, state0, [state0,state1,state2,state3,state4, state5,state6,state7]),
-    res0_min(shoot, mietus, state0, [state0]),
-    res0_plus(shoot, mietus, state0, [state0,state1,state2,state3,state4,state5,state6,state7]),
-    resN(shoot, mietus, state0, [state0]),
-    resAb(shoot, mietus, state0, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(shoot, mietus, STATE0, [STATE0,STATE1,STATE2,STATE3,STATE4, STATE5,STATE6,STATE7]),
+    res0_min(shoot, mietus, STATE0, [STATE0]),
+    res0_plus(shoot, mietus, STATE0, [STATE0,STATE1,STATE2,STATE3,STATE4,STATE5,STATE6,STATE7]),
+    resN(shoot, mietus, STATE0, [STATE0]),
+    resAb(shoot, mietus, STATE0, []).
 
 test(shoot_mietus_1) :-
-    res0(shoot, mietus, state1, [state0,state1,state4,state5]),
-    res0_min(shoot, mietus, state1, [state1]),
-    res0_plus(shoot, mietus, state1, [state0,state1,state4,state5]),
-    resN(shoot, mietus, state1, [state1]),
-    resAb(shoot, mietus, state1, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state5, STATE5),
+    state(state4, STATE4),
+
+    res0(shoot, mietus, STATE1, [STATE0,STATE1,STATE4,STATE5]),
+    res0_min(shoot, mietus, STATE1, [STATE1]),
+    res0_plus(shoot, mietus, STATE1, [STATE0,STATE1,STATE4,STATE5]),
+    resN(shoot, mietus, STATE1, [STATE1]),
+    resAb(shoot, mietus, STATE1, []).
 
 test(shoot_hador_7) :-
-    res0(shoot, hador, state7, [state0, state1, state2,state3,state4, state5,state6,state7]),
-    res0_min(shoot, hador, state7, [state7]),
-    res0_plus(shoot, hador, state7, [state0,state1,state2,state3,state4,state5,state6,state7]),
-    resN(shoot, hador, state7, [state7]),
-    resAb(shoot, hador, state7, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state3, STATE3),
+    state(state5, STATE5),
+    state(state7, STATE7),
+    state(state2, STATE2),
+    state(state4, STATE4),
+    state(state6, STATE6),
+
+    res0(shoot, hador, STATE7, [STATE0, STATE1, STATE2,STATE3,STATE4, STATE5,STATE6,STATE7]),
+    res0_min(shoot, hador, STATE7, [STATE7]),
+    res0_plus(shoot, hador, STATE7, [STATE0,STATE1,STATE2,STATE3,STATE4,STATE5,STATE6,STATE7]),
+    resN(shoot, hador, STATE7, [STATE7]),
+    resAb(shoot, hador, STATE7, []).
 
 test(shoot_hador_4) :-
-    res0(shoot, hador, state4, [state0,state1,state4,state5]),
-    res0_min(shoot, hador, state4, [state4]),
-    res0_plus(shoot, hador, state4, [state0,state1,state4,state5]),
-    resN(shoot, hador, state4, [state4]),
-    resAb(shoot, hador, state4, []).
+    state(state0, STATE0),
+    state(state1, STATE1),
+    state(state5, STATE5),
+    state(state4, STATE4),
+
+    res0(shoot, hador, STATE4, [STATE0,STATE1,STATE4,STATE5]),
+    res0_min(shoot, hador, STATE4, [STATE4]),
+    res0_plus(shoot, hador, STATE4, [STATE0,STATE1,STATE4,STATE5]),
+    resN(shoot, hador, STATE4, [STATE4]),
+    resAb(shoot, hador, STATE4, []).
 
 
 :- end_tests(resy).
