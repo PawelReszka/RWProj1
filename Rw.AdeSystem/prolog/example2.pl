@@ -25,7 +25,9 @@ order(1,has_gun_mietus).
 order(2,alive).
 order(3,walking).
 
-initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
+
+initially_after([],[],[has_gun_hador,not_has_gun_mietus,alive,walking]).
+
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).
 stmt(s2, [not_has_gun_mietus,has_gun_hador]).
