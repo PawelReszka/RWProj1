@@ -924,11 +924,22 @@ always_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
     !.
 
 
+always_involved_cont2([SEXECUTOR|SEXECUTORS], [STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS) :-
+        res0_trunc(ACTION, SEXECUTOR, STATE, OUTPUT_STATES),
+        length(OUTPUT_STATES, N),
+        N > 0,
+        always_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [SEXECUTOR | CURRENTS]),
+        always_involved_cont2(SEXECUTORS, [STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS).
+
+
+always_involved_cont2([], _, _, _, _, _).
+
 always_involved_cont([], _, _,_,_).
 
 always_involved_cont(_, INVOLVED, [], [], CURRENTS) :-
-    subset(INVOLVED, CURRENTS),
+    member(INVOLVED, CURRENTS),
     !.
+
 
 always_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS) :-
     (
@@ -937,14 +948,7 @@ always_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECU
         ;
             POSS_EXECUTORS = [EXECUTOR]
     ),
-    (
-        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
-        res0_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
-        length(OUTPUT_STATES, N),
-        N > 0,
-        always_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS]),
-        always_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS)
-    ),
+    always_involved_cont2(POSS_EXECUTORS, [STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS),
     !.
 
 involved_minimal([], _, _, _, _, _, 1000000). % stała duża - rozwiązanie nie istnieje.
@@ -982,7 +986,7 @@ involved_minimal([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS
 typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
     initially(INITIAL_FLUENTS),
     all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
-    involved_minimal(POSSIBLE_STATES, EXECUTORS, ACTIONS, EXECUTORS, [], 0, MINIMAL),
+    involved_minimal(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     typically_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     !.
 
@@ -990,7 +994,7 @@ typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
 typically_involved_cont([], _, _,_,_).
 
 typically_involved_cont(_, INVOLVED, [], [], CURRENTS, K, MINIMAL) :-
-       subset(INVOLVED, CURRENTS)
+       member(INVOLVED, CURRENTS)
     ;
        K \= MINIMAL,
     !.
