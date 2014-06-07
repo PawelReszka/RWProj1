@@ -18,7 +18,7 @@ namespace Rw.AdeSystem.Core.Expressions
         {
             var effects = String.Join(", ", Effects);
             var conditions = String.Join(", ", Conditions);
-            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName + ", "+Executor+", [" + effects + "], [" + conditions + "])");
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [" + conditions.ToLower() + "])");
         }
     }
 }

@@ -18,6 +18,9 @@ namespace Rw.AdeSystem.Core
             string text = System.IO.File.ReadAllText(filename);
             AdeSystem.LoadDomain(text);
             AdeSystem.ConstructSystemDomain();
+            AdeSystem.ParseQuery("possibly involved hador in chown by hador");
+            AdeSystem.ParseQuery("possibly involved huj in chowner by epsilon");
+            AdeSystem.ParseQuery("possibly involved h in chown, shoot by epsilon, epsilon");
             //Parsowanie wyrazenia logicznego - w literals sa fluenty, a drzewo wyrazenia w logicTree
             List<Token> literals;
             List<string> literalValues;

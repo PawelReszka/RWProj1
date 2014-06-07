@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SbsSW.SwiPlCs;
 
 namespace Rw.AdeSystem.Core
@@ -54,15 +56,31 @@ namespace Rw.AdeSystem.Core
         public void AssertFact(string prologFact)
         {
             PlQuery.PlCall("assert(" + prologFact + ")");
-            //SaveLine(prologFact);
+            SaveLine(prologFact);
         }
 
         public static string ExecuteQuery(string query)
         {
+            //query = "inertial(huu)";
             using (var q = new PlQuery(query))
             {
-
+                var x = q.NextSolution();
+                var y = q.NextSolution();
+                var z = q.NextSolution();
+                var d = q.NextSolution();
+                var a = q.NextSolution();
+                var ad = q.NextSolution();
+                var ass = q.NextSolution();
+                var aaa = q.NextSolution();
+                x = x;
+                foreach (var sol in q.Solutions)
+                {
+                    var asdaa = sol.ToString();
+                    x = x;
+                }
+                x = x;
             }
+            return "";
         }
 
         public void AssertFacts(string prologFacts)

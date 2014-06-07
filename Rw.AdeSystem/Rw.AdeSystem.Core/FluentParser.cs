@@ -19,9 +19,12 @@ namespace Rw.AdeSystem.Core
             str = str.Trim();
             if (end != null)
             {
-                return str.Substring(str.IndexOf(str) + str.Length, str.IndexOf(str)).Trim();
+                var startIndex = str.IndexOf(start);
+                var endIndex = str.IndexOf(end);
+                var val = str.Substring(startIndex + start.Length, endIndex - startIndex - start.Length).Trim();
+                return val;
             }
-            return str.Substring(str.IndexOf(str) + str.Length).Trim();
+            return str.Substring(str.IndexOf(start) + start.Length).Trim();
         }
     }
 }

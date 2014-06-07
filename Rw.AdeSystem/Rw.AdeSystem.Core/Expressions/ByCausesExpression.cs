@@ -28,7 +28,7 @@ namespace Rw.AdeSystem.Core.Expressions
         public override void ToProlog()
         {
             var effects = String.Join(", ", Effects);
-            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName + ", "+Executor+", [" + effects + "], [])");
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [])");
         }
     }
 }

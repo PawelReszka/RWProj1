@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Rw.AdeSystem.Core.Expressions;
+using Rw.AdeSystem.Core.Queries;
 
 #endregion
 
@@ -135,9 +136,9 @@ namespace Rw.AdeSystem.Core
         public static void ConstructSystemDomain()
         {
             LoadEngine();
-            Fluents = Fluents.Distinct().ToList();
-            Actions = Actions.Distinct().ToList();
-            Executors = Executors.Distinct().ToList();
+            Fluents = Fluents.Select(i=>i.ToLower()).Distinct().ToList();
+            Actions = Actions.Select(i => i.ToLower()).Distinct().ToList();
+            Executors = Executors.Select(i => i.ToLower()).Distinct().ToList();
 
             foreach (var f in Fluents)
             {
@@ -155,6 +156,10 @@ namespace Rw.AdeSystem.Core
             foreach (var f in Fluents)
             {
                 PrologEngine.AssertFact("sneg(" + f + ",not_" + f + ")");
+            }
+            foreach (var f in Fluents)
+            {
+                PrologEngine.AssertFact("sinertial("+ f + ")");
             }
             int counter = 0;
             foreach (var f in Fluents)
@@ -197,6 +202,59 @@ namespace Rw.AdeSystem.Core
                 PrologEngine.AssertFact("state(state"+stateCounter+",["+fluents+"])");
                 stateCounter++;
             }
+        }
+
+        public static string ParseQuery(string query)
+        {
+            query = query.ToLower();
+            Query q = null;
+            if (query.Contains("always accesible"))
+            {
+                q = new AlwaysAccessibleQuery(query);
+            }
+            else if(query.Contains("always") && query.Contains("after"))
+            {
+                q = new AlwaysAfterQuery(query);
+            }
+            else if (query.Contains("always executable"))
+            {
+                q = new AlwaysExecutableQuery(query);
+            }
+            else if (query.Contains("always involved"))
+            {
+                q = new AlwaysInvolvedQuery(query);
+            }
+            else if (query.Contains("possibly accesible"))
+            {
+                q = new PossiblyAccessibleQuery(query);
+            }
+            else if (query.Contains("possibly") && query.Contains("after"))
+            {
+                q = new PossiblyAfterQuery(query);
+            }
+            else if (query.Contains("possibly executable"))
+            {
+                q = new PossiblyExecutableQuery(query);
+            }
+            else if (query.Contains("possibly involved"))
+            {
+                q = new PossiblyInvolvedQuery(query);
+            }
+            else if (query.Contains("typically accesible"))
+            {
+                q = new TypicallyAccessibleQuery(query);
+            }
+            else if (query.Contains("typically") && query.Contains("after"))
+            {
+                q = new TypicallyAfterQuery(query);
+            }
+            else if (query.Contains("typically involved"))
+            {
+                q = new TypicallyInvolvedQuery(query);
+            }
+            if(q!=null)
+                q.ToProlog();
+            return "Nie rozpoznana kwerenda";
         }
 
         private static bool GetBitValue(int number, int position)

@@ -18,7 +18,7 @@ namespace Rw.AdeSystem.Core.Expressions
         public override void ToProlog()
         {
             var fluents = String.Join(", ", Fluents);
-            AdeSystem.PrologEngine.AssertFact("initially(["+fluents+"])");
+            AdeSystem.PrologEngine.AssertFact("initially(["+fluents+",not_m])");
         }
     }
 }

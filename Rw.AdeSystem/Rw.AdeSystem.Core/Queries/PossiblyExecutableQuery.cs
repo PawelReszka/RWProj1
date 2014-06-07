@@ -10,24 +10,25 @@ namespace Rw.AdeSystem.Core.Queries
 
         public PossiblyExecutableQuery(string line) : base(line)
         {
-            ActionsString = FluentParser.GetSubstring(line, "executable", "by");
+            //ActionsString = FluentParser.GetSubstring(line, "executable", "by");
             
-            if (line.Contains("from"))
-            {
-                ExecutorsString = FluentParser.GetSubstring(line, "by", "from");
-                ConditionsString = FluentParser.GetSubstring(line, "from").Replace("!", "not_");
-            }
-            else
-            {
-                ExecutorsString = FluentParser.GetSubstring(line, "by");
-                ConditionsString = "";
-            }
+            //if (line.Contains("from"))
+            //{
+            //    ExecutorsString = FluentParser.GetSubstring(line, "by", "from");
+            //    ConditionsString = FluentParser.GetSubstring(line, "from").Replace("!", "not_");
+            //}
+            //else
+            //{
+            //    ExecutorsString = FluentParser.GetSubstring(line, "by");
+            //    ConditionsString = "";
+            //}
             
         }
 
         public override string ToProlog()
         {
           //  PrologEngine.ExecuteQuery(" possibly(["++"],[entice,shoot],[epsilon,hador],[not_alive,has_gun_hador])")
+            return "";
         }
     }
 }
