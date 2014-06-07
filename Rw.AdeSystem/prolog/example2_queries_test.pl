@@ -55,7 +55,7 @@ test(typically_6) :-
 test(possibly_7) :-
     possibly_involved(mietus,[shoot,shoot, entice], [hador,mietus,hador]).
 test(always_7) :-
-    no(always_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador])).
+    not(always_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador])).
 test(typically_7) :-
     typically_involved(mietus,[shoot,shoot,entice], [hador,mietus,hador]).
 
