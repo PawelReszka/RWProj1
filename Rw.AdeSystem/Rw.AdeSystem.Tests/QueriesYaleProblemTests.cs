@@ -29,13 +29,13 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyExecutableQuery("possibly executable ENTICE by Hador from !a & !w");
+            var query = new PossiblyExecutableQuery("possibly executable ENTICE by hador from !a & !w");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result.ToLower(), FalseString.ToLower());
 
             PlEngine.PlCleanup();
         }
@@ -49,13 +49,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysExecutableQuery("always executable ENTICE by Hador from !a & !w");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -69,13 +70,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new PossiblyAccessibleQuery("possibly accessible a from !a");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -89,13 +91,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysAccessibleQuery("always accessible a from !a");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -109,13 +112,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new TypicallyAccessibleQuery("typically accessible a from !a");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -129,13 +133,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new PossiblyInvolvedQuery("possibly involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -149,13 +154,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysInvolvedQuery("always involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -169,13 +175,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new TypicallyInvolvedQuery("typically involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -188,13 +195,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new PossiblyInvolvedQuery("possibly involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -208,13 +216,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysInvolvedQuery("always involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -228,13 +237,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new TypicallyInvolvedQuery("typically involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Mietus");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -248,13 +258,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new PossiblyInvolvedQuery("possibly involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -268,13 +279,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysInvolvedQuery("always involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -288,13 +300,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new TypicallyInvolvedQuery("typically involved Mietus in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -307,13 +320,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new PossiblyInvolvedQuery("possibly involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -327,13 +341,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new AlwaysInvolvedQuery("always involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -347,13 +362,14 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
             var query = new TypicallyInvolvedQuery("typically involved Hador in SHOOT,SHOOT,ENTICE by Hador,Mietus,Hador");
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }

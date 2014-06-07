@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Rw.AdeSystem.Core.Queries
 {
@@ -31,14 +32,13 @@ namespace Rw.AdeSystem.Core.Queries
             var result = new List<string>();
 
             string query = "";
-            if (ConditionsStrings == null)
+            if (ConditionsStrings == null || !ConditionsStrings.Any())
             {
                 query = prefix+"_accessible([" + GoalString + "])";
                 result.Add(query);
             }
             else
             {
-                bool r = false;
                 foreach (var conditionsString in ConditionsStrings)
                 {
                     query = prefix+"_accessible([" + GoalString + "], [" + conditionsString.Replace("!", "not_") + "])";

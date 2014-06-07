@@ -2,7 +2,7 @@
 {
     public class PossiblyAfterQuery : AfterQuery
     {
-        public PossiblyAfterQuery(string line) : base(line)
+        public PossiblyAfterQuery(string line) : base(line, "possibly")
         {
         }
 

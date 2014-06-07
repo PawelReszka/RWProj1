@@ -2,13 +2,13 @@
 
 namespace Rw.AdeSystem.Core.Queries
 {
-    public class AfterQuery :Query
+    public class AfterQuery : Query
     {
-        public AfterQuery(string line) : base(line)
+        public AfterQuery(string line, string prefix) : base(line)
         {
             if (line.Contains("from"))
             {
-                GoalString = FluentParser.GetSubstring(line, " always ", " after ");
+                GoalString = FluentParser.GetSubstring(line, prefix+" ", " after ");
                 ActionsString = FluentParser.GetSubstring(line, " after ", " by ");
                 ExecutorsString = FluentParser.GetSubstring(line, " by ", " from ");
                 var conditions = FluentParser.GetSubstring(line, " from ");

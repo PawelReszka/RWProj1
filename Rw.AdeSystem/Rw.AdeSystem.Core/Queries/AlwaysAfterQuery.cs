@@ -4,7 +4,7 @@ namespace Rw.AdeSystem.Core.Queries
 {
     public class AlwaysAfterQuery : AfterQuery
     {
-        public AlwaysAfterQuery(string line) : base(line)
+        public AlwaysAfterQuery(string line) : base(line, "always")
         {
             
         }

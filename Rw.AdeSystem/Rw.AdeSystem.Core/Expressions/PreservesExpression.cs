@@ -8,28 +8,37 @@ namespace Rw.AdeSystem.Core.Expressions
     {
         public string ActionName { get; set; }
         public string ExecutorName { get; set; }
+        public string Fluent { get; set; }
+
         public List<string> Fluents = new List<string>();
 
         public PreservesExpression(string line)
             : base(line)
         {
-            //nie wiem czy dobrze rozumiem ale np to moze sparsowac : Entice by hador preserves a
-            var tokens = line.Trim().Split(' ');
-            ActionName = tokens[0];
-            ExecutorName = tokens[2]; //2 zeby ominac by? nie wiem czy jakos inaczej trzeba to zrobic
-            Fluents.Add(tokens.Last().Replace("!", "not_"));
+
+            ActionName = line.Substring(0, line.IndexOf(" by")).Trim();
+            ExecutorName = FluentParser.GetSubstring(line, " by ", " preserves").Trim(); 
+            if (line.Contains(" if "))
+            {
+                Fluent = FluentParser.GetSubstring(line, " preserves ", " if ");
+                var con = FluentParser.GetSubstring(line, " if ");
+                List<string> litVal;
+                List<Token> lit;
+                var exp = LogicFormulaParser.Parse(con, out lit, out litVal);
+                Fluents = LogicFormulaParser.GetFluentStrings(exp);
+            }
+            else
+            {
+                Fluent = FluentParser.GetSubstring(line, " preserves ");                
+            }
         }
 
         public override void ToProlog()
         {
-            var fluents = new StringBuilder();
-            for (int i = 0; i < Fluents.Count; i++)
+            if (!Fluents.Any())
             {
-                fluents.Append(Fluents[i]);
-                if (i != Fluents.Count - 1)
-                    fluents.Append(", ");
+                AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName + "," + ExecutorName + ",[" + Fluent + "])");
             }
-            AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName + "," + ExecutorName + ",[" + fluents + "])");
         }
     }
 }

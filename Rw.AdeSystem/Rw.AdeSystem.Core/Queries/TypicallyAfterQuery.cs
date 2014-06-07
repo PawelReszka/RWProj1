@@ -2,7 +2,7 @@
 {
     public class TypicallyAfterQuery : AfterQuery 
     {
-        public TypicallyAfterQuery(string line) : base(line)
+        public TypicallyAfterQuery(string line) : base(line, "typically")
         {
         }
 

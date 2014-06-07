@@ -56,8 +56,10 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            var fluents = String.Join(", ", Fluents);
-            AdeSystem.PrologEngine.AssertFact(prefix + "_after([" + ActionsString + "],[" + ExecutorsString + "],[" + fluents + "])");
+            foreach (var fluent in Fluents)
+            {
+                AdeSystem.PrologEngine.AssertFact(prefix + "_after([" + ActionsString + "],[" + ExecutorsString + "],[" + fluent + "])");                
+            }
         }
 
        

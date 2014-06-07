@@ -110,7 +110,7 @@ namespace Rw.AdeSystem.Core
                 }
                 
                 //by EXECUTORS preserves xxx if...
-                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ preserves [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ preserves [a-z,&,!,\s]*"))
                 {
                     DomainPhrases.Add(new PreservesExpression(line));
                 }
@@ -209,49 +209,56 @@ namespace Rw.AdeSystem.Core
         {
             query = query.ToLower();
             Query q = null;
-            if (query.Contains("always accessible"))
+            try
             {
-                q = new AlwaysAccessibleQuery(query);
+                if (query.Contains("always accessible"))
+                {
+                    q = new AlwaysAccessibleQuery(query);
+                }
+                else if (query.Contains("always") && query.Contains("after"))
+                {
+                    q = new AlwaysAfterQuery(query);
+                }
+                else if (query.Contains("always executable"))
+                {
+                    q = new AlwaysExecutableQuery(query);
+                }
+                else if (query.Contains("always involved"))
+                {
+                    q = new AlwaysInvolvedQuery(query);
+                }
+                else if (query.Contains("possibly accessible"))
+                {
+                    q = new PossiblyAccessibleQuery(query);
+                }
+                else if (query.Contains("possibly") && query.Contains("after"))
+                {
+                    q = new PossiblyAfterQuery(query);
+                }
+                else if (query.Contains("possibly executable"))
+                {
+                    q = new PossiblyExecutableQuery(query);
+                }
+                else if (query.Contains("possibly involved"))
+                {
+                    q = new PossiblyInvolvedQuery(query);
+                }
+                else if (query.Contains("typically accessible"))
+                {
+                    q = new TypicallyAccessibleQuery(query);
+                }
+                else if (query.Contains("typically") && query.Contains("after"))
+                {
+                    q = new TypicallyAfterQuery(query);
+                }
+                else if (query.Contains("typically involved"))
+                {
+                    q = new TypicallyInvolvedQuery(query);
+                }
             }
-            else if(query.Contains("always") && query.Contains("after"))
+            catch (ArgumentOutOfRangeException e)
             {
-                q = new AlwaysAfterQuery(query);
-            }
-            else if (query.Contains("always executable"))
-            {
-                q = new AlwaysExecutableQuery(query);
-            }
-            else if (query.Contains("always involved"))
-            {
-                q = new AlwaysInvolvedQuery(query);
-            }
-            else if (query.Contains("possibly accessible"))
-            {
-                q = new PossiblyAccessibleQuery(query);
-            }
-            else if (query.Contains("possibly") && query.Contains("after"))
-            {
-                q = new PossiblyAfterQuery(query);
-            }
-            else if (query.Contains("possibly executable"))
-            {
-                q = new PossiblyExecutableQuery(query);
-            }
-            else if (query.Contains("possibly involved"))
-            {
-                q = new PossiblyInvolvedQuery(query);
-            }
-            else if (query.Contains("typically accessible"))
-            {
-                q = new TypicallyAccessibleQuery(query);
-            }
-            else if (query.Contains("typically") && query.Contains("after"))
-            {
-                q = new TypicallyAfterQuery(query);
-            }
-            else if (query.Contains("typically involved"))
-            {
-                q = new TypicallyInvolvedQuery(query);
+                return "Błąd w kwerendzie";
             }
             if(q!=null)
                 return q.ToProlog();

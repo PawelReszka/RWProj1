@@ -28,18 +28,18 @@
         </Button>
         <Label x:Name="buildModelLabel" Content="" HorizontalAlignment="Left" Margin="233,29,0,0" VerticalAlignment="Top" Width="549" Grid.ColumnSpan="2"/>
         <ProgressBar x:Name="loadingProgressBar" HorizontalAlignment="Left" Height="10" Margin="10,238,0,0" VerticalAlignment="Top" Width="762"/>
-        <TextBox x:Name="queryTextBox" HorizontalAlignment="Left" Height="23" Margin="12,92,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="760" TextChanged="queryTextBox_TextChanged"/>
+        <TextBox x:Name="queryTextBox" HorizontalAlignment="Left" Height="23" Margin="12,101,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="760" TextChanged="queryTextBox_TextChanged"/>
         <ListBox x:Name="historyListView" HorizontalAlignment="Left" Height="79" Margin="12,154,0,0" VerticalAlignment="Top" Width="760" BorderBrush="{x:Null}" Opacity="0.5">
             <ListBox.Background>
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.InfoColorKey}}"/>
             </ListBox.Background>
         </ListBox>
-        <Label x:Name="queryLabel" Content="QUERY:" HorizontalAlignment="Left" Margin="12,60,0,0" VerticalAlignment="Top" Width="772" Grid.ColumnSpan="2"/>
-        <Label x:Name="answerLabel" Content="" HorizontalAlignment="Left" Margin="12,120,0,0" VerticalAlignment="Top" Height="29" Width="760" Opacity="0.5">
+        <Label x:Name="queryLabel" Content="QUERY:" HorizontalAlignment="Left" Margin="10,75,0,0" VerticalAlignment="Top" Width="772"/>
+        <Label x:Name="answerLabel" Content="" HorizontalAlignment="Left" Margin="12,177,0,0" VerticalAlignment="Top" Height="29" Width="760" Opacity="0.5">
             <Label.Background>
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.InfoColorKey}}"/>
             </Label.Background>
         </Label>
-        <ListBox x:Name="suggestionListBox" HorizontalAlignment="Left" Height="25" Margin="12,115,0,0" VerticalAlignment="Top" Width="760" SelectionChanged="ListBox_SelectionChanged"/>
+        <ListBox x:Name="suggestionListBox" HorizontalAlignment="Left" Height="25" Margin="10,129,0,0" VerticalAlignment="Top" Width="760" SelectionChanged="ListBox_SelectionChanged"/>
     </Grid>
 </Window>
