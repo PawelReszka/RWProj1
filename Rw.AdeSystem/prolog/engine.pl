@@ -991,7 +991,7 @@ typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
     !.
 
 
-typically_involved_cont([], _, _,_,_).
+typically_involved_cont([], _, _,_,_,_,_).
 
 typically_involved_cont(_, INVOLVED, [], [], CURRENTS, K, MINIMAL) :-
        member(INVOLVED, CURRENTS)
@@ -1006,16 +1006,18 @@ typically_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EX
         ;
             POSS_EXECUTORS = [EXECUTOR]
     ),
-    (
-        member(CURRENT_EXECUTOR, POSS_EXECUTORS),
-        resN_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
-        resAb_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES2),
-        K2 is K + 1,
-        typically_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K, MINIMAL),
-        typically_involved_cont(OUTPUT_STATES2, INVOLVED, ACTIONS, EXECUTORS, [CURRENT_EXECUTOR | CURRENTS], K2, MINIMAL),
-        typically_involved_cont(STATES, INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL)
-    ),
+        typically_involved_cont2(POSS_EXECUTORS,[STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL),
     !.
 
+typically_involved_cont2([SEXECUTOR | SEXECUTORS],[STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL) :- 
+    resN_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES),
+    resAb_trunc(ACTION, CURRENT_EXECUTOR, STATE, OUTPUT_STATES2),
+    K2 is K + 1,
+    typically_involved_cont(OUTPUT_STATES, INVOLVED, ACTIONS, EXECUTORS, [SEXECUTOR | CURRENTS], K, MINIMAL),
+    typically_involved_cont(OUTPUT_STATES2, INVOLVED, ACTIONS, EXECUTORS, [SEXECUTOR | CURRENTS], K2, MINIMAL),
+    typically_involved_cont2(SEXECUTORS,[STATE|STATES], INVOLVED, [ACTION|ACTIONS], 
+        [EXECUTOR|EXECUTORS], CURRENTS, K, MINIMAL).
 
+    
+typically_involved_cont2([],_, _, _, _, _, _,_).
 
