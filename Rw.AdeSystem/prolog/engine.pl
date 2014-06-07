@@ -521,7 +521,7 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %initially_after([],[],[]).
 %observable_after([],[],[]).
-
+initially_after([],[],[]).
 
 %initially(FLUENTS_FROM) :-
 % 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
