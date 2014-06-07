@@ -373,5 +373,25 @@ namespace Rw.AdeSystem.Tests
 
             PlEngine.PlCleanup();
         }
+
+        [TestMethod]
+        public void Test19()
+        {
+            //Arrange
+            String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
+            Core.AdeSystem.Initialize(param);
+
+            Core.AdeSystem.LoadDomain(YaleProblem);
+            Core.AdeSystem.ConstructSystemDomain();
+
+            //Act
+            var query = new AlwaysAccessibleQuery("always accessible a");
+            var result = query.ToProlog();
+
+            //Assert
+            Assert.AreEqual(result, TrueString);
+
+            PlEngine.PlCleanup();
+        }
     }
 }
