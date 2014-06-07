@@ -210,7 +210,8 @@ list_of_states(R) :-
     findall(X, fluent(X), POSITIVE),
     convert_negatives(POSITIVE, NEGATIVES),
     pair_lists(POSITIVE, NEGATIVES, PAIRS),
-    prod(PAIRS, R).
+    prod(PAIRS, R2),
+    states_valid(R2,R).
 
 possible_state(LIST_OF_FLUENTS, STATE) :-
     subset(LIST_OF_FLUENTS, STATE).
