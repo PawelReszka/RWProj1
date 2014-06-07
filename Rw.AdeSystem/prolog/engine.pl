@@ -225,8 +225,7 @@ fluents_valid_continue([HEAD|FORMULAS], FLUENTS) :-
 fluents_valid_continue([], _).
 
 initial_states(STATES) :- 
-    initially(X),
-    all_possible_states(X,STATES).
+    initially(STATES).
 
 list_of_states(R) :- 
     findall(X, fluent(X), POSITIVE),
@@ -609,8 +608,8 @@ possibly_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|E
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 always_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	always_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES_FROM),
+	always_accessible_continue(STATES_FROM,[], GOAL),
 	!.	
 	
 always_accessible(GOAL, FLUENTS) :-
@@ -644,8 +643,8 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     !.
 
 typically_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	typically_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES),
+	typically_accessible_continue(STATES, [], GOAL),
 	!.
 	
 	
@@ -712,8 +711,8 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     ,!.
 
 possibly_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	possibly_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES),
+	possibly_accessible_continue(STATES, [],GOAL),
 	!.
 	
 
@@ -931,8 +930,7 @@ typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR
 
 %kwerendy dotyczace wykonawcow sa zawsze wzgledem stanu poczatkowego
 possibly_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),%standardowo wyciagamy fluenty okreslone w poczatkowej klauzuli
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),% standardowo stany im odpowiadajace
+    initially(POSSIBLE_STATES),%standardowo wyciagamy fluenty okreslone w poczatkowej klauzuli
     possibly_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
     !.
 
