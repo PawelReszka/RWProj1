@@ -519,17 +519,37 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%initially_after([],[],[]).
-%observable_after([],[],[]).
-initially_after([],[],[]).
 
-%initially(FLUENTS_FROM) :-
-% 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
-% 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-%    
-%initially(FLUENTS_FROM) :-
-% 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
-% 	possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+observable_after([],[],[]).
+initially_after([],[],[]).
+initially(RES) :-
+	list_of_states(STATES),
+	findall(SET_OF_FLUENTS,
+		(
+			(
+			initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		;
+			(
+			observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		)
+		,SET_OF_SETS)
+		,intersect(SET_OF_SETS,RES)
+	,!.
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -548,8 +568,8 @@ pexecutable(ACTION, EXECUTOR, STATE, X) :-
     
 
 always_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	always_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	always_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 	
 %czy z danej listy stanow mozna zawsze dojsc do wyjsciowej	
@@ -568,8 +588,8 @@ always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXE
         
 %jw
 possibly_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	possibly_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	possibly_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 
 possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-
