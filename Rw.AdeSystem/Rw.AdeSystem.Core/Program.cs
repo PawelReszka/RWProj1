@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SbsSW.SwiPlCs;
 
@@ -9,6 +10,17 @@ namespace Rw.AdeSystem.Core
     {
         static void Main()
         {
+            String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
+            PlEngine.Initialize(param);
+
+            const string filename = "./test1.txt";
+            AdeSystem.Initialize(param);
+            string text = System.IO.File.ReadAllText(filename);
+            AdeSystem.LoadDomain(text);
+            AdeSystem.ConstructSystemDomain();
+            AdeSystem.ParseQuery("possibly involved hador in chown by hador");
+            AdeSystem.ParseQuery("possibly involved huj in chowner by epsilon");
+            AdeSystem.ParseQuery("possibly involved h in chown, shoot by epsilon, epsilon");
             //Parsowanie wyrazenia logicznego - w literals sa fluenty, a drzewo wyrazenia w logicTree
             List<Token> literals;
             List<string> literalValues;
@@ -25,11 +37,11 @@ namespace Rw.AdeSystem.Core
 
             //Environment.SetEnvironmentVariable("SWI_HOME_DIR", @"C:\swipl\bin");
             if (PlEngine.IsInitialized) return;
-            String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
-            PlEngine.Initialize(param);
+            //String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
+            //PlEngine.Initialize(param);
 
-            const string filename = "./text.txt";
-            AdeSystem.Initialize(param);
+            //const string filename = "./text.txt";
+            //AdeSystem.Initialize(param);
             AdeSystem.LoadDomainFromFile(filename);
 
             //PlQuery.PlCall("assert(father(martin, inka))");

@@ -71,7 +71,11 @@
     <Compile Include="AdeSystem.cs" />
     <Compile Include="AdeForm.cs" />
     <Compile Include="Expressions\AlwaysExpression.cs" />
+    <Compile Include="Expressions\ByCausesExpression.cs" />
+    <Compile Include="Expressions\ByCausesIfExpression.cs" />
     <Compile Include="Expressions\ByExpression.cs" />
+    <Compile Include="Expressions\ByTypicallyCausesExpression.cs" />
+    <Compile Include="Expressions\ByTypicallyCausesIfExpression.cs" />
     <Compile Include="Expressions\CausesExpression.cs" />
     <Compile Include="Expressions\CausesIfExpression.cs" />
     <Compile Include="Expressions\Expression.cs" />
@@ -92,10 +96,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Queries\AccessibleQuery.cs" />
+    <Compile Include="Queries\AfterQuery.cs" />
     <Compile Include="Queries\AlwaysAccessibleQuery.cs" />
     <Compile Include="Queries\AlwaysAfterQuery.cs" />
     <Compile Include="Queries\AlwaysExecutableQuery.cs" />
     <Compile Include="Queries\AlwaysInvolvedQuery.cs" />
+    <Compile Include="Queries\ExecutableQuery.cs" />
+    <Compile Include="Queries\InvolvedQuery.cs" />
     <Compile Include="Queries\PossiblyAccessibleQuery.cs" />
     <Compile Include="Queries\PossiblyAfterQuery.cs" />
     <Compile Include="Queries\PossiblyExecutableQuery.cs" />

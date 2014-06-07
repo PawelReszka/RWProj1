@@ -1,5 +1,7 @@
+﻿
 %definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
 :-  dynamic(releases/4),dynamic(preserve/3),dynamic(observable_after/3),dynamic(initially_after/3).
+
 
 neg(X,Y) :- sneg(Y,X).%laczy fluent z jego negacja, relacja jest symetryczna
 neg(X,Y) :- sneg(X,Y).
@@ -223,8 +225,7 @@ fluents_valid_continue([HEAD|FORMULAS], FLUENTS) :-
 fluents_valid_continue([], _).
 
 initial_states(STATES) :- 
-    initially(X),
-    all_possible_states(X,STATES).
+    initially(STATES).
 
 list_of_states(R) :- 
     findall(X, fluent(X), POSITIVE),
@@ -519,17 +520,35 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%initially_after([],[],[]).
-%observable_after([],[],[]).
 
-
-%initially(FLUENTS_FROM) :-
-% 	initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
-% 	always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
-%    
-%initially(FLUENTS_FROM) :-
-% 	observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
-% 	possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM).
+initially(RES) :-
+	list_of_states(STATES),
+	findall(SET_OF_FLUENTS,
+		(
+			(
+			initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		;
+			(
+			observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			bagof(FLUENTS_FROM, 
+				(
+				member(FLUENTS_FROM, STATES),
+				possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				), 
+				SET_OF_FLUENTS)
+			)
+		)
+		,SET_OF_SETS)
+		,intersect(SET_OF_SETS,RES)
+	,!.
+	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% $$$$$$$$$$$$$$$$$$$$$$$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% KWERENDY %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -548,8 +567,8 @@ pexecutable(ACTION, EXECUTOR, STATE, X) :-
     
 
 always_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	always_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	always_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 	
 %czy z danej listy stanow mozna zawsze dojsc do wyjsciowej	
@@ -568,8 +587,8 @@ always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXE
         
 %jw
 possibly_executable(ACTIONS, EXECUTORS) :-
-	initially(FLUENTS),
-	possibly_executable(FLUENTS, ACTIONS, EXECUTORS),
+	initially(STATES),
+	possibly_executable_cont(STATES, ACTIONS, EXECUTORS),
 	!.
 
 possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-
@@ -589,8 +608,8 @@ possibly_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|E
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 always_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	always_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES_FROM),
+	always_accessible_continue(STATES_FROM,[], GOAL),
 	!.	
 	
 always_accessible(GOAL, FLUENTS) :-
@@ -624,8 +643,8 @@ always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
     !.
 
 typically_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	typically_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES),
+	typically_accessible_continue(STATES, [], GOAL),
 	!.
 	
 	
@@ -692,8 +711,8 @@ get_res_list_for_causes(STATE, [HEAD | CAUSES], LIST_OF_RES) :-
     ,!.
 
 possibly_accessible(GOAL) :-
-	initially(FLUENTS_FROM),
-	possibly_accessible(GOAL, FLUENTS_FROM),
+	initially(STATES),
+	possibly_accessible_continue(STATES, [],GOAL),
 	!.
 	
 
@@ -911,8 +930,7 @@ typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR
 
 %kwerendy dotyczace wykonawcow sa zawsze wzgledem stanu poczatkowego
 possibly_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),%standardowo wyciagamy fluenty okreslone w poczatkowej klauzuli
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),% standardowo stany im odpowiadajace
+    initially(POSSIBLE_STATES),%standardowo wyciagamy fluenty okreslone w poczatkowej klauzuli
     possibly_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
     !.
 
@@ -941,8 +959,7 @@ possibly_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXE
     !.
 
 always_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    initially(POSSIBLE_STATES),
     always_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
     !.
 
@@ -1015,8 +1032,7 @@ involved_minimal_cont([SEXECUTOR|SEXECUTORS],
 
 
 typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    initially(POSSIBLE_STATES),
     involved_minimal(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     typically_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     !.
@@ -1051,4 +1067,17 @@ typically_involved_cont2([SEXECUTOR | SEXECUTORS],[STATE|STATES], INVOLVED, [ACT
 
     
 typically_involved_cont2([],_, _, _, _, _, _,_).
+
+proper_subset(X,Y) :- 
+    is_list(X) ->
+        subset(X,Y)
+        ;
+        gen_subset(Y,X).
+
+gen_subset([], []).
+gen_subset([E|Tail], [E|NTail]):-
+  gen_subset(Tail, NTail).
+  gen_subset([_|Tail], NTail):-
+    gen_subset(Tail, NTail).
+
 

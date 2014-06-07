@@ -191,7 +191,7 @@ namespace Rw.AdeSystem.Core
             }
             if (expr.Op == BoolExpr.Bop.Not)
             {
-                return "!" + expr.Left.Lit;
+                return "not_" + expr.Left.Lit;
             }
             if (expr.Op == BoolExpr.Bop.And)
             {

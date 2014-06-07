@@ -22,7 +22,8 @@ sinertial(has_gun_hador).
 sinertial(alive).
 sinertial(walking).
 
-initially([has_gun_hador,not_has_gun_mietus,alive,walking]).
+initially_after([],[],[]).
+initially_after([],[],[has_gun_hador,not_has_gun_mietus,alive,walking]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).
 stmt(s2, [not_has_gun_mietus,has_gun_hador]).

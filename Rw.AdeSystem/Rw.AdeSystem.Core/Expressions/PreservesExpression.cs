@@ -17,7 +17,7 @@ namespace Rw.AdeSystem.Core.Expressions
             var tokens = line.Trim().Split(' ');
             ActionName = tokens[0];
             ExecutorName = tokens[2]; //2 zeby ominac by? nie wiem czy jakos inaczej trzeba to zrobic
-            Fluents.Add(tokens.Last());
+            Fluents.Add(tokens.Last().Replace("!", "not_"));
         }
 
         public override void ToProlog()
