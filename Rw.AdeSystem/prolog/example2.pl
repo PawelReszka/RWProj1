@@ -25,6 +25,8 @@ order(1,has_gun_mietus).
 order(2,alive).
 order(3,walking).
 
+initially_after([],[],[]).
+initially_after([],[],[has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
 initially_after([],[],[has_gun_hador,not_has_gun_mietus,alive,walking]).
 

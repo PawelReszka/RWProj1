@@ -520,8 +520,6 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INICJALIZACJA %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-observable_after([],[],[]).
-initially_after([],[],[]).
 initially(RES) :-
 	list_of_states(STATES),
 	findall(SET_OF_FLUENTS,
