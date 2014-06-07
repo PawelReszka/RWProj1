@@ -166,10 +166,7 @@ test(turn2_hador_3) :-
 
 test(turn2_mietus_0) :-
     state(state0, STATE0),
-    state(state1, STATE1),
     state(state3, STATE3),
-    state(state5, STATE5),
-    state(state7, STATE7),
     state(state2, STATE2),
     state(state4, STATE4),
     state(state6, STATE6),
