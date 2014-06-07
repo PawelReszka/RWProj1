@@ -1,13 +1,14 @@
-﻿:-  dynamic(releases/4),dynamic(preserve/3).
-
-neg(X,Y) :- sneg(Y,X).%
-neg(X,Y) :- sneg(X,Y).%
+﻿
+%definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
+:-  dynamic(releases/4),dynamic(preserve/3).
+neg(X,Y) :- sneg(Y,X).%laczy fluent z jego negacja, relacja jest symetryczna
+neg(X,Y) :- sneg(X,Y).
 
 neg(X,X) :- !,fail.%nie moze byc fluentu i jego negacji
 
-inertial(X) :- sinertial(X).
+inertial(X) :- sinertial(X).%inercjalnosc fluentu
 inertial(X) :- neg(X,Y),
-               sinertial(Y).
+               sinertial(Y).%jesli fluent jest inercjalny to jego sprzezenie tez
 
 calculate([], _, _,[]).
 calculate(STATES,[],[],STATES).
@@ -19,48 +20,17 @@ calculate([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STAT
     append(STATES_TO2,STATES_TO_ADD,STATES_TO),
     !.
 
-always_executable([], _, _,[]).
-always_executable(STATES,[],[],STATES).
-always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
-    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
-    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
-    length(STATES, STATES_LENGTH),
-    STATES_LENGTH > 0, % jeżeli chociaż jedno, gdziekolwiek będzie miało pusty wysypie sie całość
-    always_executable(STATES, ACTIONS, EXECUTORS, STATES2),
-    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
-    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
-    !.
-
-possibly_executable([], _, _,[]).
-possibly_executable(STATES,[],[],STATES).
-possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
-    possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
-    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
-    possibly_executable(STATES, ACTIONS, EXECUTORS, STATES2),
-    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
-    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
-    length(STATES_TO, COUNT),
-    COUNT > 0, % jeżeli nie dostaliśmy nic z startów początkowych - nie ma żadnego wykonywalnego dla tego poziomu.
-    !.
-
+%para list l1 i l2 znajdzie sie w trzecim argumencie
 pair_lists([],[],[]).
 pair_lists([HEAD1|L1], [HEAD2|L2], [ELEM|X]) :-
     ELEM = [HEAD1,HEAD2],
     pair_lists(L1,L2,X).
 
-all_calculated_states(X) :-
-    findall(Y,fluent(Y), R),
-    convert_negatives(R,R2),
-    pair_lists(R,R2,R3),
-    prod(R3,X2),
-    append_fluents([],X2,X), % przy okazji sortujemy fluenty ;)
-    !.
 
+accRev([H|T],A,R):-  accRev(T,[H|A],R).%przerzuca heada z listy pierwszej na poczatek listy drugiej
+accRev([],A,A). %kiedy lista pierwsza jest pusta przepisuje ja do listy 3
 
-accRev([H|T],A,R):-  accRev(T,[H|A],R).
-accRev([],A,A). 
-
-reverse(LIST1, LIST2) :- accRev(LIST1,[],LIST2).
+reverse(LIST1, LIST2) :- accRev(LIST1,[],LIST2).%odwraca kolejnosc elementow w liscie
 
 reorder_fluents(LIST, RES) :-
     length(LIST, LENGTH),
@@ -103,6 +73,14 @@ normalize([HEAD|FLUENTS], [NEG|NORMALIZED]) :-
     not(fluent(HEAD)),
     neg(HEAD, NEG),
     normalize(FLUENTS, NORMALIZED).
+    
+all_calculated_states(X) :-
+    findall(Y,fluent(Y), R),
+    convert_negatives(R,R2),
+    pair_lists(R,R2,R3),
+    prod(R3,X2),
+    append_fluents([],X2,X), % przy okazji sortujemy fluenty ;)
+    !.
 
 
 all_calculated_states(FLUENTS, X) :-
@@ -126,7 +104,7 @@ all_calculated_states(STATES,FLUENTS, X) :-
     subtract(X3, STATES_NOT_IN,X).
 
 
-noninertial(X) :- not(inertial(X)).
+noninertial(X) :- not(inertial(X)). 
 
 released_fluents(ACTION, EXECUTOR, STATE_FROM, OUTPUT) :-
     findall([X,Y], releases(ACTION, EXECUTOR,X,Y),R),
@@ -546,11 +524,41 @@ actions_causes(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :
     action_causes(STATES_FROM, ACTION, EXECUTOR, STATES_TO1),
     actions_causes(STATES_TO1, ACTIONS, EXECUTORS, STATES_TO).
 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXECUTABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%czy z danej listy stanow mozna zawsze dojsc do wyjsciowej
+always_executable([], _, _,[]).
+always_executable(STATES,[],[],STATES).%dla pustych ciagow ladujemy w tych samych stanach
+always_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
+    always_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),%czy dziala dla pozostalych
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
+    length(STATES, STATES_LENGTH),
+    STATES_LENGTH > 0, % jezeli chociaz jedno, gdziekolwiek bedzie mialo pusty wysypie sie calosc
+    always_executable(STATES, ACTIONS, EXECUTORS, STATES2), %czy dziala dalej idac 
+    subtract(STATES2, STATES_TO2,STATES_TO_ADD),%dzialamy wlasciwie na zbiorach nie na listach, wiec musimy pilnowac unikalnosci elementow
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    !.
+%jw
+possibly_executable([], _, _,[]).
+possibly_executable(STATES,[],[],STATES).
+possibly_executable([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO) :-
+    possibly_executable(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], STATES_TO2),
+    res0_trunc(ACTION, EXECUTOR, STATE_FROM, STATES),
+    possibly_executable(STATES, ACTIONS, EXECUTORS, STATES2),
+    subtract(STATES2, STATES_TO2,STATES_TO_ADD),
+    append(STATES_TO2,STATES_TO_ADD,STATES_TO),
+    length(STATES_TO, COUNT),
+    COUNT > 0, % jezeli nie dostalismy nic ze stanow poczatkowych - nie ma zadnego wykonywalnego dla tego poziomu.
+    !.
+%czy jest wykonalna ta akcja w tym stanie - jest ok nawet jesli wracamy do tego samego stanu   
 pexecutable(STATE, ACTION, EXECUTOR) :-
     res0_trunc(ACTION, EXECUTOR, STATE, X),
     length(X,Y),
     Y > 0.
-
+    
+    
 possible_executable(ACTION, EXECUTOR, FLUENTS) :-
     all_possible_states(FLUENTS, STATES),
     possible_executable_continue(ACTION, EXECUTOR, STATES).
@@ -569,25 +577,23 @@ always_executable(ACTION, EXECUTOR, FLUENTS) :-
 always_executable_continue(ACTION, EXECUTOR, [HEAD|STATES]) :-   
     pexecutable(HEAD, ACTION, EXECUTOR),
     always_executable_continue(ACTION, EXECUTOR, STATES).
-
+    
 always_executable_continue(_, _, []).
-
 
 always_executable_continue([],_,_).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ACCESIBLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 always_accessible(GOAL) :-
 	initially(FLUENTS_FROM),
 	always_accessible(GOAL, FLUENTS_FROM),
-	!.
-	
+	!.	
 	
 always_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
     always_accessible_continue(STATES_FROM,[], GOAL),
     !.
-
 
 always_accessible_continue([], _, _).
 
@@ -747,25 +753,23 @@ prod([],[[]]).
 prod([L|Ls],Out) :-
             bagof([X|R],(prod(Ls,O), member(X,L), member(R,O)),Out).
 
-% possibly_involved(EXECUTOR, ACTIONS, EXECUTORS).
-% always_involved(EXECUTOR, ACTIONS, EXECUTORS).
-% typically_involved(EXECUTOR, ACTIONS, EXECUTORS).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% gamma AFTER A1,....An by E1,.....En FROM alpha  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-possibly(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    possibly_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    possibly_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
     !.
 
-possibly_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+possibly_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
     (
         state(HEAD,HEAD_LIST),
         subset(FLUENTS_TO, HEAD_LIST)
     ;
-        possibly_cont(STATES, [], [], FLUENTS_TO)
+        possibly_after_cont(STATES, [], [], FLUENTS_TO)
     ),
     !.
 
-possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+possibly_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -782,19 +786,19 @@ possibly_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
     length(STATES_ACTION, N),
     N > 0,
     (
-        possibly_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+        possibly_after_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
     ;
-        possibly_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+        possibly_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
     ),
     !.
 
-minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
+minimal_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    minimal_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO, 0, MIN),
+    minimal_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO, 0, MIN),
     !.
 
-minimal_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
-        minimal_cont(STATES, [], [], FLUENTS_TO, K, MIN1),
+minimal_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
+        minimal_after_cont(STATES, [], [], FLUENTS_TO, K, MIN1),
         state(HEAD,HEAD_LIST),
         (
             subset(FLUENTS_TO, HEAD_LIST),
@@ -805,9 +809,9 @@ minimal_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
         ),
     !.
 
-minimal_cont([],_,_,_,K,K).
-minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
-    minimal_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN1),
+minimal_after_cont([],_,_,_,K,K).
+minimal_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+    minimal_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN1),
     (
         (
             EXECUTOR \= epsilon,
@@ -823,25 +827,25 @@ minimal_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, 
             resAb_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION_AB)
         )
     ),
-    minimal_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
-    minimal_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
+    minimal_after_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
+    minimal_after_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
     MIN4 is min(MIN2,MIN3),
     MIN is min(MIN1, MIN4),
     !.
 
 
-always(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    always_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    always_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
     !.
 
-always_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+always_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
         state(HEAD,HEAD_LIST),
         subset(FLUENTS_TO, HEAD_LIST),
-        always_cont(STATES, [], [], FLUENTS_TO),
+        always_after_cont(STATES, [], [], FLUENTS_TO),
         !.
 
-always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+always_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -853,37 +857,37 @@ always_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    always_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
-    always_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    always_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    always_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
     !.
 
-always_cont([],_,_,_).
-always_cont2([],_,_,_,_).
+always_after_cont([],_,_,_).
+always_after_cont2([],_,_,_,_).
 
-always_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+always_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
     res0_trunc(ACTION,PEXECUTOR, STATE, STATES),
     length(STATES, LENGTH),
     LENGTH > 0,
-    always_cont(STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
-    always_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
+    always_after_cont(STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+    always_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
 
-typically(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
+typically_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
     all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
     minimal(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN),
-    typically_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,MIN),
+    typically_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,MIN),
     !.
 
-typically_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
+typically_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
         state(HEAD,HEAD_LIST),
         (
             K \= MIN
         ;
             subset(FLUENTS_TO, HEAD_LIST)
         ),
-        typically_cont(STATES, [], [], FLUENTS_TO, K, MIN),
+        typically_after_cont(STATES, [], [], FLUENTS_TO, K, MIN),
         !.
 
-typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+typically_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -895,21 +899,22 @@ typically_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    typically_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
-    typically_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    typically_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    typically_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
     !.
 
-typically_cont([],_,_,_, _, _).
-typically_cont2([],_,_,_,_, _, _).
+typically_after_cont([],_,_,_, _, _).
+typically_after_cont2([],_,_,_,_, _, _).
 
-typically_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
-    typically_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+    typically_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
     resN_trunc(ACTION,PEXECUTOR, STATE, STATES1),
-    typically_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
+    typically_after_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
     resAb_trunc(ACTION,PEXECUTOR, STATE, STATES2),
     K2 is K + 1,
-    typically_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN ).
+    typically_after_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN ).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INVOLVED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 possibly_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
     initially(INITIAL_FLUENTS),
