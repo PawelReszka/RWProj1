@@ -961,8 +961,7 @@ possibly_involved_cont([STATE|STATES], INVOLVED, [ACTION|ACTIONS], [EXECUTOR|EXE
     !.
 
 always_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    initially(POSSIBLE_STATES),
     always_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, []),
     !.
 
@@ -1035,8 +1034,7 @@ involved_minimal_cont([SEXECUTOR|SEXECUTORS],
 
 
 typically_involved(EXECUTOR,ACTIONS,EXECUTORS) :-
-    initially(INITIAL_FLUENTS),
-    all_possible_states(INITIAL_FLUENTS, POSSIBLE_STATES),
+    initially(POSSIBLE_STATES),
     involved_minimal(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     typically_involved_cont(POSSIBLE_STATES, EXECUTOR, ACTIONS, EXECUTORS, [], 0, MINIMAL),
     !.
