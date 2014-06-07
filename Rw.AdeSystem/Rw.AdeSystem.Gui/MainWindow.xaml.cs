@@ -417,6 +417,7 @@ namespace Rw.AdeSystem.Gui
             var query = queryTextBox.GetLineText(0);
             var answer = Core.AdeSystem.ParseQuery(query);
             answerLabel.Content = answer;
+            answerLabel.Visibility = Visibility.Visible;
         }
     }
 }
