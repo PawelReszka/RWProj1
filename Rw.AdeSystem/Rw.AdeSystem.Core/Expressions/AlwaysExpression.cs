@@ -15,7 +15,8 @@ namespace Rw.AdeSystem.Core.Expressions
             List<string> tokenValues;
             var expression = LogicFormulaParser.Parse(line, out tokens, out tokenValues);
             Conditions = LogicFormulaParser.GetConditions(line);
-            
+            AdeSystem.Fluents.AddRange(tokens.Select(i=>i.Value));
+            AdeSystem.Fluents = AdeSystem.Fluents.Distinct().ToList();
             Expression = expression;
         }
 
