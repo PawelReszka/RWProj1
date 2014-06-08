@@ -10,7 +10,7 @@ namespace Rw.AdeSystem.Tests
     {
         private const string FalseString = "False";
         private const string TrueString = "True";
-        private const string LighbulbsProblem = @"initially s1 ∧ s2
+        private const string LighbulbsProblem = @"initially s1 & s2
                                                 always l <-> (s1 <-> s2)
                                                 noninertial l
                                                 TURN1 by Hador causes s1 if !s1
@@ -37,7 +37,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -57,7 +57,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -77,7 +77,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -97,7 +97,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -117,7 +117,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -137,7 +137,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -157,7 +157,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -177,7 +177,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -197,7 +197,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -217,7 +217,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, TrueString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }
@@ -237,7 +237,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -257,7 +257,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.Equals(result, FalseString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }

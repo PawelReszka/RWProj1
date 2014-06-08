@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,10 @@ namespace Rw.AdeSystem.Core
         {
             List<string> lv;
             List<Token> l;
-            var x = LogicFormulaParser.Parse(expression, out l, out lv);
-            x = LogicFormulaParser.SimplifyIf(x);
-            x = LogicFormulaParser.AndOrReformTree(x);
-            var val = LogicFormulaParser.GetFluentStrings(x).Select(i => i.Replace("&", ", ")).ToList();
+            var x = Parse(expression, out l, out lv);
+            x = SimplifyIf(x);
+            x = AndOrReformTree(x);
+            var val = GetFluentStrings(x).Select(i => i.Replace("&", ", ")).ToList();
             return val;
 
         }
@@ -114,7 +115,6 @@ namespace Rw.AdeSystem.Core
         public static BoolExpr AndOrReformTree(BoolExpr tree)
         {
             var result = new BoolExpr(tree);
-
             var queue = new Queue<BoolExpr>();
 
             bool isChanged;
@@ -137,6 +137,7 @@ namespace Rw.AdeSystem.Core
                             expr.Right = nowy.Right;
                             expr.Op = nowy.Op;
                             expr.Lit = nowy.Lit;
+
                             isChanged = true;
                             break;
                         }
@@ -149,6 +150,7 @@ namespace Rw.AdeSystem.Core
                             expr.Op = nowy.Op;
                             expr.Lit = nowy.Lit;
                             isChanged = true;
+                           
                             break;
                         }
                     }
@@ -156,24 +158,26 @@ namespace Rw.AdeSystem.Core
                     {
                         if (expr.Left.Op == BoolExpr.Bop.And)
                         {
-                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateNot(expr.Right),
-                                BoolExpr.CreateNot(expr.Left));
+                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateNot(expr.Left.Right),
+                                BoolExpr.CreateNot(expr.Left.Left));
                             expr.Left = nowy.Left;
                             expr.Right = nowy.Right;
                             expr.Op = nowy.Op;
                             expr.Lit = nowy.Lit;
                             isChanged = true;
+                        
                             break;
                         }
                         if (expr.Left.Op == BoolExpr.Bop.Or)
                         {
-                            BoolExpr nowy = BoolExpr.CreateAnd(BoolExpr.CreateNot(expr.Right),
-                                BoolExpr.CreateNot(expr.Left));
+                            BoolExpr nowy = BoolExpr.CreateAnd(BoolExpr.CreateNot(expr.Left.Right),
+                                BoolExpr.CreateNot(expr.Left.Left));
                             expr.Left = nowy.Left;
                             expr.Right = nowy.Right;
                             expr.Op = nowy.Op;
                             expr.Lit = nowy.Lit;
                             isChanged = true;
+                           
                             break;
                         }
                         if (expr.Left.Op == BoolExpr.Bop.Not)
@@ -184,6 +188,7 @@ namespace Rw.AdeSystem.Core
                             expr.Op = left.Op;
                             expr.Lit = left.Lit;
                             isChanged = true;
+                           
                             break;
                         }
                     }
@@ -328,7 +333,6 @@ namespace Rw.AdeSystem.Core
             {
                 var t = infixTokenList[index];
 
-                //TODO: zobaczyc tutaj priorytety 
                 switch (t.Type)
                 {
                     case Token.TokenType.Literal:
@@ -415,53 +419,9 @@ namespace Rw.AdeSystem.Core
         }
     }
 
-    //abstract class Ex
-    //{
-    //    public abstract bool Evaluate();
-    //}
-
-    //class LeafEx : Ex
-    //{
-    //    override public bool Evaluate()
-    //    {
-    //        return true; //Boolean.Parse(this.Lit);
-    //    }
-    //}
-
-    //class NotEx : Ex
-    //{
-    //    public Ex Left { get; set; }
-    //    override public bool Evaluate()
-    //    {
-    //        return !Left.Evaluate();
-    //    }
-    //}
-
-    //class OrEx : Ex
-    //{
-    //    public Ex Left { get; set; }
-    //    public Ex Right { get; set; }
-
-    //    override public bool Evaluate()
-    //    {
-    //        return Left.Evaluate() || Right.Evaluate();
-    //    }
-    //}
-
-    //class AndEx : Ex
-    //{
-    //    public Ex Left { get; set; }
-    //    public Ex Right { get; set; }
-
-    //    override public bool Evaluate()
-    //    {
-    //        return Left.Evaluate() && Right.Evaluate();
-    //    }
-    //}
-
     public class Token
     {
-        public static readonly Dictionary<string, KeyValuePair<TokenType, string>> Dict = new Dictionary<string, KeyValuePair<TokenType, string>>
+        private static readonly Dictionary<string, KeyValuePair<TokenType, string>> Dict = new Dictionary<string, KeyValuePair<TokenType, string>>
         {
         {
             "(", new KeyValuePair<TokenType, string>(TokenType.OpenParen, "(")
@@ -510,7 +470,7 @@ namespace Rw.AdeSystem.Core
                 return;
             }
 
-            var ch = ((char)c).ToString();
+            var ch = ((char)c).ToString(CultureInfo.InvariantCulture);
 
             if (Dict.ContainsKey(ch))
             {
@@ -519,11 +479,9 @@ namespace Rw.AdeSystem.Core
             }
             else
             {
-                //TODO: tu bedzie trzeba zmienic cus zeby kilka znakow czytalo
                 var str = "";
                 str += ch;
-                //Tu dac cos zeby czytalo poprawnie <->
-                while (s.Peek() != -1 && !Dict.ContainsKey(((char)s.Peek()).ToString()) && ((char)s.Peek() != '-' || ((char)s.Peek() == '-' && str == "<")) && (char)s.Peek() != '<')
+                while (s.Peek() != -1 && !Dict.ContainsKey(((char)s.Peek()).ToString(CultureInfo.InvariantCulture)) && ((char)s.Peek() != '-' || ((char)s.Peek() == '-' && str == "<")) && (char)s.Peek() != '<')
                 {
                     str += (char)s.Read();
 
