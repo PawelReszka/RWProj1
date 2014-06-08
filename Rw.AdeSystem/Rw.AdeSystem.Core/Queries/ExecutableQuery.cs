@@ -48,7 +48,7 @@ namespace Rw.AdeSystem.Core.Queries
             {
                 foreach (var conditionsString in ConditionsStrings)
                 {
-                    query = prefix+"_executable([" + ActionsString + "], [" + ExecutorsString + "], ["+conditionsString+"])";
+                    query = prefix + "_executable( [" + conditionsString + "], [" + ActionsString + "], [" + ExecutorsString + "])";
                     result.Add(query);
                 }
             }

@@ -57,12 +57,12 @@ namespace Rw.AdeSystem.Core
         public void AssertFact(string prologFact)
         {
             PlQuery.PlCall("assert(" + prologFact + ")");
-            SaveLine(prologFact);
+            SaveLine(prologFact+".");
         }
 
         public static bool ExecuteQuery(string query)
         {
-            //query = "inertial(huu)";
+            query = query.ToLower();
             bool result = false;
             using (var q = new PlQuery(query))
             {

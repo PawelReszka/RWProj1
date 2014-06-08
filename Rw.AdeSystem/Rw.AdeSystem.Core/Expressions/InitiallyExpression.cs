@@ -17,6 +17,8 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
+            AdeSystem.PrologEngine.AssertFact("initially_after([],[],[])");
+
             var fluents = String.Join(", ", Fluents);
             AdeSystem.PrologEngine.AssertFact("initially_after([],[],["+fluents+"])");
         }
@@ -56,6 +58,7 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
+            AdeSystem.PrologEngine.AssertFact("initially_after([],[],[])");
             foreach (var fluent in Fluents)
             {
                 AdeSystem.PrologEngine.AssertFact(prefix + "_after([" + ActionsString + "],[" + ExecutorsString + "],[" + fluent + "])");                

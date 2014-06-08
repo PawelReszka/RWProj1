@@ -70,6 +70,27 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
                 }
+                //by EPSILON Typically Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    DomainPhrases.Add(new TypicallyCausesIfExpression(line));
+                }
+                //by EXECUTORS Typically Causes xxx if...
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
+                {
+                    DomainPhrases.Add(new ByTypicallyCausesIfExpression(line));
+                }
+                //by EPSILON Typically Causes
+                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]*"))
+                {
+                    DomainPhrases.Add(new TypicallyCausesExpression(line));
+                }
+                // by EXECUTORS Typically Causes
+                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z&!\s]*"))
+                {
+                    DomainPhrases.Add(new ByTypicallyCausesExpression(line));
+                }
+
                 else if (line.Contains("observable"))
                 {
                     DomainPhrases.Add(new ObservableAfterExpression(line));
@@ -103,26 +124,7 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new ByCausesExpression(line));
                 }
-                //by EPSILON Typically Causes xxx if...
-                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
-                {
-                    DomainPhrases.Add(new TypicallyCausesIfExpression(line));
-                }
-                //by EXECUTORS Typically Causes xxx if...
-                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z,&,!,\s]* if [a-z,&,!,\s]*"))
-                {
-                    DomainPhrases.Add(new ByTypicallyCausesIfExpression(line));
-                }
-                //by EPSILON Typically Causes
-                else if (Regex.IsMatch(line, @"[A-Z]+ typically causes [a-z,&,!,\s]*"))
-                {
-                    DomainPhrases.Add(new TypicallyCausesExpression(line));
-                }
-                // by EXECUTORS Typically Causes
-                else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ typically causes [a-z&!\s]*"))
-                {
-                    DomainPhrases.Add(new ByTypicallyCausesExpression(line));
-                }
+                
                 
                 //by EXECUTORS preserves xxx if...
                 else if (Regex.IsMatch(line, @"[A-Z]+ by [a-zA-Z,\s]+ preserves [a-z,&,!,\s]*"))
@@ -282,7 +284,8 @@ namespace Rw.AdeSystem.Core
 
         private static bool GetBitValue(int number, int position)
         {
-            return (number & (1 << position - 1)) != 0;
+            var val = (number & (1 << position)) != 0;
+            return val;
         }
 
         private static void LoadEngine()

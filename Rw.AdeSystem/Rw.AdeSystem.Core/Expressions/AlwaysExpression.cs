@@ -27,7 +27,7 @@ namespace Rw.AdeSystem.Core.Expressions
             foreach (var condition in Conditions)
             {
                 var name = "s" + FormulaCounter++;
-                AdeSystem.PrologEngine.AssertFact("stmt("+name+","+condition+")");
+                AdeSystem.PrologEngine.AssertFact("stmt("+name+",["+condition+"])");
                 states.Add(name);
             }
             var formula = "f" + FormulaCounter++;

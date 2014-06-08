@@ -34,7 +34,7 @@ namespace Rw.AdeSystem.Core.Expressions
             var effects = String.Join(", ", Effects);
             foreach (var condition in Conditions)
             {
-                AdeSystem.PrologEngine.AssertFact("releases(" + ActionName + ", " + Executor + ", [" + effects + "], [" + condition + "])");                
+                AdeSystem.PrologEngine.AssertFact("releases(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [" + condition.ToLower() + "])");                
             }
         }
     }

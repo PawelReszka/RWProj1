@@ -38,7 +38,7 @@ namespace Rw.AdeSystem.Core.Expressions
         {
             if (!Fluents.Any())
             {
-                AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName + "," + ExecutorName + ",[" + Fluent + "])");
+                AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName.ToLower() + "," + ExecutorName.ToLower() + ",[" + Fluent.ToLower() + "])");
             }
         }
     }

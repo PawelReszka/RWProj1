@@ -31,7 +31,7 @@ namespace Rw.AdeSystem.Tests
             Core.AdeSystem.LoadDomain(YaleProblem);
             Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyExecutableQuery("possibly executable ENTICE by hador from !a & !w");
+            var query = new PossiblyExecutableQuery("possibly executable entice by hador from !a & !w");
             var result = query.ToProlog();
 
             //Assert
@@ -47,12 +47,11 @@ namespace Rw.AdeSystem.Tests
             String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
             Core.AdeSystem.Initialize(param);
 
-            Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
             Core.AdeSystem.ConstructSystemDomain();
 
             //Act
-            var query = new AlwaysExecutableQuery("always executable ENTICE by Hador from !a & !w");
+            var query = new AlwaysExecutableQuery("always executable entice by hador from !a & !w");
             var result = query.ToProlog();
 
             //Assert
