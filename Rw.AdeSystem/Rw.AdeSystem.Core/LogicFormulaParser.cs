@@ -15,7 +15,7 @@ namespace Rw.AdeSystem.Core
             List<Token> l;
             var x = LogicFormulaParser.Parse(expression, out l, out lv);
             x = LogicFormulaParser.SimplifyIf(x);
-            //x = LogicFormulaParser.AndOrReformTree(x);
+            x = LogicFormulaParser.AndOrReformTree(x);
             var val = LogicFormulaParser.GetFluentStrings(x).Select(i => i.Replace("&", ", ")).ToList();
             return val;
 

@@ -14,7 +14,7 @@ namespace Rw.AdeSystem.Core.Queries
                 List<string> litValues;
                 List<Token> literals;
                 var expression = LogicFormulaParser.Parse(conditions, out literals, out litValues);
-                ConditionsStrings = LogicFormulaParser.GetFluentStrings(expression);
+                ConditionsStrings = LogicFormulaParser.GetConditions(conditions);
             }
             else
             {
