@@ -163,6 +163,16 @@ namespace Rw.AdeSystem.Core
                             isChanged = true;
                             break;
                         }
+                        if (expr.Left.Op == BoolExpr.Bop.Not)
+                        {
+                            var left = expr.Left.Left;
+                            expr.Left = left.Left;
+                            expr.Right = left.Right;
+                            expr.Op = left.Op;
+                            expr.Lit = left.Lit;
+                            isChanged = true;
+                            break;
+                        }
                     }
                     queue.Enqueue(expr.Left);
                     queue.Enqueue(expr.Right);
