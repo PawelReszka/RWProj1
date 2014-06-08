@@ -15,7 +15,7 @@ namespace Rw.AdeSystem.Tests
                                             always w -> a
                                             CHOWN by Mietus causes h
                                             CHOWN by Hador causes m
-                                            SHOOT by Mietus causes !a if m
+                                            SHOOT by Mietus causes !a if !m & h
                                             SHOOT by Hador typically causes !a if h
                                             ENTICE by Hador causes w
                                             ENTICE by Mietus typically causes w

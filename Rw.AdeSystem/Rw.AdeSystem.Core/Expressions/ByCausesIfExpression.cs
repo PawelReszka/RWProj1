@@ -14,7 +14,7 @@ namespace Rw.AdeSystem.Core.Expressions
             List<string> litVal;
             List<Token> lit;
             var exp = LogicFormulaParser.Parse(con, out lit, out litVal);
-            Conditions = LogicFormulaParser.GetFluentStrings(exp);
+            Conditions = LogicFormulaParser.GetConditions(con);
         }
 
         public override void ToProlog()

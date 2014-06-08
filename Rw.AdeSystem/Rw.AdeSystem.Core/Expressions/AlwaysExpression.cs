@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Rw.AdeSystem.Core.Expressions
 {
@@ -13,7 +14,8 @@ namespace Rw.AdeSystem.Core.Expressions
             List<Token> tokens;
             List<string> tokenValues;
             var expression = LogicFormulaParser.Parse(line, out tokens, out tokenValues);
-            Conditions = LogicFormulaParser.GetFluentStrings(expression);
+            Conditions = LogicFormulaParser.GetConditions(line);
+            
             Expression = expression;
         }
 

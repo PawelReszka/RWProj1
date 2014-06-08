@@ -44,8 +44,8 @@ namespace Rw.AdeSystem.Core
         }
 
         private const string EXPRESSION = @"[a-z,|,&,!,\s,(,)<=>]*";
-        private const string EXECUTORS = @"[a-zA-Z,\s]+*";
-        private const string EXECUTOR = @"[a-zA-Z]+*";
+        private const string EXECUTORS = @"[a-zA-Z,\s]+";
+        private const string EXECUTOR = @"[a-zA-Z]+";
         private const string ACTION = @"[A-Z]+";
         private const string ACTIONS = @"[A-Z,\s]+";
         private const string FLUENTS = @"[a-z,&,!,\s]*";
@@ -70,7 +70,7 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
                 }
-                else if (Regex.IsMatch(line, "observable " + EXPRESSION + " after " + ACTIONS + " (by " + EXECUTORS + ")?"))
+                else if (line.Contains("observable"))
                 {
                     DomainPhrases.Add(new ObservableAfterExpression(line));
                 }

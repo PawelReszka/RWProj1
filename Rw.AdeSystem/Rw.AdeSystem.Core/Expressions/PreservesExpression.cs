@@ -25,7 +25,8 @@ namespace Rw.AdeSystem.Core.Expressions
                 List<string> litVal;
                 List<Token> lit;
                 var exp = LogicFormulaParser.Parse(con, out lit, out litVal);
-                Fluents = LogicFormulaParser.GetFluentStrings(exp);
+                Fluents = LogicFormulaParser.GetConditions(con);
+
             }
             else
             {

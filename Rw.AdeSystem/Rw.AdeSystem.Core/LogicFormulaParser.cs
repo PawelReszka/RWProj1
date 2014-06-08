@@ -8,6 +8,19 @@ namespace Rw.AdeSystem.Core
 {
     public static class LogicFormulaParser
     {
+
+        public static List<string> GetConditions(string expression)
+        {
+            List<string> lv;
+            List<Token> l;
+            var x = LogicFormulaParser.Parse(expression, out l, out lv);
+            x = LogicFormulaParser.SimplifyIf(x);
+            //x = LogicFormulaParser.AndOrReformTree(x);
+            var val = LogicFormulaParser.GetFluentStrings(x).Select(i => i.Replace("&", ", ")).ToList();
+            return val;
+
+        }
+
         //metoda parsuje wyrazenie logiczne do drzewa
         public static BoolExpr Parse(string expr, out List<Token> literals, out List<string> literalValues)
         {
@@ -197,6 +210,11 @@ namespace Rw.AdeSystem.Core
         {
             if (expr.IsLeaf())
             {
+                if (parent != null && parent.Op == BoolExpr.Bop.Or)
+                {
+                    tokens.Add(expr.Lit);
+                    return "";
+                }
                 return expr.Lit;
             }
             if (expr.Op == BoolExpr.Bop.Not)
@@ -628,6 +646,8 @@ namespace Rw.AdeSystem.Core
         {
             return (_op == Bop.Leaf);
         }
+
+        
 
         /*
                 Boolean IsAtomic()

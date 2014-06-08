@@ -24,7 +24,7 @@ namespace Rw.AdeSystem.Core.Expressions
             Effects.Add(tokens[3].Replace("!", "not_"));
             AdeSystem.Fluents.Add(tokens.Last().Replace("!", ""));
             var con = line.Substring(line.IndexOf("if") + 2).Trim();
-            Conditions.Add(con.Replace("!", "not_"));
+            Conditions = LogicFormulaParser.GetConditions(con);
         }
 
 
@@ -32,8 +32,10 @@ namespace Rw.AdeSystem.Core.Expressions
         public override void ToProlog()
         {
             var effects = String.Join(", ", Effects);
-            var conditions = String.Join(", ", Conditions);
-            AdeSystem.PrologEngine.AssertFact("releases(" + ActionName + ", " + Executor + ", [" + effects + "], [" + conditions + "])");
+            foreach (var condition in Conditions)
+            {
+                AdeSystem.PrologEngine.AssertFact("releases(" + ActionName + ", " + Executor + ", [" + effects + "], [" + condition + "])");                
+            }
         }
     }
 }
