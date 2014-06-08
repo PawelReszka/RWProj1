@@ -201,8 +201,12 @@ namespace Rw.AdeSystem.Core
         {
             var list = new List<string>();
 
-            _strings(tree, null, list);
+            var token = _strings(tree, null, list);
 
+            if(!string.IsNullOrEmpty(token))
+                list.Add(token);
+
+            //usuwanie z list a & !a
             return (from s in list let f = s.Split('&') let isOk = f.All(s1 => !f.Contains("not_" + s1)) where isOk select s).ToList();
         }
 
@@ -232,6 +236,8 @@ namespace Rw.AdeSystem.Core
                     tokens.Add(_strings(expr.Left, expr, tokens) + "&" + _strings(expr.Right, expr, tokens));
                 else if (parent != null && parent.Op == BoolExpr.Bop.And)
                     return _strings(expr.Left, expr, tokens) + "&" + _strings(expr.Right, expr, tokens);
+                else if(parent == null)
+                    tokens.Add(_strings(expr.Left, expr, tokens) + "&" + _strings(expr.Right, expr, tokens));
             }
             if (expr.Left != null)
                 _strings(expr.Left, expr, tokens);
