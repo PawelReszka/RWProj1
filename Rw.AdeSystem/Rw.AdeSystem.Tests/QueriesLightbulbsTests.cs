@@ -96,7 +96,7 @@ namespace Rw.AdeSystem.Tests
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
             Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new AlwaysAfterQuery("always !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
+            var query = new AlwaysAfterQuery("always !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -116,7 +116,7 @@ namespace Rw.AdeSystem.Tests
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
             Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyAfterQuery("possibly !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
+            var query = new PossiblyAfterQuery("possibly !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -136,7 +136,7 @@ namespace Rw.AdeSystem.Tests
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
             Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new TypicallyAfterQuery("typically !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
+            var query = new TypicallyAfterQuery("typically !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
