@@ -385,7 +385,7 @@ namespace Rw.AdeSystem.Tests
             Core.AdeSystem.ConstructSystemDomain();
 
             //Act
-            var query = new AlwaysAccessibleQuery("always accessible a");
+            var query = new PossiblyExecutableQuery("possibly executable shoot by hador");
             var result = query.ToProlog();
 
             //Assert
