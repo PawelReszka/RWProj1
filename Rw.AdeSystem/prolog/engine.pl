@@ -651,7 +651,7 @@ typically_accessible(GOAL) :-
 	
 typically_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
-    typically__accessible_continue(STATES_FROM,[], GOAL),
+    typically_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
 
