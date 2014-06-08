@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Rw.AdeSystem.Core.Queries
 {
@@ -41,7 +42,20 @@ namespace Rw.AdeSystem.Core.Queries
         public List<string> GetQueries(string prefix)
         {
             var result = new List<string>();
+            string query = "";
+            if (ConditionsStrings == null || !ConditionsStrings.Any())
+            {
+                query = prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[]";
 
+                result.Add(query);
+            }
+            else
+            {
+                foreach (var conditionsString in ConditionsStrings)
+                {
+                    result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString +"],[" + conditionsString + "]");
+                }
+            }
             return result;
         }
     }
