@@ -163,6 +163,16 @@ namespace Rw.AdeSystem.Core
                             isChanged = true;
                             break;
                         }
+                        if (expr.Left.Op == BoolExpr.Bop.Not)
+                        {
+                            var left = expr.Left.Left;
+                            expr.Left = left.Left;
+                            expr.Right = left.Right;
+                            expr.Op = left.Op;
+                            expr.Lit = left.Lit;
+                            isChanged = true;
+                            break;
+                        }
                     }
                     queue.Enqueue(expr.Left);
                     queue.Enqueue(expr.Right);
@@ -180,7 +190,7 @@ namespace Rw.AdeSystem.Core
 
             _strings(tree, null, list);
 
-            return list;
+            return (from s in list let f = s.Split('&') let isOk = f.All(s1 => !f.Contains("not_" + s1)) where isOk select s).ToList();
         }
 
         static string _strings(BoolExpr expr, BoolExpr parent, List<string> tokens)
