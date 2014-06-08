@@ -190,7 +190,7 @@ namespace Rw.AdeSystem.Core
 
             _strings(tree, null, list);
 
-            return list;
+            return (from s in list let f = s.Split('&') let isOk = f.All(s1 => !f.Contains("not_" + s1)) where isOk select s).ToList();
         }
 
         static string _strings(BoolExpr expr, BoolExpr parent, List<string> tokens)
