@@ -43,6 +43,13 @@ namespace Rw.AdeSystem.Core
             LoadDomain(Helpers.LoadFromFile(filename));
         }
 
+        private const string EXPRESSION = @"[a-z,|,&,!,\s,(,)<=>]*";
+        private const string EXECUTORS = @"[a-zA-Z,\s]+*";
+        private const string EXECUTOR = @"[a-zA-Z]+*";
+        private const string ACTION = @"[A-Z]+";
+        private const string ACTIONS = @"[A-Z,\s]+";
+        private const string FLUENTS = @"[a-z,&,!,\s]*";
+
         public static void LoadDomain(string domainInAdeString)
         {
             //TODO: Dodac wyrażenia regularne dla pozostałych wyrażeń języka 
@@ -59,9 +66,17 @@ namespace Rw.AdeSystem.Core
                     DomainPhrases.Add(new AlwaysExpression(line));
                 }
                 //Initially
-                else if (Regex.IsMatch(line, @"initially [a-z,&,!,\s]*"))
+                else if (Regex.IsMatch(line, "initially "+EXPRESSION))
                 {
                     DomainPhrases.Add(new InitiallyExpression(line));
+                }
+                else if (Regex.IsMatch(line, "observable " + EXPRESSION + " after " + ACTIONS + " (by " + EXECUTORS + ")?"))
+                {
+                    DomainPhrases.Add(new ObservableAfterExpression(line));
+                }
+                else if (Regex.IsMatch(line, EXPRESSION + " after " + ACTIONS + " (by " + EXECUTORS + ")?"))
+                {
+                    DomainPhrases.Add(new InitiallyAfterExpression(line));
                 }
                 // zakladam ze slowa kluczowe sa zabronione jako nazwy akcji, fluentow, etc -> mniej kodu
                 else if (line.Contains(" releases "))
