@@ -40,6 +40,7 @@ namespace Rw.AdeSystem.Core
             if (PlEngine.IsInitialized) return;
             PlEngine.Initialize(initParams);
         }
+
         public static void CreateFile()
         {
             using (new StreamWriter(path, false))
@@ -75,7 +76,6 @@ namespace Rw.AdeSystem.Core
         {
             PlQuery.PlCall("consult('" + "engine.pl" + "')");
         }
-
 
         //etc rozne potrzebne call'e
     }

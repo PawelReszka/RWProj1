@@ -124,9 +124,11 @@ namespace Rw.AdeSystem.Core
                 do
                 {
                     isChanged = false;
+                    if (queue.Count == 0)
+                        break;
                     var expr = queue.Dequeue();
                     if (expr.IsLeaf())
-                        break;
+                        continue;
                     if (expr.Op == BoolExpr.Bop.And)
                     {
                         if (expr.Left.Op == BoolExpr.Bop.Or)
@@ -143,8 +145,8 @@ namespace Rw.AdeSystem.Core
                         }
                         if (expr.Right.Op == BoolExpr.Bop.Or)
                         {
-                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateAnd(expr.Right.Right, expr.Right),
-                                BoolExpr.CreateAnd(expr.Right.Left, expr.Right));
+                            BoolExpr nowy = BoolExpr.CreateOr(BoolExpr.CreateAnd(expr.Right.Right, expr.Left),
+                                BoolExpr.CreateAnd(expr.Right.Left, expr.Left));
                             expr.Left = nowy.Left;
                             expr.Right = nowy.Right;
                             expr.Op = nowy.Op;
@@ -192,8 +194,10 @@ namespace Rw.AdeSystem.Core
                             break;
                         }
                     }
+                    if(expr.Left!=null)
                     queue.Enqueue(expr.Left);
-                    queue.Enqueue(expr.Right);
+                    if (expr.Right != null) 
+                        queue.Enqueue(expr.Right);
                 } while (true);
                 queue.Clear();
             } while (isChanged);

@@ -10,17 +10,17 @@ namespace Rw.AdeSystem.Tests
     {
         private const string FalseString = "False";
         private const string TrueString = "True";
-        private const string LighbulbsProblem = @"initially s1 & s2
-                                                always l <-> (s1 <-> s2)
+        private const string LighbulbsProblem = @"initially sone & stwo
+                                                always l <-> (sone <-> stwo)
                                                 noninertial l
-                                                TURN1 by Hador causes s1 if !s1
-                                                TURN1 by Hador causes !s1 if s1
-                                                TURN1 by Mietus typically causes s1 if !s1
-                                                TURN1 by Mietus typically causes !s1 if s1
-                                                TURN2 by Hador causes s2 if !s2
-                                                TURN2 by Hador typically causes !s2 if s2
-                                                TURN2 by Mietus typically causes s2 if !s2
-                                                TURN2 by Mietus causes !s2 if s2";
+                                                TURNONE by Hador causes sone if !sone
+                                                TURNONE by Hador causes !sone if sone
+                                                TURNONE by Mietus typically causes sone if !sone
+                                                TURNONE by Mietus typically causes !sone if sone
+                                                TURNTWO by Hador causes stwo if !stwo
+                                                TURNTWO by Hador typically causes !stwo if stwo
+                                                TURNTWO by Mietus typically causes stwo if !stwo
+                                                TURNTWO by Mietus causes !stwo if stwo";
 
         [TestMethod]
         public void Test01()
@@ -31,9 +31,10 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
-            var query = new AlwaysAfterQuery("always !s1&!s2 after TURN1,TURN2 by epsilon,epsilon from s1&s2");
+            var query = new AlwaysAfterQuery("always !sone&!stwo after TURNONE,TURNTWO by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -51,9 +52,10 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
-            var query = new PossiblyAfterQuery("possibly !s1&!s2 after TURN1,TURN2 by epsilon,epsilon from s1&s2");
+            var query = new PossiblyAfterQuery("possibly !sone&!stwo after TURNONE,TURNTWO by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -71,9 +73,10 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
+            Core.AdeSystem.ConstructSystemDomain();
 
             //Act
-            var query = new TypicallyAfterQuery("typically !s1&!s2 after TURN1,TURN2 by epsilon,epsilon from s1&s2");
+            var query = new TypicallyAfterQuery("typically !sone&!stwo after TURNONE,TURNTWO by epsilon, epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -91,9 +94,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new AlwaysAfterQuery("always !s1&!s2 after TURN2,TURN1 by epsilon,epsilon from s1&s2");
+            var query = new AlwaysAfterQuery("always !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -111,9 +114,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyAfterQuery("possibly !s1&!s2 after TURN2,TURN1 by epsilon,epsilon from s1&s2");
+            var query = new PossiblyAfterQuery("possibly !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -131,9 +134,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new TypicallyAfterQuery("typically !s1&!s2 after TURN2,TURN1 by epsilon,epsilon from s1&s2");
+            var query = new TypicallyAfterQuery("typically !sone&!stwo after TURNTWO,TURNONE by epsilon,epsilon from sone&stwo");
             var result = query.ToProlog();
 
             //Assert
@@ -151,9 +154,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyInvolvedQuery("possibly involved Hador in TURN2, TURN1 by epsilon,epsilon");
+            var query = new PossiblyInvolvedQuery("possibly involved Hador in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert
@@ -171,9 +174,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new AlwaysInvolvedQuery("always involved Hador in TURN2, TURN1 by epsilon,epsilon");
+            var query = new AlwaysInvolvedQuery("always involved Hador in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert
@@ -191,9 +194,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new TypicallyInvolvedQuery("typically involved Hador in TURN2, TURN1 by epsilon,epsilon");
+            var query = new TypicallyInvolvedQuery("typically involved Hador in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert
@@ -211,9 +214,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new PossiblyInvolvedQuery("possibly involved Mietus in TURN2, TURN1 by epsilon,epsilon");
+            var query = new PossiblyInvolvedQuery("possibly involved Mietus in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert
@@ -231,9 +234,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new AlwaysInvolvedQuery("always involved Mietus in TURN2, TURN1 by epsilon,epsilon");
+            var query = new AlwaysInvolvedQuery("always involved Mietus in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert
@@ -251,9 +254,9 @@ namespace Rw.AdeSystem.Tests
 
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(LighbulbsProblem);
-
+            Core.AdeSystem.ConstructSystemDomain();
             //Act
-            var query = new TypicallyInvolvedQuery("typically involved Mietus in TURN2, TURN1 by epsilon,epsilon");
+            var query = new TypicallyInvolvedQuery("typically involved Mietus in TURNTWO, TURNONE by epsilon,epsilon");
             var result = query.ToProlog();
 
             //Assert

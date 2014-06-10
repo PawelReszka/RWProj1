@@ -7,6 +7,7 @@ namespace Rw.AdeSystem.Core.Queries
     {
         public AfterQuery(string line, string prefix) : base(line)
         {
+            line = line.ToLower();
             if (line.Contains("from"))
             {
                 GoalString = FluentParser.GetSubstring(line, prefix+" ", " after ");
@@ -17,6 +18,7 @@ namespace Rw.AdeSystem.Core.Queries
                 List<Token> literals;
                 var expression = LogicFormulaParser.Parse(conditions, out literals, out litValues);
                 ConditionsStrings = LogicFormulaParser.GetConditions(conditions);
+                GoalString = GoalString.Replace("&", ",").Replace("!", "not_");
             }
             else
             {
@@ -45,7 +47,7 @@ namespace Rw.AdeSystem.Core.Queries
             string query = "";
             if (ConditionsStrings == null || !ConditionsStrings.Any())
             {
-                query = prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[]";
+                query = prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[])";
 
                 result.Add(query);
             }
@@ -53,7 +55,7 @@ namespace Rw.AdeSystem.Core.Queries
             {
                 foreach (var conditionsString in ConditionsStrings)
                 {
-                    result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString +"],[" + conditionsString + "]");
+                    result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[" + conditionsString + "])");
                 }
             }
             return result;

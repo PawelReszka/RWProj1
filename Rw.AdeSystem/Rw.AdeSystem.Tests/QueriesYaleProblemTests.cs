@@ -20,16 +20,17 @@ namespace Rw.AdeSystem.Tests
                                             ENTICE by Hador causes w
                                             ENTICE by Mietus typically causes w
                                             ENTICE by Hador preserves a";
+
+
         [TestMethod]
         public void Test01()
         {
             //Arrange
             String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
             Core.AdeSystem.Initialize(param);
-
-            Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
             Core.AdeSystem.ConstructSystemDomain();
+
             //Act
             var query = new PossiblyExecutableQuery("possibly executable entice by hador from !a & !w");
             var result = query.ToProlog();
@@ -46,7 +47,6 @@ namespace Rw.AdeSystem.Tests
             //Arrange
             String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
             Core.AdeSystem.Initialize(param);
-
             Core.AdeSystem.LoadDomain(YaleProblem);
             Core.AdeSystem.ConstructSystemDomain();
 
@@ -65,8 +65,6 @@ namespace Rw.AdeSystem.Tests
         {
             //Arrange
             String[] param = { /*"-q"*/ };  // suppressing informational and banner messages
-            Core.AdeSystem.Initialize(param);
-
             Core.AdeSystem.Initialize(param);
             Core.AdeSystem.LoadDomain(YaleProblem);
             Core.AdeSystem.ConstructSystemDomain();

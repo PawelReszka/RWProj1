@@ -275,11 +275,11 @@ namespace Rw.AdeSystem.Core
             }
             catch (ArgumentOutOfRangeException e)
             {
-                return "Błąd w kwerendzie";
+                return "Error in query";
             }
             if(q!=null)
                 return q.ToProlog();
-            return "Nie rozpoznana kwerenda";
+            return "Query not recognized";
         }
 
         private static bool GetBitValue(int number, int position)
