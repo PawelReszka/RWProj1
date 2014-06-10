@@ -69,7 +69,7 @@ namespace Rw.AdeSystem.Gui
                 _actions = Core.AdeSystem.Actions;
                 _fluents = Core.AdeSystem.Fluents;
                 _executors = Core.AdeSystem.Executors;
-
+                _executors.Add("epsilon");
                 queryButton.Visibility = System.Windows.Visibility.Visible;
                 queryLabel.Visibility = System.Windows.Visibility.Visible;
                 queryTextBox.Visibility = System.Windows.Visibility.Visible;
