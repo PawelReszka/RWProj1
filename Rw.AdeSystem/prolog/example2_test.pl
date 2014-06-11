@@ -17,8 +17,10 @@ test(entice_hador_0) :-
     resAb_trunc(entice, hador, STATE0, []).
 
 test(entice_hador_1) :-
-    state(state0, STATE0),
-    state(state1, STATE1),
+    state(state0, S0),
+    state(state1, S1),
+    sort(S0, STATE0),
+    sort(S1, STATE1),
 
     res0(entice, hador, STATE1, [STATE0, STATE1]),
     res0_min(entice,hador, STATE1, [STATE1]),
@@ -29,9 +31,12 @@ test(entice_hador_1) :-
     resAb_trunc(entice, hador, STATE1, []).
 
 test(entice_hador_2) :-
-    state(state0, STATE0),
-    state(state1, STATE1),
-    state(state2, STATE2),
+    state(state0, S0),
+    state(state1, S1),
+    state(state2, S2),
+    sort(S0,STATE0),
+    sort(S1,STATE1),
+    sort(S2,STATE2),
 
     res0(entice, hador, STATE2, [STATE0, STATE1]),
     res0_min(entice,hador, STATE2, [STATE0]),
