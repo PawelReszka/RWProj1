@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 
@@ -11,7 +12,7 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public string Executor { get; set; } 
 
-        public List<string> Effects = new List<string>();
+        public string Effects {get;set;}
         public ByCausesExpression(string line)
             : base(line)
         {
@@ -20,7 +21,7 @@ namespace Rw.AdeSystem.Core.Expressions
             AdeSystem.Executors.Add(tokens[2]);
             ActionName = tokens[0];
             Executor = tokens[2];
-            Effects.Add(tokens.Last().Replace("!", "not_"));
+            Effects = FluentParser.GetSubstring(line, " causes ").Replace("!", "not_").Replace("&", ", ");
             AdeSystem.Fluents.Add(tokens.Last().Replace("!", ""));
 
         }

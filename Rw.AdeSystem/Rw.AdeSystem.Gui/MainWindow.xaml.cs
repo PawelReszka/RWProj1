@@ -209,7 +209,7 @@ namespace Rw.AdeSystem.Gui
                         suggestionListBox.Items.Add("after");
                     }
                 }
-                if (last == "executable" || last == "in")
+                if (last == "executable" || last == "in" || last == "after")
                 {
                     _actions.ForEach(a => suggestionListBox.Items.Add(a));
                 }
@@ -239,7 +239,7 @@ namespace Rw.AdeSystem.Gui
                 {
                     suggestionListBox.Items.Add("from");
                 }
-
+                
             }
             _lastSuggestions = suggestionListBox.Items.Cast<string>().ToList();
         }

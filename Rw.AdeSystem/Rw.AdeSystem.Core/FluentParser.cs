@@ -24,7 +24,8 @@ namespace Rw.AdeSystem.Core
                 var val = str.Substring(startIndex + start.Length, endIndex - startIndex - start.Length).Trim();
                 return val;
             }
-            return str.Substring(str.IndexOf(start) + start.Length).Trim();
+            var val2 = str.Substring(str.IndexOf(start) + start.Length).Trim();
+            return val2;
         }
     }
 }
