@@ -183,20 +183,22 @@ release_fluents(STATES, [HEAD|FLUENTS], OUTPUT) :-
     !.
 
 
-formula_valid(FORMULA, FLUENTS) :- 
-    formula(FORMULA, STMT_LIST),
-    formula_valid_continue(STMT_LIST, FLUENTS).
+formula_valid(FORMULA, FLUENTS) :-   
+    formula_valid_continue(FORMULA, FLUENTS).
 
-formula_valid_continue([],_) :- !,fail.
+formula_valid_continue([], _).
 
-formula_valid_continue([HEAD|_], FLUENTS) :-
-    stmt(HEAD, HEAD_LIST),
-    subset(HEAD_LIST,FLUENTS).
+formula_valid_continue(STMTS, FLUENTS) :-
+	formula_valid_continue2(STMTS, FLUENTS).
 
-formula_valid_continue([HEAD|STMT], FLUENTS) :-
-    stmt(HEAD, HEAD_LIST),
-    not(subset(HEAD_LIST,FLUENTS)),
-    formula_valid_continue(STMT, FLUENTS).
+formula_valid_continue2([],_) :- !,fail.
+
+formula_valid_continue2([HEAD|_], FLUENTS) :-
+    subset(HEAD,FLUENTS).
+
+formula_valid_continue2([HEAD|STMT], FLUENTS) :-
+    not(subset(HEAD,FLUENTS)),
+    formula_valid_continue2(STMT, FLUENTS).
 
 state_valid(X) :-
     findall([Y], always(Y), R),
@@ -316,13 +318,13 @@ filter_active(_, [], []).
 
 filter_active(STATE, [HEAD|CAUSES_ALL], [HEAD|CAUSES_ACTIVE]) :-
     nth0(1, HEAD, ACTION_REQ),
-    subset(ACTION_REQ, STATE),
+    state_valid_with_formula( STATE,ACTION_REQ),
     filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
     !.
 
 filter_active(STATE, [HEAD|CAUSES_ALL], CAUSES_ACTIVE) :-
     nth0(1, HEAD, ACTION_REQ),
-    not(subset(ACTION_REQ, STATE)),
+    not(state_valid_with_formula( STATE,ACTION_REQ)),
     filter_active(STATE, CAUSES_ALL, CAUSES_ACTIVE),
     !.
 
@@ -331,16 +333,15 @@ merge_results([],[]).
 merge_results([HEAD|CAUSES], RESULTS) :-
     nth0(0, HEAD, RESULTS1),
     merge_results(CAUSES, RESULTS2),
-    append(RESULTS1, RESULTS2,RESULTS).
+    append([RESULTS1], RESULTS2,RESULTS).
 
 
 res0(ACTION, EXECUTOR, STATE, STATES) :-
     findall([X,Y], causes(ACTION, EXECUTOR, X,Y),R),
     filter_active(STATE, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
-    all_calculated_states(RESULTS, STATES_LIST),
-    filter_only_correct_states(STATES_LIST,STATES_LIST2),
-    sort(STATES_LIST2,STATES),
+    states_for_formulas(RESULTS, STATES_LIST),
+    sort(STATES_LIST,STATES),
     !.
 
 filter_only_correct_states([],[]).
@@ -381,9 +382,9 @@ res0_plus(ACTION, EXECUTOR, STATE, STATES) :-
     filter_active(STATE, R, R_ACTIVE),
     merge_results(R_ACTIVE, RESULTS),
     res0(ACTION, EXECUTOR, STATE,STATES_0),
-    all_calculated_states(STATES_0,RESULTS, STATES_LIST),
-    filter_only_correct_states(STATES_LIST,STATES_LIST2),
-    sort(STATES_LIST2,STATES),
+    states_for_formulas(RESULTS, STATES_LIST),
+    intersect(STATES_0,STATES_LIST, X),
+    sort(X,STATES),
     !.
 
 

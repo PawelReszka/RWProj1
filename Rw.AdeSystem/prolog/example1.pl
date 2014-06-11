@@ -25,14 +25,7 @@ observable_after([],[],[]).
 initially_after([],[],[]).
 initially_after([],[],[has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
-stmt(s1, [not_has_gun_hador, has_gun_mietus]).
-stmt(s2, [not_has_gun_mietus,has_gun_hador]).
-stmt(s3, [alive]).
-stmt(s4, [not_loaded]).
-formula(f, [s1,s2]).
-formula(f1, [s3]).
-formula(f2, [s4]).
-always(f).
+always([ [not_has_gun_hador, has_gun_mietus],[not_has_gun_mietus,has_gun_hador]]).
 
 order(0, has_gun_hador).
 order(1, has_gun_mietus).
@@ -48,12 +41,12 @@ state(state5, [not_has_gun_hador, has_gun_mietus, not_loaded, not_alive]).
 state(state6, [has_gun_hador, not_has_gun_mietus, loaded, not_alive]).
 state(state7, [not_has_gun_hador, has_gun_mietus, loaded, not_alive]).
 
-causes(chown, hador, [has_gun_mietus], []).
-causes(chown, mietus, [has_gun_hador], []).
-causes(load, epsilon, [loaded], []).
+causes(chown, hador, [[has_gun_mietus]], []).
+causes(chown, mietus, [[has_gun_hador]], []).
+causes(load, epsilon, [[loaded]], []).
 
-causes(shoot, mietus, [not_loaded], [has_gun_mietus]).
-causes(shoot, hador, [not_loaded], [has_gun_hador]).
+causes(shoot, mietus, [[not_loaded]], [[has_gun_mietus]]).
+causes(shoot, hador, [[not_loaded]], [[has_gun_hador]]).
 
-causes(shoot, mietus, [not_alive], [loaded, has_gun_mietus]).
-typically_causes(shoot, hador, [not_alive], [loaded, has_gun_hador]).
+causes(shoot, mietus, [[not_alive]], [[loaded, has_gun_mietus]]).
+typically_causes(shoot, hador, [[not_alive]], [[loaded, has_gun_hador]]).
