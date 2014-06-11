@@ -274,7 +274,7 @@ possible_states(LIST_OF_FLUENTS, [HEAD|STATES], POSSIBLE_STATES) :-
 
 all_possible_states(LIST_OF_FLUENTS,X) :- 
     list_of_states(LIST_OF_ALL_STATES),
-    possible_states([LIST_OF_FLUENTS], LIST_OF_ALL_STATES, X).
+    possible_states(LIST_OF_FLUENTS, LIST_OF_ALL_STATES, X).
 
 
 force_cause_change(LIST,STATE1_LIST,STATE2_LIST) :-
@@ -498,7 +498,7 @@ convert_negatives([HEAD|FLUENTS], [CONVERTED|NFLUENTS]) :-
 preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO, OUTPUT) :-
     preserve(ACTION, EXECUTOR, PRESERVED),
     fluent_values(STATE_FROM, PRESERVED, VALUES),
-    all_possible_states(VALUES, POSSIBLE_STATES),
+    all_possible_states([VALUES], POSSIBLE_STATES),
     subtract(STATES_TO,POSSIBLE_STATES, STATES_TO_NOT_ALLOWED),
     subtract(STATES_TO, STATES_TO_NOT_ALLOWED, OUTPUT),
     !.
