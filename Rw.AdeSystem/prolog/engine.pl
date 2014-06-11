@@ -247,6 +247,9 @@ states_for_formula(FORMULA,STATES) :-
 	 , STATES),
 	 !.
 
+states_for_formulas([], STATES) :-
+    list_of_states(STATES).
+
 states_for_formulas(FORMULAS, STATES) :-
 	findall(X,
 		(
