@@ -96,6 +96,8 @@ normalize([HEAD|FLUENTS], [NEG|NORMALIZED]) :-
     neg(HEAD, NEG),
     normalize(FLUENTS, NORMALIZED).
     
+
+    
 all_calculated_states(X) :-
     findall(Y,fluent(Y), R),
     convert_negatives(R,R2),
@@ -233,6 +235,16 @@ list_of_states(R) :-
     pair_lists(POSITIVE, NEGATIVES, PAIRS),
     prod(PAIRS, R2),
     states_valid(R2,R).
+    
+states_for_formula(FORMULA,STATES) :-
+	list_of_states(ALL_STATES),	
+	findall(STATE,
+	(
+		member(STATE, ALL_STATES),
+		state_valid_with_formula(STATE, FORMULA)
+	)
+	 , STATES),
+	 !.
 
 possible_state(LIST_OF_FLUENTS, STATE) :-
     subset(LIST_OF_FLUENTS, STATE).

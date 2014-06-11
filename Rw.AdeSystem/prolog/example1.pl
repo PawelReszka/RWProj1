@@ -27,9 +27,10 @@ initially_after([],[],[has_gun_hador, not_has_gun_mietus, alive,not_loaded]).
 
 stmt(s1, [not_has_gun_hador, has_gun_mietus]).
 stmt(s2, [not_has_gun_mietus,has_gun_hador]).
-
+stmt(s3, [alive,loaded]).
+stmt(s4, [has_gun_hador,not_loaded]).
 formula(f, [s1,s2]).
-
+formula(f1, [s3,s4]).
 always(f).
 
 order(0, has_gun_hador).
