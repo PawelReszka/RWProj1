@@ -38,7 +38,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.AreEqual(result, TrueString);
+            Assert.AreEqual(result, FalseString);
 
             PlEngine.PlCleanup();
         }
@@ -140,7 +140,7 @@ namespace Rw.AdeSystem.Tests
             var result = query.ToProlog();
 
             //Assert
-            Assert.AreEqual(result, FalseString);
+            Assert.AreEqual(result, TrueString);
 
             PlEngine.PlCleanup();
         }

@@ -18,10 +18,9 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            var effects = String.Join(", ", Effects);
             foreach (var condition in Conditions)
             {
-                AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [" + condition.ToLower() + "])");
+                AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + Effects.ToLower() + "], [" + condition.ToLower() + "])");
             }
         }
     }

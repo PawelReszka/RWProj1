@@ -29,18 +29,6 @@ namespace Rw.AdeSystem.Gui
             historyListView.Visibility = System.Windows.Visibility.Hidden;
             queryButton.Visibility = System.Windows.Visibility.Hidden;
             clearButton.Visibility = System.Windows.Visibility.Hidden;
-
-            //_fluents.Add("hasGunHador");
-            //_fluents.Add("hasGunMiętus");
-            //_fluents.Add("alive");
-            //_fluents.Add("walking");
-
-            //_actions.Add("SHOOT");
-            //_actions.Add("CHOWN");
-            //_actions.Add("ENTICE");
-
-            //_executors.Add("Hador");
-            //_executors.Add("Miętus");
         }
 
         private void loadModelButton_Click(object sender, RoutedEventArgs e)
@@ -71,6 +59,8 @@ namespace Rw.AdeSystem.Gui
                 _executors = Core.AdeSystem.Executors;
                 _executors.Add("epsilon");
                 queryButton.Visibility = System.Windows.Visibility.Visible;
+                queryTextBox.Text = "";
+                answerLabel.Content = "QUERIES HISTORY";
                 queryLabel.Visibility = System.Windows.Visibility.Visible;
                 queryTextBox.Visibility = System.Windows.Visibility.Visible;
                 suggestionListBox.Visibility = System.Windows.Visibility.Visible;
@@ -106,7 +96,9 @@ namespace Rw.AdeSystem.Gui
         {
             if (e.AddedItems.Count == 0) return;
             var s = e.AddedItems[0];
-            queryTextBox.Text += " " + s;
+            string ss = s.ToString();
+            if (queryTextBox.Text.EndsWith("!") || ss.Contains(",")) queryTextBox.Text += s;
+            else queryTextBox.Text += " " + s;
             UpdateQueryTextBox();
         }
 
@@ -114,7 +106,7 @@ namespace Rw.AdeSystem.Gui
         {
             suggestionListBox.Items.Clear();
             var openings = new List<string>(new[] { "always", "possibly", "typically" });
-            var logicBinOp = new List<string>(new[] { "or,and" });
+            var logicBinOp = new List<string>(new[] { "|", "&" });
             if (queryTextBox.Text == String.Empty)
             {
                 openings.ForEach(s => suggestionListBox.Items.Add(s))
@@ -131,7 +123,7 @@ namespace Rw.AdeSystem.Gui
 
             // nothing fits
             var keywords =
-                new List<string>(new[] { "always", "possibly", "typically", "not", "or", "and", "accessible", "involved", "executable", "from", "in", "by", "after" });
+                new List<string>(new[] { "always", "possibly", "typically", "!", "|", "&", "accessible", "involved", "executable", "from", "in", "by", "after" });
             keywords.AddRange(_actions);
             keywords.AddRange(_fluents);
             keywords.AddRange(_executors);
@@ -141,6 +133,11 @@ namespace Rw.AdeSystem.Gui
                 if (tmp.EndsWith(","))
                 {
                     last = last.Substring(0, last.Length - 1);
+                }
+                if (tmp.Contains("!"))
+                {
+                    last = last.Substring(1, last.Length - 1);
+                    tmp = last;
                 }
                 if (!keywords.Contains(tmp))
                 {
@@ -157,7 +154,7 @@ namespace Rw.AdeSystem.Gui
             suggestionListBox.Items.Clear();
             if (openings.Contains(last))
             {
-                suggestionListBox.Items.Add("not");
+                suggestionListBox.Items.Add("!");
                 _fluents.ForEach(s => suggestionListBox.Items.Add(s));
                 Array.ForEach(new[] { "involved", "accessible" }, s => suggestionListBox.Items.Add(s));
                 if (last != "typically")
@@ -192,12 +189,15 @@ namespace Rw.AdeSystem.Gui
                         return;
                     }
                 }
-                if (last == "not" || logicBinOp.Contains(last))
+                if (last == "!" || logicBinOp.Contains(last))
                 {
+                    if (logicBinOp.Contains(last))
+                        suggestionListBox.Items.Add("!");
                     _fluents.ForEach(s => suggestionListBox.Items.Add(s));
                 }
                 if (last == "from")
                 {
+                    suggestionListBox.Items.Add("!");
                     _fluents.ForEach(s => suggestionListBox.Items.Add(s));
                 }
                 if (_fluents.Contains(last))
@@ -209,9 +209,14 @@ namespace Rw.AdeSystem.Gui
                         suggestionListBox.Items.Add("after");
                     }
                 }
-                if (last == "executable" || last == "in")
+                if (last == "executable" || last == "in" || last == "after")
                 {
                     _actions.ForEach(a => suggestionListBox.Items.Add(a));
+                }
+                if (last == "accessible" || last == "in")
+                {
+                    suggestionListBox.Items.Add("!");
+                    _fluents.ForEach(s => suggestionListBox.Items.Add(s));
                 }
                 if (_actions.Contains(last))
                 {
@@ -226,29 +231,32 @@ namespace Rw.AdeSystem.Gui
                 {
                     suggestionListBox.Items.Add("in");
                 }
-
+                if(_executors.Contains(last))
+                {
+                    _executors.ForEach(e => suggestionListBox.Items.Add(", " + e));
+                }
                 if (!queryTextBox.Text.Contains("involved") && (_executors.Contains(last) || _actions.Contains(last) || _fluents.Contains(last)))
                 {
                     suggestionListBox.Items.Add("from");
                 }
-
+                
             }
             _lastSuggestions = suggestionListBox.Items.Cast<string>().ToList();
         }
 
         private void QueryButton_OnClick(object sender, RoutedEventArgs e)
         {
-            suggestionListBox.Visibility = System.Windows.Visibility.Hidden;
             var query = queryTextBox.GetLineText(0);
             var answer = Core.AdeSystem.ParseQuery(query);
-            answerLabel.Content = answer;
-            answerLabel.Visibility = Visibility.Visible;
+            string output = "\n\n" + query + "\n" + answer;
+            answerLabel.Content += output;
+            queryTextBox.Text = "";
+            UpdateQueryTextBox();
         }
 
         private void clearButton_Click(object sender, RoutedEventArgs e)
         {
             suggestionListBox.Visibility = System.Windows.Visibility.Visible;
-            answerLabel.Visibility = Visibility.Hidden;
             queryTextBox.Text = "";
             UpdateQueryTextBox();
         }

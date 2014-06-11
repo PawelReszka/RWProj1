@@ -559,11 +559,18 @@ initially(RES) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% EXECUTABLE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %czy jest wykonalna ta akcja w tym stanie - jest ok nawet jesli wracamy do tego samego stanu   
-pexecutable(ACTION, EXECUTOR, STATE, X) :-
+pexecutable(ACTION, EXECUTOR, STATE, X) :-	
     res0_trunc(ACTION, EXECUTOR, STATE, X),
     length(X,Y),
     Y > 0.
     
+alw_executable(_,[],_,[]).
+
+alw_executable(ACTION,[EXECUTOR|EXECUTORS],STATE,X) :-
+	pexecutable(ACTION, EXECUTOR, STATE, Z),
+	alw_executable(ACTION,EXECUTORS,STATE,Y),
+	append(Z, Y, X),
+	!.
     
 
 always_executable(ACTIONS, EXECUTORS) :-
@@ -580,8 +587,19 @@ always_executable(FLUENTS, ACTIONS, EXECUTORS) :-
 always_executable_cont([], _, _) .
 always_executable_cont(_,[],[]).%dla pustych ciagow ladujemy w tych samych stanach i jest to wykonalne
 always_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
-    always_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych
-    pexecutable(ACTION, EXECUTOR, STATE_FROM, STATES),%czy dziala dla danego stanu
+    always_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),%czy dziala dla pozostalych 
+      (
+        (
+            EXECUTOR \= epsilon,
+            POSS_EXECUTORS = [EXECUTOR]
+        )
+    ;
+        (
+            EXECUTOR == epsilon,
+            findall(X, executor(X),POSS_EXECUTORS)
+        )
+    ), 
+    alw_executable(ACTION, POSS_EXECUTORS, STATE_FROM, STATES),
     always_executable_cont(STATES, ACTIONS, EXECUTORS), %czy dziala dalej idac - to uzupelni nam liste states2 -wywolanie rekursji
     !.
         
@@ -599,7 +617,19 @@ possibly_executable(FLUENTS, ACTIONS, EXECUTORS) :-
 
 possibly_executable_cont(_,[],[]). % tu wybiera stany dla ktorych jest mozliwy ciag akcji
 possibly_executable_cont([STATE_FROM|STATES_FROM], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]) :-
-        pexecutable(ACTION, EXECUTOR, STATE_FROM, STATES),
+    (
+	    (
+	   		EXECUTOR \= epsilon,
+	       	pexecutable(ACTION, EXECUTOR, STATE_FROM, STATES)%czy dziala dla danego stanu
+	    )
+	    ;
+	    (
+	        EXECUTOR == epsilon,
+	        findall(X, executor(X),POSS_EXECUTORS),
+	        member(POSS_EXECUTOR,POSS_EXECUTORS),
+	        pexecutable(ACTION, POSS_EXECUTOR, STATE_FROM, STATES)%czy dziala dla danego stanu
+	    )
+    ), 
         possibly_executable_cont(STATES, ACTIONS, EXECUTORS)
     ;
         possibly_executable_cont(STATES_FROM, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS]),
@@ -651,7 +681,7 @@ typically_accessible(GOAL) :-
 	
 typically_accessible(GOAL, FLUENTS) :-
     all_possible_states(FLUENTS, STATES_FROM),
-    typically__accessible_continue(STATES_FROM,[], GOAL),
+    typically_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
 
