@@ -468,8 +468,9 @@ minimals_sets(LIST, MINIMALS) :-
 
 states_valid([],[]).
 
-states_valid([HEAD|X],[HEAD|Y]) :- 
+states_valid([HEAD|X],[SHEAD|Y]) :- 
     state_valid(HEAD),
+    sort(HEAD,SHEAD),
     !,
     states_valid(X,Y).
 
