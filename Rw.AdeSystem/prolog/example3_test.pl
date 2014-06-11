@@ -187,10 +187,12 @@ test(turn2_hador_1) :-
     state(state0, S0),
     state(state1, S1),
     state(state2, S2),
+    state(state3, S3),
 
     sort(S0,STATE0),
     sort(S1,STATE1),
     sort(S2,STATE2),
+    sort(S3,STATE3),
 
 
     sort([STATE0, STATE1, STATE2, STATE3],L1),
