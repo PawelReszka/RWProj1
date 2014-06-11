@@ -274,7 +274,7 @@ possible_states(LIST_OF_FLUENTS, [HEAD|STATES], POSSIBLE_STATES) :-
 
 all_possible_states(LIST_OF_FLUENTS,X) :- 
     list_of_states(LIST_OF_ALL_STATES),
-    possible_states(LIST_OF_FLUENTS, LIST_OF_ALL_STATES, X).
+    possible_states([LIST_OF_FLUENTS], LIST_OF_ALL_STATES, X).
 
 
 force_cause_change(LIST,STATE1_LIST,STATE2_LIST) :-
