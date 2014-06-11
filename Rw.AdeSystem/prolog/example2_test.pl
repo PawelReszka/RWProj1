@@ -3,8 +3,10 @@
 :- begin_tests(resy_example2).
 
 test(entice_hador_0) :-
-    state(state0, STATE0),
-    state(state1, STATE1),
+    state(state0, S0),
+    state(state1, S1),
+    sort(S0, STATE0),
+    sort(S1, STATE1),
 
     res0(entice, hador, STATE0, [STATE0, STATE1]),
     res0_min(entice,hador, STATE0, [STATE0]),
