@@ -20,26 +20,11 @@ sinertial(has_gun_hador).
 sinertial(alive).
 sinertial(walking).
 
-order(0,has_gun_hador).
-order(1,has_gun_mietus).
-order(2,alive).
-order(3,walking).
-
 initially_after([],[],[]).
 initially_after([],[],[has_gun_hador,not_has_gun_mietus,alive,walking]).
 
-
-stmt(s1, [not_has_gun_hador, has_gun_mietus]).
-stmt(s2, [not_has_gun_mietus,has_gun_hador]).
-
-stmt(s3, [not_walking]).
-stmt(s4, [alive]).
-
-formula(f, [s1, s2]).
-formula(f2,[s3,s4]).
-
-always(f).
-always(f2).
+always([[not_has_gun_hador, has_gun_mietus], [not_has_gun_mietus,has_gun_hador]]).
+always([[not_walking],[alive]]).
 
 state(state0, [has_gun_hador, not_has_gun_mietus, alive, walking]).
 state(state1, [not_has_gun_hador, has_gun_mietus, alive, walking]).
