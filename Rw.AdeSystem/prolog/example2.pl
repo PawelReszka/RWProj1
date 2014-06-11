@@ -33,12 +33,12 @@ state(state3, [not_has_gun_hador, has_gun_mietus, alive, not_walking]).
 state(state4, [has_gun_hador, not_has_gun_mietus, not_alive, not_walking]).
 state(state5, [not_has_gun_hador, has_gun_mietus, not_alive, not_walking]).
 
-causes(chown, mietus, [has_gun_hador],[]).
-causes(chown, hador, [has_gun_mietus], []).
-causes(shoot, mietus, [not_alive], [has_gun_mietus]).
-causes(entice, hador, [walking],[]).
+causes(chown, mietus, [[has_gun_hador]],[[]]).
+causes(chown, hador, [[has_gun_mietus]], [[]]).
+causes(shoot, mietus, [[not_alive]], [[has_gun_mietus]]).
+causes(entice, hador, [[walking]],[[]]).
 
-typically_causes(entice, mietus, [walking],[]).
-typically_causes(shoot, hador, [not_alive], [has_gun_hador]).
+typically_causes(entice, mietus, [[walking]],[[]]).
+typically_causes(shoot, hador, [[not_alive]], [[has_gun_hador]]).
 
 preserve(entice, hador, [alive]).
