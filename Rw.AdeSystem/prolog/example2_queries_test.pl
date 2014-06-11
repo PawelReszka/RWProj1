@@ -3,25 +3,25 @@
 :- begin_tests(example2_queries).
 
 test(possibly_1) :-
-    possibly_after([alive],[entice,shoot],[epsilon,hador],[not_alive,has_gun_hador]).
+    possibly_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,has_gun_hador]]).
 test(always_1) :-
-    not(always_after([alive],[entice,shoot],[epsilon,hador],[not_alive,has_gun_hador])).
+    not(always_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,has_gun_hador]])).
 test(typically_1) :-
-    not(typically_after([alive],[entice,shoot],[epsilon,hador],[not_alive,has_gun_hador])).
+    not(typically_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,has_gun_hador]])).
 
 test(possibly_2) :-
-    possibly_after([alive],[entice,shoot],[epsilon,hador],[not_alive,not_has_gun_hador]).
+    possibly_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,not_has_gun_hador]]).
 test(always_2) :-
-    not(always_after([alive],[entice,shoot],[epsilon,hador],[not_alive,not_has_gun_hador])).
+    not(always_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,not_has_gun_hador]])).
 test(typically_2) :-
-    typically_after([alive],[entice,shoot],[epsilon,hador],[not_alive,not_has_gun_hador]).
+    typically_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive,not_has_gun_hador]]).
 
 test(possibly_3) :-
-    possibly_after([alive],[entice,shoot],[epsilon,hador],[not_alive]).
+    possibly_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive]]).
 test(always_3) :-
-    not(always_after([alive],[entice,shoot],[epsilon,hador],[not_alive])).
+    not(always_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive]])).
 test(typically_3) :-
-    not(typically_after([alive],[entice,shoot],[epsilon,hador],[not_alive])).
+    not(typically_after([[alive]],[entice,shoot],[epsilon,hador],[[not_alive]])).
 
 
 test(possibly_involved_3x) :-
@@ -82,20 +82,20 @@ test(typically_involved_10) :-
 
 
 test(executable_1) :-
- 	possibly_executable([not_alive, not_walking], [entice], [mietus]).
+ 	possibly_executable([[not_alive, not_walking]], [entice], [mietus]).
 test(executable_2) :-
- 	not( possibly_executable([not_alive, not_walking], [entice], [hador])).
+ 	not( possibly_executable([[not_alive, not_walking]], [entice], [hador])).
 test(executable_3) :-
-	possibly_executable([not_walking], [entice,entice], [mietus,hador]).
+	possibly_executable([[not_walking]], [entice,entice], [mietus,hador]).
 test(executable_4) :-
-	not( always_executable([not_walking], [entice,entice], [mietus,hador])).
+	not( always_executable([[not_walking]], [entice,entice], [mietus,hador])).
 test(executable_5) :-
- 	always_executable([not_alive, not_walking], [shoot], [mietus]).
+ 	always_executable([[not_alive, not_walking]], [shoot], [mietus]).
 test(executable_6) :-
- 	 always_executable([not_alive, not_walking], [entice], [mietus]).
+ 	 always_executable([[not_alive, not_walking]], [entice], [mietus]).
 test(executable_7) :-
-	not( always_executable([not_walking], [entice,entice], [mietus,hador])).
+	not( always_executable([[not_walking]], [entice,entice], [mietus,hador])).
 test(executable_8) :-
-	not( always_executable([not_walking], [shoot,entice], [mietus,hador])).
+	not( always_executable([[not_walking]], [shoot,entice], [mietus,hador])).
 
 :- end_tests(example2_queries).

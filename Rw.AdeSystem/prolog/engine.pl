@@ -553,20 +553,20 @@ initially(RES) :-
 		(
 			(
 			initially_after(ACTIONS,EXECUTORS,FORMULA),
-			bagof(FLUENTS_FROM, 
+			bagof(STATE, 
 				(
-				member(FLUENTS_FROM, STATES),
-				always_after(FORMULA, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				member(STATE, STATES),
+				always_after(FORMULA, ACTIONS, EXECUTORS, [STATE])
 				), 
 				SET_OF_FLUENTS)
 			)
 		;
 			(
 			observable_after(ACTIONS,EXECUTORS,FORMULA),
-			bagof(FLUENTS_FROM, 
+			bagof(STATE, 
 				(
-				member(FLUENTS_FROM, STATES),
-				possibly_after(FORMULA, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				member(STATE, STATES),
+				possibly_after(FORMULA, ACTIONS, EXECUTORS, [STATE])
 				), 
 				SET_OF_FLUENTS)
 			)
@@ -827,20 +827,20 @@ prod([L|Ls],Out) :-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% gamma AFTER A1,....An by E1,.....En FROM alpha  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
-    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    possibly_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+possibly_after(FORMULA_TO, ACTIONS, EXECUTORS, FORMULA_FROM) :-
+    all_possible_states(FORMULA_FROM, POSSIBLE_STATES),
+    possibly_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FORMULA_TO),
     !.
 
-possibly_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
+possibly_after_cont([HEAD|STATES], [], [], FORMULA_TO) :-
     (
-        subset(FLUENTS_TO, HEAD)
+        formula_valid(FORMULA_TO, HEAD)
     ;
-        possibly_after_cont(STATES, [], [], FLUENTS_TO)
+        possibly_after_cont(STATES, [], [], FORMULA_TO)
     ),
     !.
 
-possibly_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+possibly_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -857,31 +857,31 @@ possibly_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUEN
     length(STATES_ACTION, N),
     N > 0,
     (
-        possibly_after_cont(STATES_ACTION, ACTIONS, EXECUTORS, FLUENTS_TO)
+        possibly_after_cont(STATES_ACTION, ACTIONS, EXECUTORS, FORMULA_TO)
     ;
-        possibly_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO)
+        possibly_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO)
     ),
     !.
 
-minimal_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN) :-
-    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    minimal_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO, 0, MIN),
+minimal_after(FORMULA_TO, ACTIONS, EXECUTORS, FORMULA_FROM, MIN) :-
+    all_possible_states(FORMULA_FROM, POSSIBLE_STATES),
+    minimal_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FORMULA_TO, 0, MIN),
     !.
 
-minimal_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
-        minimal_after_cont(STATES, [], [], FLUENTS_TO, K, MIN1),
+minimal_after_cont([HEAD|STATES], [], [], FORMULA_TO, K, MIN) :-
+        minimal_after_cont(STATES, [], [], FORMULA_TO, K, MIN1),
         (
-            subset(FLUENTS_TO, HEAD),
+            formula_valid(FORMULA_TO, HEAD),
             MIN is min(MIN1,K)
         ;
-            not(subset(FLUENTS_TO, HEAD)),
+            not(subset(FORMULA_TO, HEAD)),
             MIN is MIN1
         ),
     !.
 
 minimal_after_cont([],_,_,_,K,K).
-minimal_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
-    minimal_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN1),
+minimal_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN) :-
+    minimal_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN1),
     (
         (
             EXECUTOR \= epsilon,
@@ -897,24 +897,24 @@ minimal_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENT
             resAb_trunc(ACTION, POSS_EXECUTOR, HEAD, STATES_ACTION_AB)
         )
     ),
-    minimal_after_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN2),
-    minimal_after_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN3),
+    minimal_after_cont(STATES_ACTION_N, ACTIONS, EXECUTORS, FORMULA_TO, K, MIN2),
+    minimal_after_cont(STATES_ACTION_AB, ACTIONS, EXECUTORS, FORMULA_TO, K, MIN3),
     MIN4 is min(MIN2,MIN3),
     MIN is min(MIN1, MIN4),
     !.
 
 
-always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
-    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    always_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
+always_after(FORMULA_TO, ACTIONS, EXECUTORS, FORMULA_FROM) :-
+    all_possible_states(FORMULA_FROM, POSSIBLE_STATES),
+    always_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FORMULA_TO),
     !.
 
-always_after_cont([HEAD|STATES], [], [], FLUENTS_TO) :-
-        subset(FLUENTS_TO, HEAD),
-        always_after_cont(STATES, [], [], FLUENTS_TO),
+always_after_cont([HEAD|STATES], [], [], FORMULA_TO) :-
+        formula_valid(FORMULA_TO, HEAD),
+        always_after_cont(STATES, [], [], FORMULA_TO),
         !.
 
-always_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+always_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -926,36 +926,36 @@ always_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    always_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
-    always_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO),
+    always_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO),
+    always_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO),
     !.
 
 always_after_cont([],_,_,_).
 always_after_cont2([],_,_,_,_).
 
-always_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO) :-
+always_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO) :-
     res0_trunc(ACTION,PEXECUTOR, STATE, STATES),
     length(STATES, LENGTH),
     LENGTH > 0,
-    always_after_cont(STATES, ACTIONS, EXECUTORS, FLUENTS_TO),
-    always_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO).
+    always_after_cont(STATES, ACTIONS, EXECUTORS, FORMULA_TO),
+    always_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO).
 
-typically_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM) :-
-    all_possible_states(FLUENTS_FROM, POSSIBLE_STATES),
-    minimal_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM, MIN),
-    typically_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FLUENTS_TO,0,MIN),
+typically_after(FORMULA_TO, ACTIONS, EXECUTORS, FORMULA_FROM) :-
+    all_possible_states(FORMULA_FROM, POSSIBLE_STATES),
+    minimal_after(FORMULA_TO, ACTIONS, EXECUTORS, FORMULA_FROM, MIN),
+    typically_after_cont(POSSIBLE_STATES, ACTIONS, EXECUTORS, FORMULA_TO,0,MIN),
     !.
 
-typically_after_cont([HEAD|STATES], [], [], FLUENTS_TO, K, MIN) :-
+typically_after_cont([HEAD|STATES], [], [], FORMULA_TO, K, MIN) :-
         (
             K \= MIN
         ;
-            subset(FLUENTS_TO, HEAD)
+            formula_valid(FORMULA_TO, HEAD)
         ),
-        typically_after_cont(STATES, [], [], FLUENTS_TO, K, MIN),
+        typically_after_cont(STATES, [], [], FORMULA_TO, K, MIN),
         !.
 
-typically_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
+typically_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN) :-
     (
         (
             EXECUTOR \= epsilon,
@@ -967,20 +967,20 @@ typically_after_cont([HEAD|STATES], [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUE
             findall(X, executor(X),POSS_EXECUTORS)
         )
     ),
-    typically_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
-    typically_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+    typically_after_cont2(POSS_EXECUTORS, HEAD, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN),
+    typically_after_cont(STATES, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN),
     !.
 
 typically_after_cont([],_,_,_, _, _).
 typically_after_cont2([],_,_,_,_, _, _).
 
-typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN) :-
-    typically_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FLUENTS_TO, K, MIN),
+typically_after_cont2([PEXECUTOR|PEXECUTORS], STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN) :-
+    typically_after_cont2(PEXECUTORS, STATE, [ACTION|ACTIONS], [EXECUTOR|EXECUTORS], FORMULA_TO, K, MIN),
     resN_trunc(ACTION,PEXECUTOR, STATE, STATES1),
-    typically_after_cont(STATES1, ACTIONS, EXECUTORS, FLUENTS_TO, K, MIN),
+    typically_after_cont(STATES1, ACTIONS, EXECUTORS, FORMULA_TO, K, MIN),
     resAb_trunc(ACTION,PEXECUTOR, STATE, STATES2),
     K2 is K + 1,
-    typically_after_cont(STATES2, ACTIONS, EXECUTORS, FLUENTS_TO, K2, MIN ).
+    typically_after_cont(STATES2, ACTIONS, EXECUTORS, FORMULA_TO, K2, MIN ).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INVOLVED %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
