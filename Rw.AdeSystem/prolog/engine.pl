@@ -260,13 +260,13 @@ states_for_formulas(FORMULAS, STATES) :-
 	intersect(STATES_LISTS, STATES).
 		
 
-possible_state(LIST_OF_FLUENTS, STATE) :-
-    subset(LIST_OF_FLUENTS, STATE).
+possible_state(FORMULA, STATE) :-
+    formula_valid(FORMULA, STATE).
 
 possible_states(_, [], []).
-possible_states(LIST_OF_FLUENTS, [HEAD|STATES], [HEAD|POSSIBLE_STATES]) :-
-    possible_state(LIST_OF_FLUENTS, HEAD),
-    possible_states(LIST_OF_FLUENTS, STATES, POSSIBLE_STATES).
+possible_states(FORMULA, [HEAD|STATES], [HEAD|POSSIBLE_STATES]) :-
+    possible_state(FORMULA, HEAD),
+    possible_states(FORMULA, STATES, POSSIBLE_STATES).
 
 possible_states(LIST_OF_FLUENTS, [HEAD|STATES], POSSIBLE_STATES) :-
     not(possible_state(LIST_OF_FLUENTS, HEAD)),
@@ -668,20 +668,20 @@ always_accessible(GOAL) :-
 	always_accessible_continue(STATES_FROM,[], GOAL),
 	!.	
 	
-always_accessible(GOAL, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES_FROM),
+always_accessible(GOAL, FORMULA) :-
+    all_possible_states(FORMULA, STATES_FROM),
     always_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
 always_accessible_continue([], _, _).
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    subset(GOAL, HEAD),
+    formula_valid(GOAL, HEAD),
     always_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
 always_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    not(subset(GOAL, HEAD)),
+    not(formula_valid(GOAL, HEAD)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
     append(R1,R2,R),
@@ -705,8 +705,8 @@ typically_accessible(GOAL) :-
 	
 	
 	
-typically_accessible(GOAL, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES_FROM),
+typically_accessible(GOAL, FORMULA) :-
+    all_possible_states(FORMULA, STATES_FROM),
     typically_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
@@ -714,12 +714,12 @@ typically_accessible(GOAL, FLUENTS) :-
 typically_accessible_continue([], _, _).
 
 typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    subset(GOAL, HEAD),
+    formula_valid(GOAL, HEAD),
     typically_accessible_continue(NOT_VISITED, VISITED, GOAL),
     !.
 
 typically_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    not(subset(GOAL, HEAD)),
+    not(formula_valid(GOAL, HEAD)),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R),
     member(MOVE, R),
     nth0(0, MOVE, ACTION),
@@ -772,18 +772,18 @@ possibly_accessible(GOAL) :-
 	!.
 	
 
-possibly_accessible(GOAL, FLUENTS) :-
-    all_possible_states(FLUENTS, STATES_FROM),
+possibly_accessible(GOAL, FORMULA) :-
+    all_possible_states(FORMULA, STATES_FROM),
     possibly_accessible_continue(STATES_FROM,[], GOAL),
     !.
 
 possibly_accessible_continue([],_, _) :- !,fail.
 
 possibly_accessible_continue([HEAD|_], _, GOAL) :-
-    subset(GOAL, HEAD).
+    formula_valid(GOAL, HEAD).
 
 possibly_accessible_continue([HEAD|NOT_VISITED], VISITED, GOAL) :-
-    not(subset(GOAL, HEAD)),
+    not(formula_valid(GOAL, HEAD)),
     findall([X,Y,Z,Z2], causes(X,Y,Z,Z2),R1),
     findall([X,Y,Z,Z2], typically_causes(X,Y,Z,Z2),R2),
     states_possible_with_causes(HEAD, R1, STATES1),
