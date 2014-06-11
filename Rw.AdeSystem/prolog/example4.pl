@@ -25,23 +25,14 @@ sinertial(walking).
 initially_after([],[],[]).
 initially_after([],[],[has_gun_hador,not_has_gun_mietus,alive,walking]).
 
-stmt(s1, [not_has_gun_hador, has_gun_mietus]).
-stmt(s2, [not_has_gun_mietus,has_gun_hador]).
-
-stmt(s3, [not_walking]).
-stmt(s4, [alive]).
-
-stmt(s5, [has_gun_mietus]).
-stmt(s6, [has_gun_hador]).
-
-formula(f, [s1, s2]).
-formula(f2,[s3,s4]).
-
-formula(f3, [s5]).
-formula(f4, [s6]).
-
-always(f).
-always(f2).
+always([
+          [not_has_gun_hador, has_gun_mietus],
+          [not_has_gun_mietus,has_gun_hador]
+        ]).
+always([
+        [not_walking],
+        [alive]
+    ]).
 
 
 order(0, has_gun_hador).
@@ -56,11 +47,11 @@ state(state3, [not_has_gun_hador, has_gun_mietus, alive, not_walking]).
 state(state4, [has_gun_hador, not_has_gun_mietus, not_alive, not_walking]).
 state(state5, [not_has_gun_hador, has_gun_mietus, not_alive, not_walking]).
 
-causes(chown, mietus, [has_gun_hador],[]).
-causes(chown, hador, [has_gun_mietus], []).
-causes(shoot, mietus, [not_alive], [has_gun_mietus]).
+causes(chown, mietus, [[has_gun_hador]],[[]]).
+causes(chown, hador, [[has_gun_mietus]], [[]]).
+causes(shoot, mietus, [[not_alive]], [[has_gun_mietus]]).
 
-typically_causes(shoot, hador, [not_alive], [has_gun_hador]).
+typically_causes(shoot, hador, [[not_alive]], [[has_gun_hador]]).
 
-releases(shoot,mietus,[walking], f3).
-releases(shoot,hador,[walking], f4).
+releases(shoot,mietus,[walking], [[has_gun_mietus]]).
+releases(shoot,hador,[walking], [[has_gun_hador]]).
