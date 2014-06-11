@@ -1,4 +1,3 @@
-﻿
 %definicje reslease i preserve sie zmieniac moga - moze dlatego ze najpierw sie liczy resy bez nich?
 :-  dynamic(releases/4),dynamic(preserve/3),dynamic(observable_after/3),dynamic(initially_after/3).
 
@@ -221,7 +220,7 @@ fluents_valid(X) :-
 
 fluents_valid_continue([HEAD|FORMULAS], FLUENTS) :-
     nth0(0, HEAD, FORMULA),
-    formula_valid(FORMULA, FLUENTS),
+    formula_valid(FORMULA, FLUENTS), 
     fluents_valid_continue(FORMULAS, FLUENTS).
 
 fluents_valid_continue([], _).
@@ -245,6 +244,16 @@ states_for_formula(FORMULA,STATES) :-
 	)
 	 , STATES),
 	 !.
+
+states_for_formulas(FORMULAS, STATES) :-
+	findall(X,
+		(
+			member(FORMULA, FORMULAS),
+			states_for_formula(FORMULA, X)
+		),
+		STATES_LISTS),
+	intersect(STATES_LISTS, STATES).
+		
 
 possible_state(LIST_OF_FLUENTS, STATE) :-
     subset(LIST_OF_FLUENTS, STATE).
@@ -538,21 +547,21 @@ initially(RES) :-
 	findall(SET_OF_FLUENTS,
 		(
 			(
-			initially_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			initially_after(ACTIONS,EXECUTORS,FORMULA),
 			bagof(FLUENTS_FROM, 
 				(
 				member(FLUENTS_FROM, STATES),
-				always_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				always_after(FORMULA, ACTIONS, EXECUTORS, FLUENTS_FROM)
 				), 
 				SET_OF_FLUENTS)
 			)
 		;
 			(
-			observable_after(ACTIONS,EXECUTORS,FLUENTS_TO),
+			observable_after(ACTIONS,EXECUTORS,FORMULA),
 			bagof(FLUENTS_FROM, 
 				(
 				member(FLUENTS_FROM, STATES),
-				possibly_after(FLUENTS_TO, ACTIONS, EXECUTORS, FLUENTS_FROM)
+				possibly_after(FORMULA, ACTIONS, EXECUTORS, FLUENTS_FROM)
 				), 
 				SET_OF_FLUENTS)
 			)
