@@ -19,16 +19,18 @@ namespace Rw.AdeSystem.Gui
     /// </summary>
     public partial class EditStoryForm : Window
     {
-        public EditStoryForm()
+        private MainWindow MainWindowRef { get; set; }
+        public EditStoryForm(MainWindow _ref)
         {
             InitializeComponent();
+            MainWindowRef = _ref;
             domainTextBlock.Text = Core.AdeSystem.Domain;
         }
 
         private void okButton_Click(object sender, RoutedEventArgs e)
         {
             //TU WSTAWIC REBUILD MODELU
-
+            MainWindowRef.LoadModel(domainTextBlock.Text);
             this.Close();
         }
 

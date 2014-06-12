@@ -72,9 +72,14 @@ namespace Rw.AdeSystem.Core
             return result;
         }
 
-        public void AssertFacts(string prologFacts)
+        public void LoadEngine()
         {
             PlQuery.PlCall("consult('" + "engine.pl" + "')");
+        }
+
+        public static void ResetProlog()
+        {
+            PlEngine.PlCleanup();
         }
 
         //etc rozne potrzebne call'e

@@ -35,6 +35,8 @@ namespace Rw.AdeSystem.Core
             PrologEngine.Initialize(prologEngineInitParams);
         }
 
+        
+
         #endregion
 
         #region System domain
@@ -62,6 +64,8 @@ namespace Rw.AdeSystem.Core
             foreach (var lineNotTrimmed in domainInAdeString.Split(new[] {Environment.NewLine}, StringSplitOptions.None))
             {
                 var line = lineNotTrimmed.Trim();
+                try
+                {
                 //Always
                 if (Regex.IsMatch(line, @"always [a-z,|,&,!,\s,(,)<=>]*"))
                 {
@@ -138,14 +142,25 @@ namespace Rw.AdeSystem.Core
                 {
                     DomainPhrases.Add(new NoninertialExpression(line));
                 }
+                else if (!line.Any())
+                {
+
+                }
                 else
                 {
-                    throw new ArgumentException("Nieznane wyrażenie języka ADE.");
+                    throw new ArgumentException("Unknown ADE expression - " + line + "\"");
+                }
+
+
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentException("Error while parsing line: - \"" + line+"\"");
                 }
             }
             if (DomainPhrases.Count == 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("There are no lines in model");
             }
         }
 
@@ -181,13 +196,29 @@ namespace Rw.AdeSystem.Core
             {
                 PrologEngine.AssertFact("sinertial("+ f + ")");
             }
-            int counter = 0;
-            foreach (var f in Fluents)
+            //int counter = 0;
+            //foreach (var f in Fluents)
+            //{
+            //    PrologEngine.AssertFact("order("+counter+", "+f+")");
+            //    counter++;
+            //}
+           // InitializeStates(DomainPhrases.OfType<AlwaysExpression>().ToList());
+            foreach (var dp in DomainPhrases.OfType<ReleasesExpression>())
             {
-                PrologEngine.AssertFact("order("+counter+", "+f+")");
-                counter++;
+                dp.ToProlog(Executors);   
             }
-            InitializeStates(DomainPhrases.OfType<AlwaysExpression>().ToList());
+            foreach (var dp in DomainPhrases.OfType<PreservesExpression>())
+            {
+                dp.ToProlog(Executors);
+            }
+            if (!DomainPhrases.OfType<InitiallyExpression>().Any())
+            {
+                PrologEngine.AssertFact("initially_after([],[],[])");                
+            }
+            if (!DomainPhrases.OfType<AlwaysExpression>().Any())
+            {
+                PrologEngine.AssertFact("always([[]])");
+            }
             foreach (var domainPhrase in DomainPhrases)
             {
                 domainPhrase.ToProlog();
@@ -277,10 +308,17 @@ namespace Rw.AdeSystem.Core
             }
             catch (ArgumentOutOfRangeException e)
             {
-                return "Error in query";
+                return "Error parsing  in query - " +query;
             }
+            try
+            {
             if(q!=null)
                 return q.ToProlog();
+            }
+            catch (Exception)
+            {
+                throw new Exception("Error in executing query - " + query);
+            }
             return "Query not recognized";
         }
 
@@ -292,8 +330,12 @@ namespace Rw.AdeSystem.Core
 
         private static void LoadEngine()
         {
-            PrologEngine.AssertFacts("x");
-           
+            PrologEngine.LoadEngine();
+        }
+
+        public static void ResetProlog()
+        {
+            PrologEngine.ResetProlog();
         }
         #endregion
     }

@@ -17,10 +17,9 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            AdeSystem.PrologEngine.AssertFact("initially_after([],[],[])");
 
-            var fluents = FluentParser.GetConditions(Fluents);
-            AdeSystem.PrologEngine.AssertFact("initially_after([],[],["+fluents+"])");
+            var fluents = String.Join(", ", Fluents);
+            AdeSystem.PrologEngine.AssertFact("initially_after([],[],[["+fluents+"]])");
         }
     }
 

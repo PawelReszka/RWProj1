@@ -17,6 +17,7 @@ namespace Rw.AdeSystem.Tests
                                                 TURNONE by Hador causes !sone if sone
                                                 TURNONE by Mietus typically causes sone if !sone
                                                 TURNONE by Mietus typically causes !sone if sone
+
                                                 TURNTWO by Hador causes stwo if !stwo
                                                 TURNTWO by Hador typically causes !stwo if stwo
                                                 TURNTWO by Mietus typically causes stwo if !stwo

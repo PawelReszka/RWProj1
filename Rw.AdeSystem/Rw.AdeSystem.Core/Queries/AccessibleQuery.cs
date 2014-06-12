@@ -9,7 +9,7 @@ namespace Rw.AdeSystem.Core.Queries
         {
             if (line.Contains("from"))
             {
-                GoalString = FluentParser.GetSubstring(line, " accessible ", " from ");
+                GoalString = FluentParser.GetConditions(LogicFormulaParser.GetConditions(FluentParser.GetSubstring(line, " accessible ", " from ")));
                 var conditions = FluentParser.GetSubstring(line, " from ");
                 List<string> litValues;
                 List<Token> literals;

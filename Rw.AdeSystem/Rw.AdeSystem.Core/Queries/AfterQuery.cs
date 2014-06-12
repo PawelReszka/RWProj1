@@ -27,6 +27,7 @@ namespace Rw.AdeSystem.Core.Queries
                 ActionsString = FluentParser.GetSubstring(line, " after ", " by ");
                 ExecutorsString = FluentParser.GetSubstring(line, " by ");
             }
+            
         }
 
         public string ConditionsStrings { get; set; }
@@ -48,14 +49,14 @@ namespace Rw.AdeSystem.Core.Queries
             string query = "";
             if (ConditionsStrings == null || !ConditionsStrings.Any())
             {
-                query = prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[])";
+                query = prefix + "_after([[" + GoalString + "]],[" + ActionsString + "],[" + ExecutorsString + "],[])";
 
                 result.Add(query);
             }
             else
             {
 
-                result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[" + ConditionsStrings + "])");
+                result.Add(prefix + "_after([[" + GoalString + "]],[" + ActionsString + "],[" + ExecutorsString + "],[" + ConditionsStrings + "])");
 
             }
             return result;

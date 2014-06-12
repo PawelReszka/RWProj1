@@ -15,9 +15,15 @@ namespace Rw.AdeSystem.Core.Expressions
         public PreservesExpression(string line)
             : base(line)
         {
+            var tokens = line.Trim().Split(' ');
+            AdeSystem.Actions.Add(tokens[0]);
 
-            ActionName = line.Substring(0, line.IndexOf(" by")).Trim();
-            ExecutorName = FluentParser.GetSubstring(line, " by ", " preserves").Trim(); 
+            ActionName = tokens[0];
+            if (line.Contains(" by "))
+            {
+                ExecutorName = FluentParser.GetSubstring(line, " by ", " preserves").Trim();
+                AdeSystem.Executors.Add(ExecutorName);
+            }
             if (line.Contains(" if "))
             {
                 Fluent = FluentParser.GetSubstring(line, " preserves ", " if ");
@@ -36,9 +42,32 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            if (!Fluents.Any())
+            //if (!Fluents.Any())
+            //{
+               // AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName.ToLower() + "," + ExecutorName.ToLower() + ",[" + Fluent.ToLower() + "],[])");
+           // }
+        }
+        public void ToProlog(List<string> executors)
+        {
+            
+            var condition = "";
+            if (Fluents != null && Fluents.Any())
             {
-                AdeSystem.PrologEngine.AssertFact("preserve(" + ActionName.ToLower() + "," + ExecutorName.ToLower() + ",[" + Fluent.ToLower() + "])");
+                condition = FluentParser.GetConditions(Fluents);
+            }
+            if (ExecutorName != null && ExecutorName.Any())
+            {
+                AdeSystem.PrologEngine.AssertFact("releases(" + ActionName.ToLower() + ", " + ExecutorName.ToLower() + ", [" +
+                                                  Fluent.ToLower() + "], [" + condition.ToLower() + "])");
+
+            }
+            else
+            {
+                foreach (var executor in executors)
+                {
+                    AdeSystem.PrologEngine.AssertFact("releases(" + ActionName.ToLower() + ", " + executor.ToLower() + ", [" +
+                                                  Fluent.ToLower() + "], [" + condition.ToLower() + "])");
+                }
             }
         }
     }

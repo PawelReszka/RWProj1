@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{760E6DD4-449E-4E83-A2EB-D35203FBF093}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Rw.AdeSystem.Core</RootNamespace>
     <AssemblyName>Rw.AdeSystem.Core</AssemblyName>
@@ -51,7 +51,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Rw.AdeSystem.Core.Program</StartupObject>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SwiPlCs, Version=1.1.60301.0, Culture=neutral, PublicKeyToken=03ea137181587c56, processorArchitecture=MSIL">

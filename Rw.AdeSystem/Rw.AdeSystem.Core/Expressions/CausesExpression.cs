@@ -24,7 +24,7 @@ namespace Rw.AdeSystem.Core.Expressions
         public override void ToProlog()
         {
             var effects = FluentParser.GetConditions(Effects);
-            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [])");
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [[]])");
         }
     }
 }

@@ -12,15 +12,15 @@ namespace Rw.AdeSystem.Gui
     /// </summary>
     public partial class MainWindow : Window
     {
-        private  List<string> _fluents = new List<string>();
-        private  List<string> _actions = new List<string>();
-        private  List<string> _executors = new List<string>();
+        private List<string> _fluents = new List<string>();
+        private List<string> _actions = new List<string>();
+        private List<string> _executors = new List<string>();
 
         private List<string> _lastSuggestions;
 
         public MainWindow()
         {
-            
+
             InitializeComponent();
             queryLabel.Visibility = System.Windows.Visibility.Hidden;
             queryTextBox.Visibility = System.Windows.Visibility.Hidden;
@@ -29,7 +29,7 @@ namespace Rw.AdeSystem.Gui
             historyListView.Visibility = System.Windows.Visibility.Hidden;
             queryButton.Visibility = System.Windows.Visibility.Hidden;
             clearButton.Visibility = System.Windows.Visibility.Hidden;
-            editModelButton.Visibility = Visibility.Hidden;
+            editModelButton.Visibility = Visibility.Visible;
         }
 
         private void loadModelButton_Click(object sender, RoutedEventArgs e)
@@ -49,29 +49,44 @@ namespace Rw.AdeSystem.Gui
                 // Open document 
                 string filename = dlg.FileName;
                 pathLabel.Content = filename;
-                String[] param = { /*"-q"*/ };
-                Core.AdeSystem.Initialize(param);
+                
                 List<string> words = LoadModelFile(filename);
                 string text = System.IO.File.ReadAllText(filename);
-                Core.AdeSystem.LoadDomain(text);
-                Core.AdeSystem.ConstructSystemDomain();
-                _actions = Core.AdeSystem.Actions;
-                _fluents = Core.AdeSystem.Fluents;
-                _executors = Core.AdeSystem.Executors;
-                _executors.Add("epsilon");
-                queryButton.Visibility = System.Windows.Visibility.Visible;
-                queryTextBox.Text = "";
-                answerLabel.Content = "QUERIES HISTORY";
-                queryLabel.Visibility = System.Windows.Visibility.Visible;
-                queryTextBox.Visibility = System.Windows.Visibility.Visible;
-                suggestionListBox.Visibility = System.Windows.Visibility.Visible;
-                answerLabel.Visibility = System.Windows.Visibility.Visible;
-                historyListView.Visibility = System.Windows.Visibility.Visible;
-                clearButton.Visibility = System.Windows.Visibility.Visible;
-                editModelButton.Visibility = Visibility.Visible;
-                UpdateQueryTextBox();
-                queryButton.IsEnabled = true;
+                LoadModel(text);
             }
+        }
+
+        public void LoadModel(string text)
+        {
+            Core.AdeSystem.ResetProlog();
+            String[] param = { /*"-q"*/ };
+            Core.AdeSystem.Initialize(param);
+            try
+            {
+                Core.AdeSystem.LoadDomain(text);
+
+                Core.AdeSystem.ConstructSystemDomain();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Error: " + exception.Message, "Error");
+            }
+            _actions = Core.AdeSystem.Actions;
+            _fluents = Core.AdeSystem.Fluents;
+            _executors = Core.AdeSystem.Executors;
+            _executors.Add("epsilon");
+            queryButton.Visibility = System.Windows.Visibility.Visible;
+            queryTextBox.Text = "";
+            answerLabel.Content = "QUERIES HISTORY";
+            queryLabel.Visibility = System.Windows.Visibility.Visible;
+            queryTextBox.Visibility = System.Windows.Visibility.Visible;
+            suggestionListBox.Visibility = System.Windows.Visibility.Visible;
+            answerLabel.Visibility = System.Windows.Visibility.Visible;
+            historyListView.Visibility = System.Windows.Visibility.Visible;
+            clearButton.Visibility = System.Windows.Visibility.Visible;
+            editModelButton.Visibility = Visibility.Visible;
+            UpdateQueryTextBox();
+            queryButton.IsEnabled = true;
         }
 
         List<String> LoadModelFile(string filePath)
@@ -108,7 +123,7 @@ namespace Rw.AdeSystem.Gui
         {
             suggestionListBox.Items.Clear();
             var openings = new List<string>(new[] { "always", "possibly", "typically" });
-            var logicBinOp = new List<string>(new[] { "|", "&" });
+            var logicBinOp = new List<string>(new[] { "(", ")","&", "|" });
             if (queryTextBox.Text == String.Empty)
             {
                 openings.ForEach(s => suggestionListBox.Items.Add(s))
@@ -125,7 +140,7 @@ namespace Rw.AdeSystem.Gui
 
             // nothing fits
             var keywords =
-                new List<string>(new[] { "always", "possibly", "typically", "!", "|", "&", "accessible", "involved", "executable", "from", "in", "by", "after" });
+                new List<string>(new[] { "always", "possibly", "typically", "!", "|", "&", "accessible", "involved", "executable", "from", "in", "by", "after","(",")" });
             keywords.AddRange(_actions);
             keywords.AddRange(_fluents);
             keywords.AddRange(_executors);
@@ -177,10 +192,10 @@ namespace Rw.AdeSystem.Gui
                     {
                         _actions.ForEach(s => suggestionListBox.Items.Add(s));
                     }
-                    if (_fluents.FirstOrDefault(s => s.Contains(last)) != null)
-                    {
-                        _fluents.ForEach(s => suggestionListBox.Items.Add(s));
-                    }
+                    //if (_fluents.FirstOrDefault(s => s.Contains(last)) != null)
+                    //{
+                    //    _fluents.ForEach(s => suggestionListBox.Items.Add(s));
+                    //}
                     if (_executors.FirstOrDefault(s => s.Contains(last)) != null)
                     {
                         _executors.ForEach(s => suggestionListBox.Items.Add(s));
@@ -204,7 +219,8 @@ namespace Rw.AdeSystem.Gui
                 }
                 if (_fluents.Contains(last))
                 {
-                    _fluents.ForEach(f => suggestionListBox.Items.Add(", " + f));
+                    _fluents.ForEach(f => suggestionListBox.Items.Add( f));
+                    
                     logicBinOp.ForEach(op => suggestionListBox.Items.Add(op));
                     if (!queryTextBox.Text.Contains("from") && !queryTextBox.Text.Contains("after"))
                     {
@@ -233,7 +249,7 @@ namespace Rw.AdeSystem.Gui
                 {
                     suggestionListBox.Items.Add("in");
                 }
-                if(_executors.Contains(last))
+                if (_executors.Contains(last))
                 {
                     _executors.ForEach(e => suggestionListBox.Items.Add(", " + e));
                 }
@@ -241,7 +257,7 @@ namespace Rw.AdeSystem.Gui
                 {
                     suggestionListBox.Items.Add("from");
                 }
-                
+
             }
             _lastSuggestions = suggestionListBox.Items.Cast<string>().ToList();
         }
@@ -249,7 +265,16 @@ namespace Rw.AdeSystem.Gui
         private void QueryButton_OnClick(object sender, RoutedEventArgs e)
         {
             var query = queryTextBox.GetLineText(0);
-            var answer = Core.AdeSystem.ParseQuery(query);
+            string answer = "";
+            try
+            {
+                answer = Core.AdeSystem.ParseQuery(query);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show("Error: " + exception.Message, "Error");
+                return;
+            }
             string output = "\n\n" + query + "\n" + answer;
             answerLabel.Content += output;
             queryTextBox.Text = "";
@@ -265,7 +290,7 @@ namespace Rw.AdeSystem.Gui
 
         private void editModelButton_Click(object sender, RoutedEventArgs e)
         {
-            new EditStoryForm().ShowDialog();
+            new EditStoryForm(this).ShowDialog();
         }
     }
 }
