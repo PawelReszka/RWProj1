@@ -520,12 +520,17 @@ preserve_fluents(ACTION, EXECUTOR, _, STATES_TO, STATES_TO) :-
 resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATES2),
     states_valid(STATES2, STATES3),
-    preserve(ACTION, EXECUTOR, _, COND),
     (
-        state_valid_with_formula(STATE, COND) ->
-            preserve_fluents(ACTION, EXECUTOR, STATE, STATES3,STATES)
-        ;
-            STATES = STATES2
+        preserve(ACTION, EXECUTOR, _, COND) ->
+            (
+            state_valid_with_formula(STATE, COND) ->
+                preserve_fluents(ACTION, EXECUTOR, STATE, STATES3,STATES)
+            ;
+                STATES = STATES2
+        
+            )
+    ;
+        STATES = STATES2
     ).
 
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
