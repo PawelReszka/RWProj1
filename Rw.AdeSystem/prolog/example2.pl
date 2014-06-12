@@ -41,4 +41,4 @@ causes(entice, hador, [[walking]],[[]]).
 typically_causes(entice, mietus, [[walking]],[[]]).
 typically_causes(shoot, hador, [[not_alive]], [[has_gun_hador]]).
 
-preserve(entice, hador, [alive]).
+preserve(entice, hador, [alive],[[alive],[not_alive]]).%prawda zawsze
