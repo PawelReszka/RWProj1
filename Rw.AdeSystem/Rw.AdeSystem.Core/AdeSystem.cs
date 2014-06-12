@@ -15,6 +15,7 @@ namespace Rw.AdeSystem.Core
     {
         #region Fields & ctors
 
+        public static string Domain { get; set; }
         public static readonly List<Expression> DomainPhrases = new List<Expression>();
         public static readonly PrologEngine PrologEngine = PrologEngine.Instance;
         public static readonly AdeSignature Signature = new AdeSignature();
@@ -52,6 +53,7 @@ namespace Rw.AdeSystem.Core
 
         public static void LoadDomain(string domainInAdeString)
         {
+            Domain = domainInAdeString;
             //TODO: Dodac wyrażenia regularne dla pozostałych wyrażeń języka 
             //Na razie wystarczy, żeby rozróżniać wyrażenia i załadować akcje/wykonawcow do odpowiednich list - Actions, Executors
             //Fluenty na razie można zostawić - parser wyrażen logicznych zrobi Konrad i Paweł

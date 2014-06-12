@@ -1,0 +1,18 @@
+﻿<Window x:Class="Rw.AdeSystem.Gui.EditStoryForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit story" Height="367.576" Width="390.102">
+    <Grid>
+        <TextBox x:Name="domainTextBlock" VerticalScrollBarVisibility="Auto" AcceptsReturn="True" TextWrapping="Wrap" Margin="0,0,0,60"></TextBox>
+        <Button x:Name="okButton" Content="SAVE STORY" HorizontalAlignment="Left" Margin="21,0,0,10" VerticalAlignment="Bottom" Width="152" BorderThickness="0" BorderBrush="{x:Null}" Click="okButton_Click">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+            </Button.Foreground>
+        </Button>
+        <Button x:Name="cancelButton" Content="CANCEL" HorizontalAlignment="Left" Margin="211,0,0,10" VerticalAlignment="Bottom" Width="152" BorderThickness="0" BorderBrush="{x:Null}" Click="cancelButton_Click">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+            </Button.Foreground>
+        </Button>
+    </Grid>
+</Window>

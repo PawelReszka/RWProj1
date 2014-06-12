@@ -15,6 +15,11 @@
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
             </Button.Foreground>
         </Button>
+        <Button x:Name="editModelButton" Content="EDIT STORY" HorizontalAlignment="Left" Margin="233,10,0,0" VerticalAlignment="Top" Width="200" BorderThickness="0" BorderBrush="{x:Null}" Click="editModelButton_Click">
+            <Button.Foreground>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}"/>
+            </Button.Foreground>
+        </Button>
         <Label x:Name="pathLabel" Content="" HorizontalAlignment="Left" Margin="12,33,0,0" VerticalAlignment="Top" Width="504"/>
         <Button x:Name="queryButton" Content="EXECUTE QUERY" HorizontalAlignment="Left" Margin="10,74,0,0" VerticalAlignment="Top" Width="200" BorderThickness="0" Click="QueryButton_OnClick" IsEnabled="True" BorderBrush="{x:Null}">
             <Button.Foreground>

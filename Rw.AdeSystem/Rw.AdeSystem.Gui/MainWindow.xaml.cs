@@ -29,6 +29,7 @@ namespace Rw.AdeSystem.Gui
             historyListView.Visibility = System.Windows.Visibility.Hidden;
             queryButton.Visibility = System.Windows.Visibility.Hidden;
             clearButton.Visibility = System.Windows.Visibility.Hidden;
+            editModelButton.Visibility = Visibility.Hidden;
         }
 
         private void loadModelButton_Click(object sender, RoutedEventArgs e)
@@ -67,6 +68,7 @@ namespace Rw.AdeSystem.Gui
                 answerLabel.Visibility = System.Windows.Visibility.Visible;
                 historyListView.Visibility = System.Windows.Visibility.Visible;
                 clearButton.Visibility = System.Windows.Visibility.Visible;
+                editModelButton.Visibility = Visibility.Visible;
                 UpdateQueryTextBox();
                 queryButton.IsEnabled = true;
             }
@@ -259,6 +261,11 @@ namespace Rw.AdeSystem.Gui
             suggestionListBox.Visibility = System.Windows.Visibility.Visible;
             queryTextBox.Text = "";
             UpdateQueryTextBox();
+        }
+
+        private void editModelButton_Click(object sender, RoutedEventArgs e)
+        {
+            new EditStoryForm().ShowDialog();
         }
     }
 }
