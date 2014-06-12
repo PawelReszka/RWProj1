@@ -26,8 +26,6 @@ state(state5,[hasa,lr,lrt,not_hasb]).
 state(state6,[hasb,lr,lrt,not_hasa]).
 state(state7,[hasa,hasb,lr,lrt]).
 initially_after([],[],[not_hasA, not_hasB]).
-stmt(s0,[lr]).
-formula(f1, [s0]).
-always(f1).
+always([[lr]]).
 typically_causes(do, epsilon, [lrt], []).
-causes(buy, hador,[[hasa,hasb], [hasa,not_hasb],[hasb,not_hasa]], []).
+causes(buy, hador,[[hasa],[hasb]], []).
