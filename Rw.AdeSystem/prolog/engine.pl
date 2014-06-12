@@ -504,8 +504,8 @@ preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO, OUTPUT) :-
     !.
     
 preserve_fluents(ACTION, EXECUTOR, STATE_FROM, STATES_TO, OUTPUT) :-
-	state_valid_with_formula(CONDITION,STATE_FROM),
     preserve(ACTION, EXECUTOR, PRESERVED,CONDITION),
+	state_valid_with_formula(STATE_FROM, CONDITION),
     fluent_values(STATE_FROM, PRESERVED, VALUES),
     all_possible_states([VALUES], POSSIBLE_STATES),
     subtract(STATES_TO,POSSIBLE_STATES, STATES_TO_NOT_ALLOWED),
@@ -520,7 +520,13 @@ preserve_fluents(ACTION, EXECUTOR, _, STATES_TO, STATES_TO) :-
 resN_trunc(ACTION, EXECUTOR, STATE, STATES) :-
     resN(ACTION, EXECUTOR, STATE, STATES2),
     states_valid(STATES2, STATES3),
-    preserve_fluents(ACTION, EXECUTOR, STATE, STATES3,STATES).
+    preserve(ACTION, EXECUTOR, _, COND),
+    (
+        state_valid_with_formula(STATE, COND) ->
+            preserve_fluents(ACTION, EXECUTOR, STATE, STATES3,STATES)
+        ;
+            STATES = STATES2
+    ).
 
 resAb(ACTION,EXECUTOR, STATE, STATES) :-
     res0_min(ACTION, EXECUTOR, STATE, STATES0),
