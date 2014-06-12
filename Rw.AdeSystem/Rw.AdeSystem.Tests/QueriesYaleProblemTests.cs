@@ -11,15 +11,15 @@ namespace Rw.AdeSystem.Tests
         private const string FalseString = "False";
         private const string TrueString = "True";
         private const string YaleProblem = @"initially h & a & w
-                                            always h <-> !m
-                                            always w -> a
-                                            CHOWN by Mietus causes h
-                                            CHOWN by Hador causes m
-                                            SHOOT by Mietus causes !a if m
-                                            SHOOT by Hador typically causes !a if h
-                                            ENTICE by Hador causes w
-                                            ENTICE by Mietus typically causes w
-                                            ENTICE by Hador preserves a";
+always h <-> !m
+always w -> a
+CHOWN by Mietus causes h
+CHOWN by Hador causes m
+SHOOT by Mietus causes !a if m
+SHOOT by Hador typically causes !a if h
+ENTICE by Hador causes w
+ENTICE by Mietus typically causes w
+ENTICE by Hador preserves a";
 
 
         [TestMethod]

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Rw.AdeSystem.Core
 {
@@ -26,6 +27,11 @@ namespace Rw.AdeSystem.Core
             }
             var val2 = str.Substring(str.IndexOf(start) + start.Length).Trim();
             return val2;
+        }
+
+        public static string GetConditions(List<string> con)
+        {
+            return  "[" + String.Join("], [", con) +"]";
         }
     }
 }

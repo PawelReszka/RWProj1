@@ -12,7 +12,7 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public string Executor { get; set; } 
 
-        public string Effects {get;set;}
+        public List<string> Effects  = new List<string>();
         public ByCausesExpression(string line)
             : base(line)
         {
@@ -21,14 +21,15 @@ namespace Rw.AdeSystem.Core.Expressions
             AdeSystem.Executors.Add(tokens[2]);
             ActionName = tokens[0];
             Executor = tokens[2];
-            Effects = FluentParser.GetSubstring(line, " causes ").Replace("!", "not_").Replace("&", ", ");
+            var ef = FluentParser.GetSubstring(line, " causes ");
+            Effects = LogicFormulaParser.GetConditions(ef);
             AdeSystem.Fluents.Add(tokens.Last().Replace("!", ""));
 
         }
 
         public override void ToProlog()
         {
-            var effects = String.Join(", ", Effects);
+            var effects = FluentParser.GetConditions(Effects);
             AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [])");
         }
     }

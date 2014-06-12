@@ -5,19 +5,20 @@ namespace Rw.AdeSystem.Core.Queries
 {
     public class AfterQuery : Query
     {
-        public AfterQuery(string line, string prefix) : base(line)
+        public AfterQuery(string line, string prefix)
+            : base(line)
         {
             line = line.ToLower();
             if (line.Contains("from"))
             {
-                GoalString = FluentParser.GetSubstring(line, prefix+" ", " after ");
+                GoalString = FluentParser.GetSubstring(line, prefix + " ", " after ");
                 ActionsString = FluentParser.GetSubstring(line, " after ", " by ");
                 ExecutorsString = FluentParser.GetSubstring(line, " by ", " from ");
                 var conditions = FluentParser.GetSubstring(line, " from ");
                 List<string> litValues;
                 List<Token> literals;
                 var expression = LogicFormulaParser.Parse(conditions, out literals, out litValues);
-                ConditionsStrings = LogicFormulaParser.GetConditions(conditions);
+                ConditionsStrings = FluentParser.GetConditions(LogicFormulaParser.GetConditions(conditions));
                 GoalString = GoalString.Replace("&", ",").Replace("!", "not_");
             }
             else
@@ -28,7 +29,7 @@ namespace Rw.AdeSystem.Core.Queries
             }
         }
 
-        public List<string> ConditionsStrings { get; set; }
+        public string ConditionsStrings { get; set; }
 
         public string ExecutorsString { get; set; }
 
@@ -53,10 +54,9 @@ namespace Rw.AdeSystem.Core.Queries
             }
             else
             {
-                foreach (var conditionsString in ConditionsStrings)
-                {
-                    result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[" + conditionsString + "])");
-                }
+
+                result.Add(prefix + "_after([" + GoalString + "],[" + ActionsString + "],[" + ExecutorsString + "],[" + ConditionsStrings + "])");
+
             }
             return result;
         }

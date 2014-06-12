@@ -17,7 +17,7 @@ namespace Rw.AdeSystem.Core
             var x = Parse(expression, out l, out lv);
             x = SimplifyIf(x);
             x = AndOrReformTree(x);
-            var val = GetFluentStrings(x).Select(i => i.Replace("&", ", ")).ToList();
+            var val = GetFluentStrings(x).Select(i => i.Replace("&", ", ").Replace("!", "not_")).ToList();
             return val;
 
         }

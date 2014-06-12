@@ -14,7 +14,7 @@ namespace Rw.AdeSystem.Core.Queries
                 List<string> litValues;
                 List<Token> literals;
                 var expression = LogicFormulaParser.Parse(conditions, out literals, out litValues);
-                ConditionsStrings = LogicFormulaParser.GetConditions(conditions);
+                ConditionsStrings = FluentParser.GetConditions(LogicFormulaParser.GetConditions(conditions));
             }
             else
             {
@@ -39,17 +39,15 @@ namespace Rw.AdeSystem.Core.Queries
             }
             else
             {
-                foreach (var conditionsString in ConditionsStrings)
-                {
-                    query = prefix+"_accessible([" + GoalString + "], [" + conditionsString.Replace("!", "not_") + "])";
+
+                    query = prefix+"_accessible([" + GoalString + "], [" + ConditionsStrings + "])";
                     result.Add(query);
-                    
-                }
+
             }
             return result;
         }
 
-        public List<string> ConditionsStrings { get; set; }
+        public string ConditionsStrings { get; set; }
 
         public string GoalString { get; set; }
     }

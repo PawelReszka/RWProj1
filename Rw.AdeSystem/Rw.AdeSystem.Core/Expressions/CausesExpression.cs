@@ -10,19 +10,21 @@ namespace Rw.AdeSystem.Core.Expressions
     {
         public string ActionName { get; set; }
 
-        public string Effects { get; set; }
+        public List<string> Effects { get; set; }
         public CausesExpression(string line) : base(line)
         {
             var tokens = line.Trim().Split(' ');
             AdeSystem.Actions.Add(tokens[0]);
             ActionName = tokens[0];
-            Effects = FluentParser.GetSubstring(line, " causes ").Replace("!", "not_").Replace("&", ", ");
+            var ef = FluentParser.GetSubstring(line, " causes ");
+            Effects = LogicFormulaParser.GetConditions(ef);
             AdeSystem.Fluents.Add(tokens.Last().Replace("!",""));
         }
 
         public override void ToProlog()
         {
-            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + Effects.ToLower() + "], [])");
+            var effects = FluentParser.GetConditions(Effects);
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [])");
         }
     }
 }

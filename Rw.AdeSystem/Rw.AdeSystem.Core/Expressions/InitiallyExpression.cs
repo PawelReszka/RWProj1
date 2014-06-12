@@ -19,7 +19,7 @@ namespace Rw.AdeSystem.Core.Expressions
         {
             AdeSystem.PrologEngine.AssertFact("initially_after([],[],[])");
 
-            var fluents = String.Join(", ", Fluents);
+            var fluents = FluentParser.GetConditions(Fluents);
             AdeSystem.PrologEngine.AssertFact("initially_after([],[],["+fluents+"])");
         }
     }

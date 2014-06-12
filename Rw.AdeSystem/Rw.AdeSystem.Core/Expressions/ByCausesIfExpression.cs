@@ -19,12 +19,10 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            var effects = String.Join(", ", Effects);
-            foreach (var condition in Conditions)
-            {
-                AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [" + condition.ToLower() + "])");
-            }
-            
+            var effects = FluentParser.GetConditions(Effects);
+            var conditions = FluentParser.GetConditions(Conditions);
+
+            AdeSystem.PrologEngine.AssertFact("causes(" + ActionName.ToLower() + ", " + Executor.ToLower() + ", [" + effects.ToLower() + "], [" + conditions.ToLower() + "])");
         }
     }
 }

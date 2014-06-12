@@ -24,16 +24,17 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            var states = new List<string>();
-            foreach (var condition in Conditions)
-            {
-                var name = "s" + FormulaCounter++;
-                AdeSystem.PrologEngine.AssertFact("stmt("+name+",["+condition+"])");
-                states.Add(name);
-            }
-            var formula = "f" + FormulaCounter++;
-            AdeSystem.PrologEngine.AssertFact("formula("+formula+", ["+String.Join(", ", states)+"])");
-            AdeSystem.PrologEngine.AssertFact("always("+formula+")");
+            //var states = new List<string>();
+            //foreach (var condition in Conditions)
+            //{
+            //    var name = "s" + FormulaCounter++;
+            //    AdeSystem.PrologEngine.AssertFact("stmt("+name+",["+condition+"])");
+            //    states.Add(name);
+            //}
+            //var formula = "f" + FormulaCounter++;
+            //AdeSystem.PrologEngine.AssertFact("formula("+formula+", ["+String.Join(", ", states)+"])");
+            var conditions = FluentParser.GetConditions(Conditions);
+            AdeSystem.PrologEngine.AssertFact("always(["+conditions+"])");
 
         }
     }

@@ -14,7 +14,7 @@ namespace Rw.AdeSystem.Core.Queries
                 List<string> litValues;
                 List<Token> literals;
                 var expression = LogicFormulaParser.Parse(conditions, out literals, out litValues);
-                ConditionsStrings = LogicFormulaParser.GetConditions(conditions);
+                ConditionsStrings = FluentParser.GetConditions(LogicFormulaParser.GetConditions(conditions));
             }
             else
             {
@@ -23,7 +23,7 @@ namespace Rw.AdeSystem.Core.Queries
             }
         }
 
-        public List<string> ConditionsStrings { get; set; }
+        public string ConditionsStrings { get; set; }
 
         public string ExecutorsString { get; set; }
 
@@ -46,11 +46,10 @@ namespace Rw.AdeSystem.Core.Queries
             }
             else
             {
-                foreach (var conditionsString in ConditionsStrings)
-                {
-                    query = prefix + "_executable( [" + conditionsString + "], [" + ActionsString + "], [" + ExecutorsString + "])";
+
+                    query = prefix + "_executable( [" + ConditionsStrings + "], [" + ActionsString + "], [" + ExecutorsString + "])";
                     result.Add(query);
-                }
+                
             }
             return result;
         }

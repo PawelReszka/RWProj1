@@ -10,7 +10,7 @@ namespace Rw.AdeSystem.Core.Expressions
 
         public override void ToProlog()
         {
-            var effects = String.Join(", ", Effects);
+            var effects = FluentParser.GetConditions(Effects);
             AdeSystem.PrologEngine.AssertFact("typically_causes(" + ActionName.ToLower() + ", epsilon, [" + effects.ToLower() + "], [])");
         }
     }
